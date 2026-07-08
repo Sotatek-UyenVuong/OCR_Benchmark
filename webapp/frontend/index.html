@@ -141,6 +141,24 @@ body { font-family: -apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
 .tbl-edit td:focus, .tbl-edit th:focus {
   background:#1e2a4a; box-shadow:inset 0 0 0 2px var(--accent); }
 .tbl-edit tr:hover td, .tbl-edit tr:hover th { background:#1a1d2e; }
+/* ── table structure toolbar ── */
+.tbl-toolbar { display:flex; gap:4px; padding:6px 8px; background:var(--surface2);
+               border-bottom:1px solid var(--border); flex-wrap:wrap; }
+.tbl-toolbar button { padding:3px 9px; border-radius:4px; border:none; cursor:pointer;
+                      font-size:11px; font-weight:600; background:var(--border);
+                      color:var(--text); transition:background .1s; white-space:nowrap; }
+.tbl-toolbar button:hover { background:var(--accent); color:#fff; }
+
+/* ── context menu ── */
+#tbl-ctx-menu { position:fixed; background:var(--surface); border:1px solid var(--border);
+                border-radius:8px; padding:4px; z-index:5000; min-width:190px;
+                box-shadow:0 4px 20px rgba(0,0,0,.5); display:none; }
+#tbl-ctx-menu button { display:block; width:100%; text-align:left; padding:7px 12px;
+                        background:none; border:none; color:var(--text); cursor:pointer;
+                        font-size:13px; border-radius:5px; }
+#tbl-ctx-menu button:hover { background:var(--border); }
+#tbl-ctx-menu .ctx-sep { height:1px; background:var(--border); margin:3px 0; }
+
 .resizer { width:5px; background:var(--border); cursor:col-resize; flex-shrink:0;
            transition:background .15s; position:relative; z-index:10; }
 .resizer:hover, .resizer.dragging { background:var(--accent); }
@@ -386,6 +404,19 @@ body { font-family: -apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
 </div>
 
 <div id="toast"></div>
+
+<!-- Table context menu -->
+<div id="tbl-ctx-menu">
+  <button onclick="tblCtx('insert-row-above')">↑ Insert row above</button>
+  <button onclick="tblCtx('insert-row-below')">↓ Insert row below</button>
+  <button onclick="tblCtx('delete-row')">🗑 Delete row</button>
+  <div class="ctx-sep"></div>
+  <button onclick="tblCtx('insert-col-left')">← Insert column left</button>
+  <button onclick="tblCtx('insert-col-right')">→ Insert column right</button>
+  <button onclick="tblCtx('delete-col')">🗑 Delete column</button>
+  <div class="ctx-sep"></div>
+  <button onclick="tblCtx('toggle-header')">⇅ Toggle th/td</button>
+</div>
 
 <!-- Dashboard overlay -->
 <div id="dashboard-overlay" class="dashboard-overlay" style="display:none" onclick="if(event.target===this)hideDashboard()">
@@ -1037,7 +1068,6 @@ function onHtmlInput(pageNum,ti){
 // Build contenteditable table từ HTML string
 function buildEditableTable(html, pageNum, ti){
   if(!html.trim()) return '<div style="padding:12px;color:var(--muted);font-size:12px">Empty table</div>';
-  // Parse rồi inject contenteditable vào mỗi td/th
   const doc=new DOMParser().parseFromString(html,'text/html');
   const table=doc.querySelector('table');
   if(!table) return `<div style="padding:12px;color:var(--muted);font-size:12px">${esc(html)}</div>`;
@@ -1046,39 +1076,30 @@ function buildEditableTable(html, pageNum, ti){
   table.querySelectorAll('td,th').forEach(cell=>{
     cell.setAttribute('contenteditable','true');
     cell.setAttribute('spellcheck','false');
-    // oninput → sync back
     cell.setAttribute('oninput',`onCellEdit(event,${pageNum},${ti})`);
+    cell.setAttribute('oncontextmenu',`showTblCtx(event,${pageNum},${ti});return false;`);
   });
-  return table.outerHTML;
+
+  const toolbar = `<div class="tbl-toolbar">
+    <button onclick="tblAction(${pageNum},${ti},'insert-row-below')">+ Row ↓</button>
+    <button onclick="tblAction(${pageNum},${ti},'insert-row-above')">+ Row ↑</button>
+    <button onclick="tblAction(${pageNum},${ti},'delete-row')" style="color:var(--red)">− Row</button>
+    <div style="width:1px;background:var(--border);margin:0 2px"></div>
+    <button onclick="tblAction(${pageNum},${ti},'insert-col-right')">+ Col →</button>
+    <button onclick="tblAction(${pageNum},${ti},'insert-col-left')">+ Col ←</button>
+    <button onclick="tblAction(${pageNum},${ti},'delete-col')" style="color:var(--red)">− Col</button>
+    <div style="width:1px;background:var(--border);margin:0 2px"></div>
+    <button onclick="tblAction(${pageNum},${ti},'toggle-header')">th↔td</button>
+  </div>`;
+
+  return toolbar + `<div style="overflow-x:auto;padding:6px">${table.outerHTML}</div>`;
 }
 
 // Khi sửa cell trực tiếp → rebuild HTML + sync textarea
 function onCellEdit(event, pageNum, ti){
   const tv=document.getElementById(`tv-${pageNum}-${ti}`);
   if(!tv) return;
-  // Lấy bảng hiện tại từ DOM (đã sửa)
-  const table=tv.querySelector('table');
-  if(!table) return;
-
-  // Clone và bỏ contenteditable trước khi lấy HTML
-  const clone=table.cloneNode(true);
-  clone.querySelectorAll('[contenteditable]').forEach(el=>{
-    el.removeAttribute('contenteditable');
-    el.removeAttribute('spellcheck');
-    el.removeAttribute('oninput');
-  });
-  clone.className='';
-  const newHtml=clone.outerHTML;
-
-  // Sync về editorData + textarea
-  S.editorData[pageNum].tables[ti].html=newHtml;
-  S.editorData[pageNum].tables[ti].cells=parseCells(newHtml);
-
-  const ta=document.getElementById(`th-${pageNum}-${ti}`);
-  if(ta) ta.value=newHtml;
-
-  const cc=document.getElementById(`cell-count-${pageNum}-${ti}`);
-  if(cc) cc.textContent=`${S.editorData[pageNum].tables[ti].cells.length} cells`;
+  _syncTableFromDom(pageNum, ti, tv);
 }
 
 // Toggle giữa visual editor và raw HTML
@@ -1438,6 +1459,131 @@ document.addEventListener('keydown',e=>{
     if(S.step===3&&!document.getElementById('btn-save-eval').disabled) saveAndEval();
   }
 });
+
+// ═══════════════════════════════════════════════════════════════
+// Table structure editing
+// ═══════════════════════════════════════════════════════════════
+
+let _ctxTarget = null;  // { pageNum, ti, cell } — cell đang right-click
+
+function showTblCtx(e, pageNum, ti){
+  e.preventDefault();
+  _ctxTarget = { pageNum, ti, cell: e.target.closest('td,th') };
+  const menu = document.getElementById('tbl-ctx-menu');
+  menu.style.display = 'block';
+  menu.style.left = Math.min(e.clientX, window.innerWidth - 200) + 'px';
+  menu.style.top  = Math.min(e.clientY, window.innerHeight - 280) + 'px';
+}
+
+function tblCtx(action){
+  document.getElementById('tbl-ctx-menu').style.display='none';
+  if(!_ctxTarget) return;
+  tblAction(_ctxTarget.pageNum, _ctxTarget.ti, action, _ctxTarget.cell);
+}
+
+document.addEventListener('click', ()=>{
+  document.getElementById('tbl-ctx-menu').style.display='none';
+});
+
+// Core: thực hiện thao tác cấu trúc trên live DOM table rồi sync về data
+function tblAction(pageNum, ti, action, targetCell=null){
+  const tv    = document.getElementById(`tv-${pageNum}-${ti}`);
+  const table = tv?.querySelector('table');
+  if(!table) return;
+
+  // Nếu không có targetCell, dùng cell đang focus hoặc cell đầu tiên
+  const activeCell = targetCell
+    || document.activeElement?.closest(`#tv-${pageNum}-${ti} td, #tv-${pageNum}-${ti} th`)
+    || table.querySelector('td,th');
+  if(!activeCell && action.includes('row') || !activeCell && action.includes('col') || !activeCell && action==='toggle-header') return;
+
+  const row   = activeCell?.closest('tr');
+  const rows  = [...table.querySelectorAll('tr')];
+  const rowIdx = row ? rows.indexOf(row) : -1;
+  const cells  = row ? [...row.querySelectorAll('td,th')] : [];
+  const colIdx = activeCell ? cells.indexOf(activeCell) : 0;
+  const colCount = rows[0] ? rows[0].querySelectorAll('td,th').length : 1;
+
+  if(action === 'insert-row-below' || action === 'insert-row-above'){
+    const newRow = document.createElement('tr');
+    for(let c=0;c<colCount;c++){
+      const td=document.createElement('td');
+      td.textContent='';
+      newRow.appendChild(td);
+    }
+    if(action==='insert-row-below' && row) row.after(newRow);
+    else if(row) row.before(newRow);
+    else table.querySelector('tbody,table')?.appendChild(newRow);
+  }
+  else if(action === 'delete-row'){
+    if(rows.length > 1) row?.remove();
+    else alert('Bảng cần ít nhất 1 hàng');
+    return _syncTableFromDom(pageNum, ti, tv);
+  }
+  else if(action === 'insert-col-right' || action === 'insert-col-left'){
+    rows.forEach((r,ri)=>{
+      const rCells=[...r.querySelectorAll('td,th')];
+      const refCell = rCells[colIdx];
+      const newCell = document.createElement(ri===0&&table.querySelector('th')?'th':'td');
+      newCell.textContent='';
+      if(action==='insert-col-right' && refCell) refCell.after(newCell);
+      else if(refCell) refCell.before(newCell);
+      else r.appendChild(newCell);
+    });
+  }
+  else if(action === 'delete-col'){
+    if(colCount > 1){
+      rows.forEach(r=>{
+        const rCells=[...r.querySelectorAll('td,th')];
+        rCells[colIdx]?.remove();
+      });
+    } else { alert('Bảng cần ít nhất 1 cột'); return; }
+  }
+  else if(action === 'toggle-header'){
+    if(activeCell){
+      const newTag = activeCell.tagName.toLowerCase()==='td' ? 'th' : 'td';
+      const newCell = document.createElement(newTag);
+      newCell.innerHTML = activeCell.innerHTML;
+      [...activeCell.attributes].forEach(a=>newCell.setAttribute(a.name,a.value));
+      activeCell.replaceWith(newCell);
+    }
+  }
+
+  _syncTableFromDom(pageNum, ti, tv);
+}
+
+function _syncTableFromDom(pageNum, ti, tv){
+  const table=tv?.querySelector('table');
+  if(!table) return;
+
+  // Re-inject contenteditable sau khi DOM thay đổi
+  table.className='tbl-edit';
+  table.querySelectorAll('td,th').forEach(cell=>{
+    cell.setAttribute('contenteditable','true');
+    cell.setAttribute('spellcheck','false');
+    cell.setAttribute('oninput',`onCellEdit(event,${pageNum},${ti})`);
+    cell.setAttribute('oncontextmenu',`showTblCtx(event,${pageNum},${ti});return false;`);
+  });
+
+  // Lấy HTML sạch
+  const clone=table.cloneNode(true);
+  clone.querySelectorAll('[contenteditable]').forEach(el=>{
+    el.removeAttribute('contenteditable');
+    el.removeAttribute('spellcheck');
+    el.removeAttribute('oninput');
+    el.removeAttribute('oncontextmenu');
+  });
+  clone.className='';
+  const newHtml=clone.outerHTML;
+
+  S.editorData[pageNum].tables[ti].html=newHtml;
+  S.editorData[pageNum].tables[ti].cells=parseCells(newHtml);
+
+  const ta=document.getElementById(`th-${pageNum}-${ti}`);
+  if(ta) ta.value=newHtml;
+  const cc=document.getElementById(`cell-count-${pageNum}-${ti}`);
+  if(cc) cc.textContent=`${S.editorData[pageNum].tables[ti].cells.length} cells`;
+}
 
 // ═══════════════════════════════════════════════════════════════
 // Resizer — kéo divider trái/phải
