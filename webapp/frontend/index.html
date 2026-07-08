@@ -131,7 +131,16 @@ body { font-family: -apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
 .pdf-panel { display:flex; flex-direction:column; overflow:hidden; min-width:200px; }
 .editor-panel { display:flex; flex-direction:column; overflow:hidden; flex:1; min-width:200px; }
 
-/* ── resizer handle ── */
+/* ── editable table preview ── */
+.tbl-edit { border-collapse:collapse; width:100%; font-size:12px; }
+.tbl-edit td, .tbl-edit th {
+  border:1px solid #4a5080; padding:5px 8px; min-width:60px; min-height:24px;
+  outline:none; vertical-align:top; line-height:1.4; word-break:break-word; }
+.tbl-edit th { background:#1e2a4a; color:var(--accent); font-weight:600; }
+.tbl-edit td { background:var(--bg); color:var(--text); }
+.tbl-edit td:focus, .tbl-edit th:focus {
+  background:#1e2a4a; box-shadow:inset 0 0 0 2px var(--accent); }
+.tbl-edit tr:hover td, .tbl-edit tr:hover th { background:#1a1d2e; }
 .resizer { width:5px; background:var(--border); cursor:col-resize; flex-shrink:0;
            transition:background .15s; position:relative; z-index:10; }
 .resizer:hover, .resizer.dragging { background:var(--accent); }
@@ -989,15 +998,20 @@ function renderPage(pageNum){
       sec.innerHTML=`
         <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px">
           <span class="field-lbl" style="margin:0">Table ${t.table_id}</span>
-          <span style="font-size:11px;color:var(--muted)">${(t.cells||[]).length} cells</span>
-          <button class="btn btn-ghost" style="padding:3px 9px;font-size:11px;margin-left:auto"
-            onclick="togglePreview(${pageNum},${ti})">👁 Preview</button>
+          <span style="font-size:11px;color:var(--muted)" id="cell-count-${pageNum}-${ti}">${(t.cells||[]).length} cells</span>
+          <div style="margin-left:auto;display:flex;gap:4px">
+            <button class="btn btn-ghost" style="padding:3px 9px;font-size:11px"
+              onclick="toggleRawHtml(${pageNum},${ti})" id="btn-raw-${pageNum}-${ti}">‹/› Raw</button>
+          </div>
         </div>
-        <textarea class="html-area" id="th-${pageNum}-${ti}" oninput="onHtmlInput(${pageNum},${ti})"
-          rows="10">${esc(t.html||'')}</textarea>
-        <div id="tp-${pageNum}-${ti}" style="display:none;margin-top:8px;padding:10px;
-          background:var(--bg);border:1px solid var(--border);border-radius:6px;overflow-x:auto;
-          font-size:12px;color:var(--text)"></div>`;
+        <!-- Visual editable table -->
+        <div id="tv-${pageNum}-${ti}" style="overflow-x:auto;border:1px solid var(--border);border-radius:6px;background:var(--bg)">
+          ${buildEditableTable(t.html||'', pageNum, ti)}
+        </div>
+        <!-- Raw HTML textarea (hidden by default) -->
+        <textarea class="html-area" id="th-${pageNum}-${ti}"
+          style="display:none;margin-top:6px" rows="8"
+          oninput="onHtmlInput(${pageNum},${ti})">${esc(t.html||'')}</textarea>`;
       body.appendChild(sec);
     }
   }
@@ -1013,14 +1027,88 @@ function onHtmlInput(pageNum,ti){
   const v=document.getElementById(`th-${pageNum}-${ti}`).value;
   S.editorData[pageNum].tables[ti].html=v;
   S.editorData[pageNum].tables[ti].cells=parseCells(v);
+  // Sync visual table
+  const tv=document.getElementById(`tv-${pageNum}-${ti}`);
+  if(tv) tv.innerHTML=buildEditableTable(v, pageNum, ti);
+  const cc=document.getElementById(`cell-count-${pageNum}-${ti}`);
+  if(cc) cc.textContent=`${S.editorData[pageNum].tables[ti].cells.length} cells`;
 }
-function togglePreview(pageNum,ti){
-  const el=document.getElementById(`tp-${pageNum}-${ti}`);
-  const html=document.getElementById(`th-${pageNum}-${ti}`).value;
-  if(el.style.display==='none'){
-    el.innerHTML=html; el.style.display='block';
-  } else { el.style.display='none'; }
+
+// Build contenteditable table từ HTML string
+function buildEditableTable(html, pageNum, ti){
+  if(!html.trim()) return '<div style="padding:12px;color:var(--muted);font-size:12px">Empty table</div>';
+  // Parse rồi inject contenteditable vào mỗi td/th
+  const doc=new DOMParser().parseFromString(html,'text/html');
+  const table=doc.querySelector('table');
+  if(!table) return `<div style="padding:12px;color:var(--muted);font-size:12px">${esc(html)}</div>`;
+
+  table.className='tbl-edit';
+  table.querySelectorAll('td,th').forEach(cell=>{
+    cell.setAttribute('contenteditable','true');
+    cell.setAttribute('spellcheck','false');
+    // oninput → sync back
+    cell.setAttribute('oninput',`onCellEdit(event,${pageNum},${ti})`);
+  });
+  return table.outerHTML;
 }
+
+// Khi sửa cell trực tiếp → rebuild HTML + sync textarea
+function onCellEdit(event, pageNum, ti){
+  const tv=document.getElementById(`tv-${pageNum}-${ti}`);
+  if(!tv) return;
+  // Lấy bảng hiện tại từ DOM (đã sửa)
+  const table=tv.querySelector('table');
+  if(!table) return;
+
+  // Clone và bỏ contenteditable trước khi lấy HTML
+  const clone=table.cloneNode(true);
+  clone.querySelectorAll('[contenteditable]').forEach(el=>{
+    el.removeAttribute('contenteditable');
+    el.removeAttribute('spellcheck');
+    el.removeAttribute('oninput');
+  });
+  clone.className='';
+  const newHtml=clone.outerHTML;
+
+  // Sync về editorData + textarea
+  S.editorData[pageNum].tables[ti].html=newHtml;
+  S.editorData[pageNum].tables[ti].cells=parseCells(newHtml);
+
+  const ta=document.getElementById(`th-${pageNum}-${ti}`);
+  if(ta) ta.value=newHtml;
+
+  const cc=document.getElementById(`cell-count-${pageNum}-${ti}`);
+  if(cc) cc.textContent=`${S.editorData[pageNum].tables[ti].cells.length} cells`;
+}
+
+// Toggle giữa visual editor và raw HTML
+function toggleRawHtml(pageNum,ti){
+  const tv  = document.getElementById(`tv-${pageNum}-${ti}`);
+  const ta  = document.getElementById(`th-${pageNum}-${ti}`);
+  const btn = document.getElementById(`btn-raw-${pageNum}-${ti}`);
+  if(!tv||!ta||!btn) return;
+
+  const showingRaw = ta.style.display !== 'none';
+  if(showingRaw){
+    // Raw → Visual: sync textarea → rebuild table
+    const html=ta.value;
+    S.editorData[pageNum].tables[ti].html=html;
+    S.editorData[pageNum].tables[ti].cells=parseCells(html);
+    tv.innerHTML=buildEditableTable(html, pageNum, ti);
+    ta.style.display='none';
+    tv.style.display='';
+    btn.style.background='';
+    btn.style.color='';
+  } else {
+    // Visual → Raw: show textarea
+    ta.style.display='block';
+    tv.style.display='none';
+    btn.style.background='var(--accent)';
+    btn.style.color='#fff';
+  }
+}
+
+function togglePreview(pageNum,ti){ toggleRawHtml(pageNum,ti); } // backward compat
 
 function parseCells(html){
   const doc=new DOMParser().parseFromString(html,'text/html');
