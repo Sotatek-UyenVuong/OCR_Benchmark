@@ -201,7 +201,8 @@ body { font-family: -apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
        background:var(--border); color:var(--muted); border:1px solid transparent; }
 .tab.active { background:var(--accent); color:#fff; }
 .editor-body { flex:1; overflow-y:auto; padding:12px; }
-.hot-wrapper { height:calc(100% - 24px); min-height:200px; }
+.editor-body.table-mode { padding:0; overflow:hidden; display:flex; flex-direction:column; }
+.hot-wrapper { flex:1; min-height:0; }
 .text-area { width:100%; background:var(--bg); border:1px solid var(--border); color:var(--text);
              font-family:"JetBrains Mono","Fira Code",monospace; font-size:12px; line-height:1.65;
              padding:10px 12px; resize:vertical; outline:none; min-height:200px; border-radius:6px; }
@@ -985,6 +986,7 @@ function renderPage(pageNum){
   if(S.editorSplit === 'text'){
     body.style.padding='12px';
     body.style.overflow='auto';
+    body.classList.remove('table-mode');
     // ── text editor ──
     const wrap=document.createElement('div');
     wrap.innerHTML=`
@@ -1000,6 +1002,7 @@ function renderPage(pageNum){
     // ── table editor ── fill full editor height
     body.style.padding='0';
     body.style.overflow='hidden';
+    body.classList.add('table-mode');
     const tables=page.tables||[];
     if(!tables.length){
       // Tìm trang gần nhất có table để gợi ý
@@ -1151,10 +1154,12 @@ function _buildJss(pageNum, ti, html){
   const parsed=_htmlToHotData(html);
   if(!parsed){ container.innerHTML='<div style="padding:12px;color:var(--muted)">Empty table</div>'; return; }
 
-  // Wrapper: chiều cao lớn hơn, scroll dọc
-  const editorBody = document.getElementById('editor-body');
-  const availH = (editorBody?.offsetHeight || 500) - 80;
-  container.style.height = Math.max(300, availH) + 'px';
+  // Tính chiều cao khả dụng: panel height - header - tabs - table-label row
+  const editorPanel = document.getElementById('editor-panel');
+  const panelH = editorPanel?.offsetHeight || 600;
+  const usedH  = 48 + 40 + 44;  // panel-hdr + page-tabs + table-label row
+  const hotH   = Math.max(300, panelH - usedH);
+  container.style.height = hotH + 'px';
   container.style.overflow = 'hidden';
 
   const onChange=(_change, source)=>{
@@ -1183,7 +1188,7 @@ function _buildJss(pageNum, ti, html){
       undo: true,
       redo: true,
       height: '100%',
-      stretchH: 'all',
+      stretchH: 'none',
       autoWrapRow: true,
       licenseKey: 'non-commercial-and-evaluation',
       afterChange: onChange,
@@ -1197,6 +1202,8 @@ function _buildJss(pageNum, ti, html){
       afterRedo: onChange,
     });
     _jssInstances[key]=hot;
+    // Sau khi DOM settle, updateSettings để HOT tính lại kích thước
+    setTimeout(()=>{ try{ hot.updateSettings({}); }catch(e){} }, 50);
   } catch(e){
     console.error('Handsontable init error:', e);
     container.innerHTML=`<div style="padding:12px;color:var(--red)">Error: ${e.message}</div>`;
