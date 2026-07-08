@@ -1083,11 +1083,9 @@ function _htmlToJssData(html){
 }
 
 function _jssToHtml(jss){
-  // jspreadsheet CE v5: instance có thể là array hoặc object
-  const inst = Array.isArray(jss) ? jss[0] : jss;
-  const data = inst.getData ? inst.getData() : (jss.getData ? jss.getData() : []);
-  // getMerge may not exist in all versions — fallback to empty
-  const merges = (inst.getMerge ? inst.getMerge() : null) || {};
+  // jspreadsheet CE v5: instance là worksheet object
+  const data = jss.getData ? jss.getData() : [];
+  const merges = (jss.options?.mergeCells) || {};
   const nRows=data.length, nCols=(data[0]||[]).length;
   const skip={};
   let html='<table>';
@@ -1135,17 +1133,24 @@ function _buildJss(pageNum, ti, html){
 
   try {
     const jss=jspreadsheet(container,{
-      data:parsed.data, columns:parsed.columns, mergeCells:parsed.mergeCells,
-      rowHeaders:true, columnResize:true, rowResize:true,
-      allowInsertRow:true, allowInsertColumn:true,
-      allowDeleteRow:true, allowDeleteColumn:true,
-      contextMenu:true, columnSorting:false,
-      onchange:onChange, onmerge:onChange,
-      ondeleterow:onChange, oninsertrow:onChange,
-      ondeletecol:onChange, oninsertcol:onChange,
-      onundo:onChange, onredo:onChange,
+      worksheets:[{
+        data:parsed.data,
+        columns:parsed.columns,
+        mergeCells:parsed.mergeCells,
+        tableOverflow:true,
+        tableWidth:'100%',
+      }],
+      onchange:onChange,
+      onmerge:onChange,
+      ondeleterow:onChange,
+      oninsertrow:onChange,
+      ondeletecol:onChange,
+      oninsertcol:onChange,
+      onundo:onChange,
+      onredo:onChange,
     });
-    _jssInstances[key]=jss;
+    // v5 returns array of worksheet instances
+    _jssInstances[key] = Array.isArray(jss) ? jss[0] : jss;
   } catch(e) {
     console.error('jspreadsheet init error:', e);
     container.innerHTML=`<div style="padding:12px;color:var(--red)">Spreadsheet error: ${e.message}</div>`;
@@ -1581,228 +1586,6 @@ function _updateUndoBtns(pageNum,ti){
   const r=document.getElementById(`btn-redo-${pageNum}-${ti}`);
   if(u) u.disabled=!_undoStack[k]?.length;
   if(r) r.disabled=!_redoStack[k]?.length;
-}
-
-let _ctxTarget = null;
-
-// ── Cell floating action bar ──────────────────────────────────
-let _focusedCell = null;
-
-function _showCellActions(cell, pageNum, ti){
-  _focusedCell = { cell, pageNum, ti };
-  const bar = document.getElementById('cell-actions');
-  bar.style.display = 'flex';
-  _repositionCellActions();
-}
-function _repositionCellActions(){
-  if(!_focusedCell) return;
-  const rect = _focusedCell.cell.getBoundingClientRect();
-  const bar  = document.getElementById('cell-actions');
-  const bw   = bar.offsetWidth  || 120;
-  const bh   = bar.offsetHeight || 30;
-  let top  = rect.top - bh - 6;
-  let left = rect.left + rect.width/2 - bw/2;
-  if(top < 4) top = rect.bottom + 6;
-  left = Math.max(4, Math.min(window.innerWidth - bw - 4, left));
-  bar.style.top  = top  + 'px';
-  bar.style.left = left + 'px';
-}
-function _hideCellActions(){
-  document.getElementById('cell-actions').style.display = 'none';
-  _focusedCell = null;
-}
-function cellActionLeft(){
-  if(!_focusedCell) return;
-  const {cell,pageNum,ti} = _focusedCell;
-  tblAction(pageNum, ti, 'insert-cell-before', cell);
-  _hideCellActions();
-}
-function cellActionRight(){
-  if(!_focusedCell) return;
-  const {cell,pageNum,ti} = _focusedCell;
-  tblAction(pageNum, ti, 'insert-cell-after', cell);
-  _hideCellActions();
-}
-function cellActionDel(){
-  if(!_focusedCell) return;
-  const {cell,pageNum,ti} = _focusedCell;
-  tblAction(pageNum, ti, 'delete-cell', cell);
-  _hideCellActions();
-}
-document.addEventListener('mousedown', e=>{
-  if(!e.target.closest('#cell-actions')&&!e.target.closest('.tbl-edit td,.tbl-edit th'))
-    _hideCellActions();
-  if(!e.target.closest('#tbl-ctx-menu'))
-    document.getElementById('tbl-ctx-menu').style.display='none';
-});
-
-function showTblCtx(e, pageNum, ti){
-  e.preventDefault();
-  _ctxTarget = { pageNum, ti, cell: e.target.closest('td,th') };
-  const menu = document.getElementById('tbl-ctx-menu');
-  menu.style.display = 'block';
-  menu.style.left = Math.min(e.clientX, window.innerWidth - 200) + 'px';
-  menu.style.top  = Math.min(e.clientY, window.innerHeight - 280) + 'px';
-}
-
-function tblCtx(action){
-  document.getElementById('tbl-ctx-menu').style.display='none';
-  if(!_ctxTarget) return;
-  tblAction(_ctxTarget.pageNum, _ctxTarget.ti, action, _ctxTarget.cell);
-}
-
-document.addEventListener('click', ()=>{
-  document.getElementById('tbl-ctx-menu').style.display='none';
-});
-
-// ── Core action ───────────────────────────────────────────────
-function tblAction(pageNum, ti, action, targetCell=null){
-  const tv    = document.getElementById(`tv-${pageNum}-${ti}`);
-  const table = tv?.querySelector('table');
-  if(!table) return;
-
-  // Snapshot trước khi thay đổi
-  _pushUndo(pageNum, ti, S.editorData[pageNum]?.tables[ti]?.html || '');
-
-  const activeCell = targetCell
-    || document.activeElement?.closest(`#tv-${pageNum}-${ti} td, #tv-${pageNum}-${ti} th`)
-    || table.querySelector('td,th');
-
-  const row      = activeCell?.closest('tr');
-  const rows     = [...table.querySelectorAll('tr')];
-  const cells    = row ? [...row.querySelectorAll('td,th')] : [];
-  const colIdx   = activeCell ? cells.indexOf(activeCell) : 0;
-  const colCount = rows[0] ? rows[0].querySelectorAll('td,th').length : 1;
-
-  if(action === 'insert-row-below' || action === 'insert-row-above'){
-    const newRow = document.createElement('tr');
-    for(let c=0;c<colCount;c++){
-      const td=document.createElement('td'); td.textContent=''; newRow.appendChild(td);
-    }
-    if(action==='insert-row-below' && row) row.after(newRow);
-    else if(row) row.before(newRow);
-    else (table.querySelector('tbody')||table).appendChild(newRow);
-  }
-  else if(action === 'delete-row'){
-    if(rows.length > 1) row?.remove();
-    else { _undoStack[`${pageNum}|${ti}`]?.pop(); return; }
-  }
-  else if(action === 'insert-col-right' || action === 'insert-col-left'){
-    rows.forEach((r,ri)=>{
-      const rCells=[...r.querySelectorAll('td,th')];
-      const refCell=rCells[colIdx];
-      const nc=document.createElement(ri===0&&table.querySelector('th')?'th':'td');
-      nc.textContent='';
-      if(action==='insert-col-right'&&refCell) refCell.after(nc);
-      else if(refCell) refCell.before(nc);
-      else r.appendChild(nc);
-    });
-  }
-  else if(action === 'delete-col'){
-    if(colCount > 1) rows.forEach(r=>[...r.querySelectorAll('td,th')][colIdx]?.remove());
-    else { _undoStack[`${pageNum}|${ti}`]?.pop(); return; }
-  }
-  // ── Thêm / xóa ô đơn lẻ ────────────────────────────────────
-  else if(action === 'insert-cell-after'||action === 'insert-cell-before'){
-    if(activeCell){
-      const nc=document.createElement(activeCell.tagName.toLowerCase());
-      nc.textContent='';
-      action==='insert-cell-after' ? activeCell.after(nc) : activeCell.before(nc);
-    }
-  }
-  else if(action === 'delete-cell'){
-    if(activeCell){
-      const r=activeCell.closest('tr');
-      if((r?.querySelectorAll('td,th').length||0)>1) activeCell.remove();
-      else { _undoStack[`${pageNum}|${ti}`]?.pop(); return; }
-    }
-  }
-  // ── Merge / Split ─────────────────────────────────────────
-  else if(action === 'merge-right'){
-    const next=activeCell?.nextElementSibling;
-    if(activeCell&&next&&'TD TH'.includes(next.tagName)){
-      activeCell.setAttribute('colspan',+( activeCell.getAttribute('colspan')||1)+1);
-      activeCell.textContent=(activeCell.textContent+' '+next.textContent).trim();
-      next.remove();
-    }
-  }
-  else if(action === 'merge-down'){
-    if(activeCell&&row){
-      const ri=rows.indexOf(row);
-      const ci=cells.indexOf(activeCell);
-      const below=[...rows[ri+1]?.querySelectorAll('td,th')||[]][ci];
-      if(below){
-        activeCell.setAttribute('rowspan',+(activeCell.getAttribute('rowspan')||1)+1);
-        activeCell.textContent=(activeCell.textContent+' '+below.textContent).trim();
-        below.remove();
-      }
-    }
-  }
-  else if(action === 'split-cell'){
-    if(activeCell){
-      const cs=+(activeCell.getAttribute('colspan')||1);
-      const rs=+(activeCell.getAttribute('rowspan')||1);
-      if(cs>1){
-        activeCell.removeAttribute('colspan');
-        for(let i=1;i<cs;i++){
-          const nc=document.createElement(activeCell.tagName.toLowerCase());
-          nc.textContent=''; activeCell.after(nc);
-        }
-      } else if(rs>1){
-        activeCell.removeAttribute('rowspan');
-        const ri=rows.indexOf(row);
-        for(let r2=1;r2<rs;r2++){
-          const tr=rows[ri+r2]; if(!tr) continue;
-          const nc=document.createElement(activeCell.tagName.toLowerCase());
-          nc.textContent=''; tr.insertBefore(nc,tr.firstChild);
-        }
-      }
-    }
-  }
-  else if(action === 'toggle-header'){
-    if(activeCell){
-      const newTag=activeCell.tagName.toLowerCase()==='td'?'th':'td';
-      const nc=document.createElement(newTag);
-      nc.innerHTML=activeCell.innerHTML;
-      [...activeCell.attributes].forEach(a=>nc.setAttribute(a.name,a.value));
-      activeCell.replaceWith(nc);
-    }
-  }
-
-  _syncTableFromDom(pageNum, ti, tv);
-}
-
-function _syncTableFromDom(pageNum, ti, tv){
-  const table=tv?.querySelector('table');
-  if(!table) return;
-
-  // Re-inject contenteditable sau khi DOM thay đổi
-  table.className='tbl-edit';
-  table.querySelectorAll('td,th').forEach(cell=>{
-    cell.setAttribute('contenteditable','true');
-    cell.setAttribute('spellcheck','false');
-    cell.setAttribute('oninput',`onCellEdit(event,${pageNum},${ti})`);
-    cell.setAttribute('oncontextmenu',`showTblCtx(event,${pageNum},${ti});return false;`);
-  });
-
-  // Lấy HTML sạch
-  const clone=table.cloneNode(true);
-  clone.querySelectorAll('[contenteditable]').forEach(el=>{
-    el.removeAttribute('contenteditable');
-    el.removeAttribute('spellcheck');
-    el.removeAttribute('oninput');
-    el.removeAttribute('oncontextmenu');
-  });
-  clone.className='';
-  const newHtml=clone.outerHTML;
-
-  S.editorData[pageNum].tables[ti].html=newHtml;
-  S.editorData[pageNum].tables[ti].cells=parseCells(newHtml);
-
-  const ta=document.getElementById(`th-${pageNum}-${ti}`);
-  if(ta) ta.value=newHtml;
-  const cc=document.getElementById(`cell-count-${pageNum}-${ti}`);
-  if(cc) cc.textContent=`${S.editorData[pageNum].tables[ti].cells.length} cells`;
 }
 
 // ═══════════════════════════════════════════════════════════════
