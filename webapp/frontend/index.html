@@ -1398,7 +1398,7 @@ window.PDF.drawPageBboxes = function(pn, blocks) {
     rect.setAttribute('height', ((y2-y1) * H).toFixed(1));
     rect.setAttribute('rx', '3');
 
-    const isTable = blk.type === 'Table';
+    const isTable = blk.type === 'Table' || blk.type === 'Form';
     rect.setAttribute('class', isTable ? 'hl-table' : 'hl-text');
     rect.dataset.blockId = blk.block_id;
     rect.dataset.page    = pn;

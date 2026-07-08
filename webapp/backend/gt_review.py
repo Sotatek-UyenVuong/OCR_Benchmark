@@ -232,6 +232,7 @@ def get_bboxes(
         full = json.load(f)
 
     SKIP = {"Picture", "Figure", "Image", "Caption", "PageHeader", "PageFooter"}
+    TABLE_TYPES = {"Table", "Form"}   # cả 2 đều dùng HTML <table>
 
     marker_json = full.get("json", {})
     page_nodes = marker_json.get("children") or []

@@ -95,6 +95,9 @@ def _poll(check_url: str, headers: dict, poll_timeout: int, interval: int = 3) -
 # Metadata builders — Marker JSON → benchmark prediction schema
 # ──────────────────────────────────────────────────────────────────────────────
 
+# Block types Marker dùng cho bảng / biểu mẫu — đều có HTML dạng <table>
+TABLE_BLOCK_TYPES = {"Table", "Form"}
+
 def _extract_blocks_from_marker(marker_json: dict) -> list[dict]:
     """
     Flatten all blocks from Marker JSON response into a list of
@@ -121,8 +124,8 @@ def _extract_blocks_from_marker(marker_json: dict) -> list[dict]:
         "metadata": {...}
       }
     """
-    # Block types to skip — no useful text content for OCR evaluation
-    SKIP_BLOCK_TYPES = {
+    # Block types Marker dùng cho bảng / biểu mẫu — đều có HTML dạng <table>
+TABLE_BLOCK_TYPES = {"Table", "Form"}
         "Picture", "Figure", "Image",   # image blocks
         "Caption",                       # image captions
         "PageHeader",                    # usually just a logo/watermark
@@ -369,7 +372,7 @@ def build_table_prediction(
     table_counter: dict[int, int] = {}
 
     for blk in blocks:
-        if blk["block_type"] != "Table":
+        if blk["block_type"] not in TABLE_BLOCK_TYPES:
             continue
         pn = blk["page_num"]
         pages_tables.setdefault(pn, [])
@@ -476,8 +479,8 @@ def build_split_prediction(
     # Re-use skip logic but keep everything that isn't a Table
     pages_text: dict[int, list[str]] = {}
     for blk in blocks:
-        # block_type Table → goes to table prediction only
-        if blk["block_type"] == "Table":
+        # block_type Table/Form → goes to table prediction only
+        if blk["block_type"] in TABLE_BLOCK_TYPES:
             continue
         pn = blk["page_num"]
         pages_text.setdefault(pn, [])
@@ -495,7 +498,7 @@ def build_split_prediction(
     table_counter: dict[int, int] = {}
 
     for blk in blocks:
-        if blk["block_type"] != "Table":
+        if blk["block_type"] not in TABLE_BLOCK_TYPES:
             continue
         pn = blk["page_num"]
         pages_tables.setdefault(pn, [])
