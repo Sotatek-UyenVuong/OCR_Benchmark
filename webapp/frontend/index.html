@@ -188,6 +188,20 @@ body { font-family: -apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
 .status-info { color:var(--accent); }
 .status-err  { color:var(--red); }
 
+/* ── save modal ── */
+.modal-backdrop { position:fixed; inset:0; background:rgba(0,0,0,.6);
+                  display:flex; align-items:center; justify-content:center; z-index:1000; }
+.modal { background:var(--surface); border:1px solid var(--border); border-radius:12px;
+         padding:24px; width:380px; display:flex; flex-direction:column; gap:16px;
+         box-shadow:0 8px 40px rgba(0,0,0,.5); }
+.modal h3 { font-size:15px; font-weight:700; }
+.modal label { font-size:12px; font-weight:600; color:var(--muted); display:block; margin-bottom:5px; }
+.modal input, .modal select {
+  width:100%; background:var(--bg); border:1px solid var(--border); color:var(--text);
+  padding:8px 10px; border-radius:6px; font-size:13px; outline:none; }
+.modal input:focus, .modal select:focus { border-color:var(--accent); }
+.modal-footer { display:flex; justify-content:flex-end; gap:8px; margin-top:4px; }
+
 /* ── toast ── */
 #toast { position:fixed; bottom:20px; right:20px; padding:10px 18px; border-radius:8px;
          font-size:13px; font-weight:600; display:none; z-index:9999;
@@ -302,6 +316,28 @@ body { font-family: -apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
 </div>
 
 <div id="toast"></div>
+
+<!-- Save GT modal -->
+<div id="save-modal" class="modal-backdrop" style="display:none" onclick="if(event.target===this)closeSaveModal()">
+  <div class="modal">
+    <h3>💾 Save Ground Truth</h3>
+    <div>
+      <label for="input-reviewer">Reviewer name</label>
+      <input id="input-reviewer" type="text" placeholder="e.g. Uyên" autocomplete="name">
+    </div>
+    <div>
+      <label for="input-status">Review status</label>
+      <select id="input-status">
+        <option value="in_progress">🟠 In progress — chưa hoàn thiện</option>
+        <option value="done">🟢 Done — đã xác nhận xong</option>
+      </select>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-ghost" onclick="closeSaveModal()">Cancel</button>
+      <button class="btn btn-success" onclick="confirmSave()">💾 Save &amp; Evaluate</button>
+    </div>
+  </div>
+</div>
 
 <script>
 // ═══════════════════════════════════════════════════════════════
@@ -467,7 +503,11 @@ function renderSidebar(pdfs){
         <div class="file-dot ${dotClass(f)}"></div>
         <div class="file-info">
           <div class="file-name">${f.doc_id}</div>
-          <div class="file-meta"><span>${f.uc_type}</span><span>${f.lang}</span></div>
+          <div class="file-meta">
+            <span>${f.uc_type}</span><span>${f.lang}</span>
+            ${f.gt_saved && f.gt_status ? `<span style="color:${f.gt_status==='done'?'var(--green)':'var(--orange)'}">${f.gt_status==='done'?'✓ done':'◐ in progress'}</span>` : ''}
+            ${f.gt_reviewer ? `<span style="color:var(--muted)">${f.gt_reviewer}</span>` : ''}
+          </div>
         </div>`;
       el.onclick=()=>selectFile(f);
       list.appendChild(el);
@@ -874,62 +914,108 @@ async function copyDraft(){
 // ═══════════════════════════════════════════════════════════════
 // Save GT + Evaluate (chained)
 // ═══════════════════════════════════════════════════════════════
+
+// Step 1: click button → mở modal
 async function saveAndEval(){
-  const f=S.selected;
-  if(!f) return;
+  if(!S.selected) return;
 
-  const btn=document.getElementById('btn-save-eval');
-  btn.disabled=true; btn.textContent='⏳ Saving…';
-  info('Saving GT…','status-info');
+  // Pre-fill reviewer từ localStorage
+  const saved = localStorage.getItem('ocr_reviewer') || '';
+  document.getElementById('input-reviewer').value = saved;
 
-  // Build unified GT: mỗi page có full_text + tables (nếu có)
-  const pages=Object.values(S.editorData)
-    .sort((a,b)=>a.page_num-b.page_num)
-    .map(p=>{
-      const out={page_num:p.page_num, full_text:p.full_text||''};
-      if((p.tables||[]).length>0) out.tables=p.tables;
+  // Pre-fill status từ GT đã lưu nếu có
+  const f = S.selected;
+  const existingStatus = S._lastGTStatus || 'in_progress';
+  document.getElementById('input-status').value = existingStatus;
+
+  document.getElementById('save-modal').style.display = 'flex';
+  setTimeout(()=>document.getElementById('input-reviewer').focus(), 50);
+}
+
+function closeSaveModal(){
+  document.getElementById('save-modal').style.display = 'none';
+}
+
+// Enter key trong modal → confirm
+document.addEventListener('keydown', e => {
+  if(e.key === 'Enter' && document.getElementById('save-modal').style.display !== 'none'){
+    e.preventDefault();
+    confirmSave();
+  }
+  if(e.key === 'Escape'){
+    closeSaveModal();
+  }
+});
+
+// Step 2: confirm → thực sự save + eval
+async function confirmSave(){
+  const reviewer = document.getElementById('input-reviewer').value.trim();
+  const status   = document.getElementById('input-status').value;
+  closeSaveModal();
+
+  // Lưu reviewer vào localStorage để prefill lần sau
+  if(reviewer) localStorage.setItem('ocr_reviewer', reviewer);
+
+  const f = S.selected;
+  const btn = document.getElementById('btn-save-eval');
+  btn.disabled = true; btn.textContent = '⏳ Saving…';
+  info('Saving GT…', 'status-info');
+
+  // Build unified GT
+  const pages = Object.values(S.editorData)
+    .sort((a,b) => a.page_num - b.page_num)
+    .map(p => {
+      const out = {page_num: p.page_num, full_text: p.full_text || ''};
+      if((p.tables||[]).length > 0) out.tables = p.tables;
       return out;
     });
-  const gtData={doc_id:f.doc_id, pages};
+  const gtData = {doc_id: f.doc_id, pages};
 
   try {
     // 1. Save GT
-    const saveRes=await fetch('/api/gt/save',{
-      method:'POST',
-      headers:{'Content-Type':'application/json'},
-      body:JSON.stringify({doc_id:f.doc_id,uc_type:f.uc_type,lang:f.lang,gt_data:gtData})
+    const saveRes = await fetch('/api/gt/save', {
+      method: 'POST',
+      headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify({
+        doc_id: f.doc_id, uc_type: f.uc_type, lang: f.lang,
+        gt_data: gtData, reviewer, status,
+      })
     });
-    if(!saveRes.ok) throw new Error((await saveRes.json()).detail||'Save failed');
-    toast('GT saved ✓');
+    if(!saveRes.ok) throw new Error((await saveRes.json()).detail || 'Save failed');
+    const saveData = await saveRes.json();
+
+    const statusIcon = status === 'done' ? '🟢' : '🟠';
+    toast(`✅ Saved ${statusIcon} ${status}${reviewer ? ' · ' + reviewer : ''}`);
+    S._lastGTStatus = status;
 
     // 2. Evaluate
-    btn.textContent='⏳ Evaluating…';
-    info('Running evaluation…','status-info');
+    btn.textContent = '⏳ Evaluating…';
+    info('Running evaluation…', 'status-info');
 
     const hasBoth = f.has_text_pred && f.has_table_pred;
-    const split = hasBoth ? 'both' : (f.has_table_pred ? 'table' : 'text');
+    const split   = hasBoth ? 'both' : (f.has_table_pred ? 'table' : 'text');
 
-    const evalRes=await fetch('/api/ocr/eval',{
-      method:'POST',
-      headers:{'Content-Type':'application/json'},
-      body:JSON.stringify({doc_id:f.doc_id,uc_type:f.uc_type,lang:f.lang,model:S.model,split})
+    const evalRes = await fetch('/api/ocr/eval', {
+      method: 'POST',
+      headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify({doc_id: f.doc_id, uc_type: f.uc_type, lang: f.lang, model: S.model, split})
     });
-    if(!evalRes.ok) throw new Error((await evalRes.json()).detail||'Eval failed');
-    S.scores=await evalRes.json();
+    if(!evalRes.ok) throw new Error((await evalRes.json()).detail || 'Eval failed');
+    S.scores = await evalRes.json();
 
     toast('✅ Evaluation complete!');
-    info('Done! Showing scores…','status-ok');
-    btn.textContent='💾 Save GT & Evaluate';
-    btn.disabled=false;
+    info('Done! Showing scores…', 'status-ok');
+    btn.textContent = '💾 Save GT & Evaluate';
+    btn.disabled = false;
 
     await refreshAll();
     renderScores(S.scores);
     goStep(4);
-  } catch(e){
+  } catch(e) {
     toast(e.message, true);
-    info(e.message,'status-err');
-    btn.textContent='💾 Save GT & Evaluate';
-    btn.disabled=false;
+    info(e.message, 'status-err');
+    btn.textContent = '💾 Save GT & Evaluate';
+    btn.disabled = false;
   }
 }
 
@@ -1017,7 +1103,7 @@ function buildPageTable(pages, type){
 }
 
 // ═══════════════════════════════════════════════════════════════
-// Ctrl+S shortcut
+// Ctrl+S shortcut → mở save modal
 // ═══════════════════════════════════════════════════════════════
 document.addEventListener('keydown',e=>{
   if((e.ctrlKey||e.metaKey)&&e.key==='s'){
@@ -1263,6 +1349,10 @@ const _patchedRenderReview = async function() {
   buildEditorChrome();
 
   const hasGT = results.some(d=>d?.gt_saved);
+  // Lưu status hiện tại để modal pre-fill đúng
+  const firstGT = results.find(d=>d?.existing_gt);
+  S._lastGTStatus = firstGT?.existing_gt?.status || 'in_progress';
+
   info(hasGT ? '✓ GT saved — editing will update it'
              : 'Click a block on PDF to jump to it • Edit text/table • Save & Evaluate',
        hasGT ? 'status-ok' : '');

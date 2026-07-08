@@ -63,6 +63,17 @@ def _iter_draft_files():
         # Check if GT already saved
         gt_path = GT_ROOT / uc_type / lang / f"{doc_id}.json"
         gt_saved = gt_path.exists()
+        gt_status = ""
+        gt_reviewer = ""
+        if gt_saved:
+            try:
+                import json as _json
+                with open(gt_path, encoding="utf-8") as _f:
+                    _gt = _json.load(_f)
+                gt_status   = _gt.get("status", "")
+                gt_reviewer = _gt.get("reviewer", "")
+            except Exception:
+                pass
 
         # Corresponding PDF
         pdf_path = RAW_ROOT / uc_type / lang / f"{doc_id}.pdf"
@@ -75,6 +86,8 @@ def _iter_draft_files():
             "draft_path": str(pred_file.relative_to(PROJECT_ROOT)),
             "pdf_exists": pdf_path.exists(),
             "gt_saved": gt_saved,
+            "gt_status": gt_status,
+            "gt_reviewer": gt_reviewer,
             "gt_path": str(gt_path.relative_to(PROJECT_ROOT)) if gt_saved else None,
         }
 
@@ -85,7 +98,9 @@ class SaveGTRequest(BaseModel):
     doc_id: str
     uc_type: str
     lang: str
-    gt_data: dict   # full GT JSON matching benchmark schema
+    gt_data: dict           # full GT JSON matching benchmark schema
+    reviewer: str = ""      # tên người review
+    status: str = "in_progress"  # "in_progress" | "done"
 
 
 # ── Endpoints ─────────────────────────────────────────────────────────────────
@@ -164,15 +179,17 @@ def serve_pdf(uc_type: str, lang: str, filename: str):
 @router.post("/save")
 def save_gt(req: SaveGTRequest):
     """Save reviewed GT JSON to ground_truth/<uc_type>/<lang>/<doc_id>.json."""
-    # Validate basic schema
     if "pages" not in req.gt_data:
         raise HTTPException(400, "GT data must have 'pages' key")
 
     gt_dir = GT_ROOT / req.uc_type / req.lang
     gt_dir.mkdir(parents=True, exist_ok=True)
 
-    # Ensure doc_id in data matches request
-    req.gt_data["doc_id"] = req.doc_id
+    import datetime
+    req.gt_data["doc_id"]   = req.doc_id
+    req.gt_data["reviewer"] = req.reviewer
+    req.gt_data["status"]   = req.status   # "in_progress" | "done"
+    req.gt_data["updated_at"] = datetime.datetime.utcnow().strftime("%Y-%m-%dT%H:%M:%SZ")
 
     gt_path = gt_dir / f"{req.doc_id}.json"
     with open(gt_path, "w", encoding="utf-8") as f:
@@ -182,6 +199,8 @@ def save_gt(req: SaveGTRequest):
         "success": True,
         "saved_to": str(gt_path.relative_to(PROJECT_ROOT)),
         "doc_id": req.doc_id,
+        "status": req.status,
+        "reviewer": req.reviewer,
     }
 
 
