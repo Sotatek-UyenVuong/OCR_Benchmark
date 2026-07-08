@@ -14,9 +14,9 @@ Endpoints:
 
 from __future__ import annotations
 
-import base64
 import json
 import re
+import sys
 from pathlib import Path
 from typing import Literal
 
@@ -24,11 +24,8 @@ from fastapi import APIRouter, HTTPException, Query
 from fastapi.responses import FileResponse, JSONResponse
 from pydantic import BaseModel
 
-# ── Paths ────────────────────────────────────────────────────────────────────
-PROJECT_ROOT   = Path(__file__).resolve().parents[2]
-RAW_ROOT       = PROJECT_ROOT / "raw"
-GT_ROOT        = PROJECT_ROOT / "ground_truth"
-MARKER_SUBDIR  = "marker_output"
+# ── Paths: import từ config để dùng DATA_ROOT env var khi deploy ──
+from .config import PROJECT_ROOT, RAW_ROOT, GT_ROOT, MARKER_SUBDIR
 
 router = APIRouter(prefix="/api/gt", tags=["GT Review"])
 

@@ -19,6 +19,7 @@ from fastapi.staticfiles import StaticFiles
 
 # Add project root to path so ocr_benchmark package resolves
 import sys
+from pathlib import Path
 sys.path.insert(0, str(Path(__file__).resolve().parents[2]))
 
 from ocr_benchmark.eval.scan import eval_scan

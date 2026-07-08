@@ -5,7 +5,7 @@ API router để trigger OCR và evaluate.
 
 POST /api/ocr/run      — chạy OCR (idempotent: skip nếu prediction đã có)
 POST /api/ocr/eval     — evaluate 1 doc với GT đã lưu
-GET  /api/ocr/pdfs     — liệt kê tất cả PDF trong raw/
+GET  /api/ocr/pdfs     — list tất cả PDF trong raw/
 GET  /api/ocr/result   — load kết quả eval đã lưu (nếu có)
 """
 
@@ -30,12 +30,7 @@ from ocr_benchmark.eval.table import eval_table
 from ocr_benchmark.eval.text_layer import eval_text_layer
 from ocr_benchmark.metrics.wer import compute_wer, compute_nwer
 from ocr_benchmark.normalize import normalize_for_text_benchmark
-
-RAW_ROOT    = PROJECT_ROOT / "raw"
-GT_ROOT     = PROJECT_ROOT / "ground_truth"
-PRED_ROOT   = PROJECT_ROOT / "predictions"
-RESULT_ROOT = PROJECT_ROOT / "benchmark_results"
-MARKER_DIR  = "marker_output"
+from .config import PROJECT_ROOT, RAW_ROOT, GT_ROOT, PRED_ROOT, RESULT_ROOT, MARKER_SUBDIR
 
 router = APIRouter(prefix="/api/ocr", tags=["OCR"])
 
@@ -84,9 +79,9 @@ def list_pdfs():
         doc_id = pdf.stem
 
         # Check marker prediction exists
-        marker_text_pred = RAW_ROOT / uc_type / lang / MARKER_DIR / f"{doc_id}_text_prediction.json"
-        marker_table_pred = RAW_ROOT / uc_type / lang / MARKER_DIR / f"{doc_id}_table_prediction.json"
-        marker_unified_pred = RAW_ROOT / uc_type / lang / MARKER_DIR / f"{doc_id}_prediction.json"
+        marker_text_pred = RAW_ROOT / uc_type / lang / MARKER_SUBDIR / f"{doc_id}_text_prediction.json"
+        marker_table_pred = RAW_ROOT / uc_type / lang / MARKER_SUBDIR / f"{doc_id}_table_prediction.json"
+        marker_unified_pred = RAW_ROOT / uc_type / lang / MARKER_SUBDIR / f"{doc_id}_prediction.json"
         marker_done = marker_text_pred.exists() or marker_unified_pred.exists()
 
         # Check GT saved
@@ -132,8 +127,8 @@ async def run_ocr(req: RunOCRRequest, background_tasks: BackgroundTasks):
         raise HTTPException(404, f"PDF not found: {pdf_path.relative_to(PROJECT_ROOT)}")
 
     # Check if already done
-    text_pred = RAW_ROOT / req.uc_type / req.lang / MARKER_DIR / f"{req.doc_id}_text_prediction.json"
-    unified_pred = RAW_ROOT / req.uc_type / req.lang / MARKER_DIR / f"{req.doc_id}_prediction.json"
+    text_pred = RAW_ROOT / req.uc_type / req.lang / MARKER_SUBDIR / f"{req.doc_id}_text_prediction.json"
+    unified_pred = RAW_ROOT / req.uc_type / req.lang / MARKER_SUBDIR / f"{req.doc_id}_prediction.json"
     already_done = text_pred.exists() or unified_pred.exists()
 
     if already_done and not req.force:
@@ -165,7 +160,7 @@ async def _run_ocr_job(job_id: str, req: RunOCRRequest, pdf_path: Path):
         lang_map = {"vi": "vi,en", "en": "en", "ja": "ja,en"}
         langs = lang_map.get(req.lang, req.lang)
 
-        out_dir = RAW_ROOT / req.uc_type / req.lang / MARKER_DIR
+        out_dir = RAW_ROOT / req.uc_type / req.lang / MARKER_SUBDIR
 
         _jobs[job_id]["message"] = "Processing…"
         _jobs[job_id]["progress"] = 30
@@ -229,10 +224,10 @@ def run_eval(req: EvalRequest):
 
     # ── text eval ──────────────────────────────────────────────────────────
     if req.split in ("text", "both"):
-        text_pred_file = RAW_ROOT / req.uc_type / req.lang / MARKER_DIR / f"{req.doc_id}_text_prediction.json"
+        text_pred_file = RAW_ROOT / req.uc_type / req.lang / MARKER_SUBDIR / f"{req.doc_id}_text_prediction.json"
         # Fallback to unified
         if not text_pred_file.exists():
-            text_pred_file = RAW_ROOT / req.uc_type / req.lang / MARKER_DIR / f"{req.doc_id}_prediction.json"
+            text_pred_file = RAW_ROOT / req.uc_type / req.lang / MARKER_SUBDIR / f"{req.doc_id}_prediction.json"
         if not text_pred_file.exists():
             raise HTTPException(404, "Text prediction not found — run OCR first")
 
@@ -278,7 +273,7 @@ def run_eval(req: EvalRequest):
 
     # ── table eval ────────────────────────────────────────────────────────
     if req.split in ("table", "both"):
-        table_pred_file = RAW_ROOT / req.uc_type / req.lang / MARKER_DIR / f"{req.doc_id}_table_prediction.json"
+        table_pred_file = RAW_ROOT / req.uc_type / req.lang / MARKER_SUBDIR / f"{req.doc_id}_table_prediction.json"
         if not table_pred_file.exists():
             if req.split == "table":
                 raise HTTPException(404, "Table prediction not found — run OCR first")
