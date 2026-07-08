@@ -331,7 +331,7 @@ body { font-family: -apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
             <!-- Zoom controls -->
             <div class="zoom-bar">
               <button onclick="zoomOut()" title="Thu nhỏ">−</button>
-              <span class="zoom-label" id="zoom-label">150%</span>
+              <span class="zoom-label" id="zoom-label">120%</span>
               <button onclick="zoomIn()" title="Phóng to">+</button>
               <button onclick="zoomFit()" title="Fit width" style="width:auto;padding:0 8px;font-size:11px;font-weight:600">Fit</button>
             </div>
@@ -1401,31 +1401,35 @@ async function _rerender(){
   const frame   = document.getElementById('pdf-frame');
   const scrollY = frame.scrollTop;
 
-  // Re-render từng page trực tiếp lên canvas đã có — không xoá DOM
-  const doc = window.PDF.doc;
-  for(let pn = 1; pn <= doc.numPages; pn++){
-    const canvas   = window.PDF.canvases[pn];
-    const svg      = window.PDF.overlays[pn];
-    const wrap     = document.getElementById(`pdf-page-${pn}`);
-    if(!canvas) continue;
+  // Re-render song song 3 trang cùng lúc
+  const doc   = window.PDF.doc;
+  const queue = Array.from({length: doc.numPages}, (_, i) => i + 1);
+  const worker = async () => {
+    while(queue.length) {
+      const pn = queue.shift();
+      const canvas  = window.PDF.canvases[pn];
+      const svg     = window.PDF.overlays[pn];
+      const wrap    = document.getElementById(`pdf-page-${pn}`);
+      if(!canvas) continue;
 
-    const page     = await doc.getPage(pn);
-    const viewport = page.getViewport({ scale: window.PDF.SCALE });
+      const page     = await doc.getPage(pn);
+      const viewport = page.getViewport({ scale: window.PDF.SCALE });
 
-    canvas.width  = viewport.width;
-    canvas.height = viewport.height;
-    svg.setAttribute('viewBox', `0 0 ${viewport.width} ${viewport.height}`);
-    svg.setAttribute('width',  viewport.width);
-    svg.setAttribute('height', viewport.height);
-    wrap.style.width = viewport.width + 'px';
+      canvas.width  = viewport.width;
+      canvas.height = viewport.height;
+      if(svg){
+        svg.setAttribute('viewBox', `0 0 ${viewport.width} ${viewport.height}`);
+        svg.setAttribute('width',  viewport.width);
+        svg.setAttribute('height', viewport.height);
+      }
+      if(wrap) wrap.style.width = viewport.width + 'px';
 
-    await page.render({ canvasContext: canvas.getContext('2d'), viewport }).promise;
-  }
+      await page.render({ canvasContext: canvas.getContext('2d'), viewport }).promise;
+    }
+  };
+  await Promise.all(Array.from({length: 3}, worker));
 
-  // Redraw bboxes với scale mới
   window.PDF.drawAllBboxes();
-
-  // Restore scroll tương đối
   frame.scrollTop = scrollY;
 }
 
@@ -1473,17 +1477,22 @@ window.PDF = {
   activeBlock: null,  // { pageNum, blockId }
   canvases: {},   // pageNum → canvas element
   overlays: {},   // pageNum → svg element
-  SCALE: 1.5,
+  SCALE: 1.2,
 };
 
 // ── render all pages ──────────────────────────────────────────
 window.PDF.renderDocument = async function(url) {
-  window.PDF._lastUrl = url;   // lưu để re-render khi zoom
+  window.PDF._lastUrl = url;
+  window.PDF._rendering = {};  // track trang đang render
   const frame = document.getElementById('pdf-frame');
   frame.innerHTML = '<div style="padding:20px;color:var(--muted);text-align:center">Loading PDF…</div>';
 
   try {
-    const doc = await pdfjsLib.getDocument(url).promise;
+    const doc = await pdfjsLib.getDocument({
+      url,
+      cMapUrl: 'https://cdn.jsdelivr.net/npm/pdfjs-dist@4.4.168/cmaps/',
+      cMapPacked: true,
+    }).promise;
     window.PDF.doc = doc;
     window.PDF.canvases = {};
     window.PDF.overlays = {};
@@ -1491,43 +1500,69 @@ window.PDF.renderDocument = async function(url) {
 
     document.getElementById('pdf-page-info').textContent = `${doc.numPages} pages`;
 
+    // Tạo placeholder cho tất cả trang trước (không render canvas ngay)
     for(let pn = 1; pn <= doc.numPages; pn++) {
-      const page = await doc.getPage(pn);
+      const page     = await doc.getPage(pn);
       const viewport = page.getViewport({ scale: window.PDF.SCALE });
 
-      // wrapper
       const wrap = document.createElement('div');
       wrap.className = 'pdf-page-wrap';
       wrap.id = `pdf-page-${pn}`;
-      wrap.style.width = viewport.width + 'px';
+      wrap.style.width  = viewport.width  + 'px';
+      wrap.style.height = viewport.height + 'px';
+      wrap.style.background = '#3a3a3a';  // placeholder màu
 
-      // canvas
       const canvas = document.createElement('canvas');
       canvas.width  = viewport.width;
       canvas.height = viewport.height;
       window.PDF.canvases[pn] = canvas;
 
-      // SVG overlay
       const svg = document.createElementNS('http://www.w3.org/2000/svg','svg');
       svg.setAttribute('class','pdf-overlay');
       svg.setAttribute('viewBox',`0 0 ${viewport.width} ${viewport.height}`);
-      svg.setAttribute('width', viewport.width);
+      svg.setAttribute('width',  viewport.width);
       svg.setAttribute('height', viewport.height);
       window.PDF.overlays[pn] = svg;
 
       wrap.appendChild(canvas);
       wrap.appendChild(svg);
       frame.appendChild(wrap);
-
-      // render page
-      await page.render({ canvasContext: canvas.getContext('2d'), viewport }).promise;
     }
 
-    // Draw bboxes once all pages rendered
+    // Render song song, tối đa 3 trang cùng lúc
+    const CONCURRENCY = 3;
+    const queue = Array.from({length: doc.numPages}, (_, i) => i + 1);
+    const worker = async () => {
+      while(queue.length) {
+        const pn = queue.shift();
+        await window.PDF._renderPage(pn);
+      }
+    };
+    await Promise.all(Array.from({length: CONCURRENCY}, worker));
+
     window.PDF.drawAllBboxes();
   } catch(e) {
     frame.innerHTML = `<div style="padding:20px;color:var(--red)">${e.message}</div>`;
   }
+};
+
+// ── render 1 trang ────────────────────────────────────────────
+window.PDF._renderPage = async function(pn) {
+  const doc    = window.PDF.doc;
+  const canvas = window.PDF.canvases[pn];
+  if(!doc || !canvas) return;
+
+  const page     = await doc.getPage(pn);
+  const viewport = page.getViewport({ scale: window.PDF.SCALE });
+  canvas.width   = viewport.width;
+  canvas.height  = viewport.height;
+
+  const ctx = canvas.getContext('2d');
+  await page.render({ canvasContext: ctx, viewport }).promise;
+
+  // Update wrap height (placeholder → real)
+  const wrap = document.getElementById(`pdf-page-${pn}`);
+  if(wrap) wrap.style.height = '';
 };
 
 // ── draw all bboxes on all pages ──────────────────────────────
