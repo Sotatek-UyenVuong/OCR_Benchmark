@@ -5,6 +5,11 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>OCR Benchmark</title>
 <script src="https://cdn.jsdelivr.net/npm/pdfjs-dist@4.4.168/build/pdf.min.mjs" type="module" id="pdfjs-script"></script>
+<!-- Jspreadsheet CE: Excel-like table editor -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/jspreadsheet-ce/dist/jspreadsheet.min.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/jsuites/dist/jsuites.min.css">
+<script src="https://cdn.jsdelivr.net/npm/jsuites/dist/jsuites.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/jspreadsheet-ce/dist/jspreadsheet.min.js"></script>
 <style>
 * { box-sizing: border-box; margin: 0; padding: 0; }
 :root {
@@ -131,34 +136,25 @@ body { font-family: -apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
 .pdf-panel { display:flex; flex-direction:column; overflow:hidden; min-width:200px; }
 .editor-panel { display:flex; flex-direction:column; overflow:hidden; flex:1; min-width:200px; }
 
-/* ── editable table preview ── */
+/* ── editable table preview (Jspreadsheet) ── */
+.jss-wrapper { border:1px solid var(--border); border-radius:6px; overflow:hidden; background:var(--bg); }
+.jss-wrapper .jss_content { background:var(--bg); }
+/* Dark theme overrides */
+.jss_container, .jss_table { background:var(--bg) !important; color:var(--text) !important; font-size:12px !important; }
+.jss_header { background:var(--surface2) !important; color:var(--muted) !important; border-color:var(--border) !important; }
+.jss_table td, .jss_table th { border-color:var(--border) !important; background:var(--bg) !important; color:var(--text) !important; }
+.jss_table td.readonly { background:var(--surface2) !important; color:var(--muted) !important; }
+.jss_table td.highlight { background:#1e2a4a !important; }
+.jss_table td.selected { background:rgba(124,131,255,.15) !important; }
+.jss_contextmenu, .jss_contextmenu_item { background:var(--surface) !important; color:var(--text) !important; border-color:var(--border) !important; }
+.jss_contextmenu_item:hover { background:var(--border) !important; }
+.jss_table thead td { background:var(--surface2) !important; font-weight:700 !important; color:var(--accent) !important; }
+
+/* legacy .tbl-edit still used for Raw preview */
 .tbl-edit { border-collapse:collapse; width:100%; font-size:12px; }
-.tbl-edit td, .tbl-edit th {
-  border:1px solid #4a5080; padding:5px 8px; min-width:60px; min-height:24px;
-  outline:none; vertical-align:top; line-height:1.4; word-break:break-word; }
-.tbl-edit th { background:#1e2a4a; color:var(--accent); font-weight:600; }
-.tbl-edit td { background:var(--bg); color:var(--text); }
-.tbl-edit td:focus, .tbl-edit th:focus {
-  background:#1e2a4a; box-shadow:inset 0 0 0 2px var(--accent); }
-.tbl-edit tr:hover td, .tbl-edit tr:hover th { background:#1a1d2e; }
-/* ── table structure toolbar ── */
-.tbl-toolbar { display:flex; gap:4px; padding:6px 8px; background:var(--surface2);
-               border-bottom:1px solid var(--border); flex-wrap:wrap; }
-.tbl-toolbar button { padding:3px 9px; border-radius:4px; border:none; cursor:pointer;
-                      font-size:11px; font-weight:600; background:var(--border);
-                      color:var(--text); transition:background .1s; white-space:nowrap; }
-.tbl-toolbar button:hover { background:var(--accent); color:#fff; }
-
-/* ── context menu ── */
-#tbl-ctx-menu { position:fixed; background:var(--surface); border:1px solid var(--border);
-                border-radius:8px; padding:4px; z-index:5000; min-width:190px;
-                box-shadow:0 4px 20px rgba(0,0,0,.5); display:none; }
-#tbl-ctx-menu button { display:block; width:100%; text-align:left; padding:7px 12px;
-                        background:none; border:none; color:var(--text); cursor:pointer;
-                        font-size:13px; border-radius:5px; }
-#tbl-ctx-menu button:hover { background:var(--border); }
-#tbl-ctx-menu .ctx-sep { height:1px; background:var(--border); margin:3px 0; }
-
+.tbl-edit td, .tbl-edit th { border:1px solid #4a5080; padding:5px 8px; }
+.tbl-edit th { background:#1e2a4a; color:var(--accent); }
+/* ── resizer handle ── */
 .resizer { width:5px; background:var(--border); cursor:col-resize; flex-shrink:0;
            transition:background .15s; position:relative; z-index:10; }
 .resizer:hover, .resizer.dragging { background:var(--accent); }
@@ -404,27 +400,6 @@ body { font-family: -apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
 </div>
 
 <div id="toast"></div>
-
-<!-- Table context menu -->
-<div id="tbl-ctx-menu">
-  <button onclick="tblCtx('insert-row-above')">↑ Insert row above</button>
-  <button onclick="tblCtx('insert-row-below')">↓ Insert row below</button>
-  <button onclick="tblCtx('delete-row')" style="color:var(--red)">🗑 Delete row</button>
-  <div class="ctx-sep"></div>
-  <button onclick="tblCtx('insert-col-left')">← Insert col left</button>
-  <button onclick="tblCtx('insert-col-right')">→ Insert col right</button>
-  <button onclick="tblCtx('delete-col')" style="color:var(--red)">🗑 Delete col</button>
-  <div class="ctx-sep"></div>
-  <button onclick="tblCtx('insert-cell-before')">+ Cell before</button>
-  <button onclick="tblCtx('insert-cell-after')">+ Cell after</button>
-  <button onclick="tblCtx('delete-cell')" style="color:var(--red)">🗑 Delete cell</button>
-  <div class="ctx-sep"></div>
-  <button onclick="tblCtx('merge-right')">⊞ Merge right</button>
-  <button onclick="tblCtx('merge-down')">⊟ Merge down</button>
-  <button onclick="tblCtx('split-cell')">⊠ Split cell</button>
-  <div class="ctx-sep"></div>
-  <button onclick="tblCtx('toggle-header')">⇅ Toggle th/td</button>
-</div>
 
 <!-- Dashboard overlay -->
 <div id="dashboard-overlay" class="dashboard-overlay" style="display:none" onclick="if(event.target===this)hideDashboard()">
@@ -1043,7 +1018,7 @@ function renderPage(pageNum){
               onclick="toggleRawHtml(${pageNum},${ti})" id="btn-raw-${pageNum}-${ti}">‹/› Raw</button>
           </div>
         </div>
-        <!-- Visual editable table -->
+        <!-- Visual editable table (Jspreadsheet) -->
         <div id="tv-${pageNum}-${ti}" style="overflow-x:auto;border:1px solid var(--border);border-radius:6px;background:var(--bg)">
           ${buildEditableTable(t.html||'', pageNum, ti)}
         </div>
@@ -1066,88 +1041,141 @@ function onHtmlInput(pageNum,ti){
   const v=document.getElementById(`th-${pageNum}-${ti}`).value;
   S.editorData[pageNum].tables[ti].html=v;
   S.editorData[pageNum].tables[ti].cells=parseCells(v);
-  // Sync visual table
-  const tv=document.getElementById(`tv-${pageNum}-${ti}`);
-  if(tv) tv.innerHTML=buildEditableTable(v, pageNum, ti);
+  _buildJss(pageNum, ti, v);
   const cc=document.getElementById(`cell-count-${pageNum}-${ti}`);
   if(cc) cc.textContent=`${S.editorData[pageNum].tables[ti].cells.length} cells`;
 }
 
-// Build contenteditable table từ HTML string
-function buildEditableTable(html, pageNum, ti){
-  if(!html.trim()) return '<div style="padding:12px;color:var(--muted);font-size:12px">Empty table</div>';
+// ── Jspreadsheet registry ─────────────────────────────────────
+const _jssInstances = {};
+
+function _htmlToJssData(html){
+  if(!html.trim()) return null;
   const doc=new DOMParser().parseFromString(html,'text/html');
   const table=doc.querySelector('table');
-  if(!table) return `<div style="padding:12px;color:var(--muted);font-size:12px">${esc(html)}</div>`;
+  if(!table) return null;
+  const rows=[...table.querySelectorAll('tr')];
+  if(!rows.length) return null;
 
-  table.className='tbl-edit';
-  table.querySelectorAll('td,th').forEach(cell=>{
-    cell.setAttribute('contenteditable','true');
-    cell.setAttribute('spellcheck','false');
-    cell.setAttribute('oninput',`onCellEdit(event,${pageNum},${ti})`);
-    cell.setAttribute('oncontextmenu',`showTblCtx(event,${pageNum},${ti});return false;`);
+  let maxCols=0;
+  rows.forEach(r=>{let c=0; r.querySelectorAll('td,th').forEach(cell=>{c+=+(cell.getAttribute('colspan')||1);}); if(c>maxCols)maxCols=c;});
+  if(!maxCols) maxCols=1;
+
+  const data=[], mergeCells={}, occupied={};
+  rows.forEach((row,ri)=>{
+    const rowData=new Array(maxCols).fill('');
+    let ci=0;
+    row.querySelectorAll('td,th').forEach(cell=>{
+      while(occupied[`${ri},${ci}`]) ci++;
+      const cs=+(cell.getAttribute('colspan')||1);
+      const rs=+(cell.getAttribute('rowspan')||1);
+      rowData[ci]=cell.textContent.trim();
+      if(cs>1||rs>1){
+        mergeCells[`${String.fromCharCode(65+ci)}${ri+1}`]=[rs,cs];
+        for(let r2=ri;r2<ri+rs;r2++) for(let c2=ci;c2<ci+cs;c2++) if(r2!==ri||c2!==ci) occupied[`${r2},${c2}`]=true;
+      }
+      ci+=cs;
+    });
+    data.push(rowData);
   });
-
-  const toolbar = `<div class="tbl-toolbar">
-    <button id="btn-undo-${pageNum}-${ti}" onclick="tblUndo(${pageNum},${ti})" disabled title="Ctrl+Z">↩ Undo</button>
-    <button id="btn-redo-${pageNum}-${ti}" onclick="tblRedo(${pageNum},${ti})" disabled title="Ctrl+Y">↪ Redo</button>
-    <div style="width:1px;background:var(--border);margin:0 2px"></div>
-    <button onclick="tblAction(${pageNum},${ti},'insert-row-below')">+Row↓</button>
-    <button onclick="tblAction(${pageNum},${ti},'insert-row-above')">+Row↑</button>
-    <button onclick="tblAction(${pageNum},${ti},'delete-row')" style="color:var(--red)">−Row</button>
-    <div style="width:1px;background:var(--border);margin:0 2px"></div>
-    <button onclick="tblAction(${pageNum},${ti},'insert-col-right')">+Col→</button>
-    <button onclick="tblAction(${pageNum},${ti},'insert-col-left')">+Col←</button>
-    <button onclick="tblAction(${pageNum},${ti},'delete-col')" style="color:var(--red)">−Col</button>
-    <div style="width:1px;background:var(--border);margin:0 2px"></div>
-    <button onclick="tblAction(${pageNum},${ti},'insert-cell-after')">+Cell→</button>
-    <button onclick="tblAction(${pageNum},${ti},'insert-cell-before')">+Cell←</button>
-    <button onclick="tblAction(${pageNum},${ti},'delete-cell')" style="color:var(--red)">−Cell</button>
-    <div style="width:1px;background:var(--border);margin:0 2px"></div>
-    <button onclick="tblAction(${pageNum},${ti},'merge-right')">Merge→</button>
-    <button onclick="tblAction(${pageNum},${ti},'merge-down')">Merge↓</button>
-    <button onclick="tblAction(${pageNum},${ti},'split-cell')">Split</button>
-    <button onclick="tblAction(${pageNum},${ti},'toggle-header')">th↔td</button>
-  </div>`;
-
-  return toolbar + `<div style="overflow-x:auto;padding:6px">${table.outerHTML}</div>`;
+  const columns=Array.from({length:maxCols},(_,i)=>({title:String.fromCharCode(65+i), width:Math.max(80,Math.floor(520/maxCols))}));
+  return {data, columns, mergeCells};
 }
 
-// Khi sửa cell trực tiếp → rebuild HTML + sync textarea
-function onCellEdit(event, pageNum, ti){
-  const tv=document.getElementById(`tv-${pageNum}-${ti}`);
-  if(!tv) return;
-  _syncTableFromDom(pageNum, ti, tv);
+function _jssToHtml(jss){
+  const data=jss.getData();
+  const merges=jss.getMerge ? jss.getMerge() : {};
+  const nRows=data.length, nCols=(data[0]||[]).length;
+  const skip={};
+  let html='<table>';
+  for(let r=0;r<nRows;r++){
+    html+='<tr>';
+    for(let c=0;c<nCols;c++){
+      if(skip[`${r},${c}`]) continue;
+      const ref=`${String.fromCharCode(65+c)}${r+1}`;
+      const m=merges[ref]; const rs=m?m[0]:1; const cs=m?m[1]:1;
+      if(rs>1||cs>1) for(let dr=0;dr<rs;dr++) for(let dc=0;dc<cs;dc++) if(dr||dc) skip[`${r+dr},${c+dc}`]=true;
+      const attrs=[rs>1?`rowspan="${rs}"`:'', cs>1?`colspan="${cs}"`:''].filter(Boolean).join(' ');
+      const tag=r===0?'th':'td';
+      const val=String(data[r][c]||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+      html+=`<${tag}${attrs?' '+attrs:''}>${val}</${tag}>`;
+    }
+    html+='</tr>';
+  }
+  return html+'</table>';
 }
 
-// Toggle giữa visual editor và raw HTML
+function _buildJss(pageNum, ti, html){
+  const key=`${pageNum}-${ti}`;
+  const container=document.getElementById(`jss-${pageNum}-${ti}`);
+  if(!container) return;
+  if(_jssInstances[key]){ try{_jssInstances[key].destroy();}catch(e){} delete _jssInstances[key]; }
+  container.innerHTML='';
+  const parsed=_htmlToJssData(html);
+  if(!parsed){ container.innerHTML='<div style="padding:12px;color:var(--muted)">Empty table</div>'; return; }
+  const onChange=()=>{
+    const jss=_jssInstances[key]; if(!jss) return;
+    const newHtml=_jssToHtml(jss);
+    S.editorData[pageNum].tables[ti].html=newHtml;
+    S.editorData[pageNum].tables[ti].cells=parseCells(newHtml);
+    const ta=document.getElementById(`th-${pageNum}-${ti}`); if(ta) ta.value=newHtml;
+    const cc=document.getElementById(`cell-count-${pageNum}-${ti}`); if(cc) cc.textContent=`${S.editorData[pageNum].tables[ti].cells.length} cells`;
+  };
+  const jss=jspreadsheet(container,{
+    data:parsed.data, columns:parsed.columns, mergeCells:parsed.mergeCells,
+    rowHeaders:true, columnResize:true, rowResize:true,
+    allowInsertRow:true, allowInsertColumn:true,
+    allowDeleteRow:true, allowDeleteColumn:true,
+    contextMenu:true, columnSorting:false,
+    onchange:onChange, onmerge:onChange,
+    ondeleterow:onChange, oninsertrow:onChange,
+    ondeletecol:onChange, oninsertcol:onChange,
+    onundo:onChange, onredo:onChange,
+  });
+  _jssInstances[key]=jss;
+}
+
+function buildEditableTable(html, pageNum, ti){
+  setTimeout(()=>_buildJss(pageNum, ti, html), 0);
+  return `<div id="jss-${pageNum}-${ti}" style="min-height:40px"></div>`;
+}
+
+function onCellEdit(){}  // no-op — jss handles via onchange
+
 function toggleRawHtml(pageNum,ti){
-  const tv  = document.getElementById(`tv-${pageNum}-${ti}`);
-  const ta  = document.getElementById(`th-${pageNum}-${ti}`);
-  const btn = document.getElementById(`btn-raw-${pageNum}-${ti}`);
-  if(!tv||!ta||!btn) return;
-
-  const showingRaw = ta.style.display !== 'none';
+  const jssDiv=document.getElementById(`jss-${pageNum}-${ti}`);
+  const ta=document.getElementById(`th-${pageNum}-${ti}`);
+  const btn=document.getElementById(`btn-raw-${pageNum}-${ti}`);
+  if(!ta||!btn) return;
+  const showingRaw=ta.style.display!=='none';
   if(showingRaw){
-    // Raw → Visual: sync textarea → rebuild table
     const html=ta.value;
     S.editorData[pageNum].tables[ti].html=html;
     S.editorData[pageNum].tables[ti].cells=parseCells(html);
-    tv.innerHTML=buildEditableTable(html, pageNum, ti);
     ta.style.display='none';
-    tv.style.display='';
-    btn.style.background='';
-    btn.style.color='';
+    if(jssDiv) jssDiv.style.display='';
+    _buildJss(pageNum, ti, html);
+    btn.style.background=''; btn.style.color='';
   } else {
-    // Visual → Raw: show textarea
+    if(jssDiv) jssDiv.style.display='none';
     ta.style.display='block';
-    tv.style.display='none';
-    btn.style.background='var(--accent)';
-    btn.style.color='#fff';
+    btn.style.background='var(--accent)'; btn.style.color='#fff';
   }
 }
+function togglePreview(pageNum,ti){ toggleRawHtml(pageNum,ti); }
 
-function togglePreview(pageNum,ti){ toggleRawHtml(pageNum,ti); } // backward compat
+// Stub old functions no longer needed
+function tblAction(){}
+function tblUndo(){}
+function tblRedo(){}
+function _syncTableFromDom(){}
+function showTblCtx(){}
+function tblCtx(){}
+function _showCellActions(){}
+function _hideCellActions(){}
+function cellActionLeft(){}
+function cellActionRight(){}
+function cellActionDel(){}
 
 function parseCells(html){
   const doc=new DOMParser().parseFromString(html,'text/html');
@@ -1539,6 +1567,57 @@ function _updateUndoBtns(pageNum,ti){
 }
 
 let _ctxTarget = null;
+
+// ── Cell floating action bar ──────────────────────────────────
+let _focusedCell = null;
+
+function _showCellActions(cell, pageNum, ti){
+  _focusedCell = { cell, pageNum, ti };
+  const bar = document.getElementById('cell-actions');
+  bar.style.display = 'flex';
+  _repositionCellActions();
+}
+function _repositionCellActions(){
+  if(!_focusedCell) return;
+  const rect = _focusedCell.cell.getBoundingClientRect();
+  const bar  = document.getElementById('cell-actions');
+  const bw   = bar.offsetWidth  || 120;
+  const bh   = bar.offsetHeight || 30;
+  let top  = rect.top - bh - 6;
+  let left = rect.left + rect.width/2 - bw/2;
+  if(top < 4) top = rect.bottom + 6;
+  left = Math.max(4, Math.min(window.innerWidth - bw - 4, left));
+  bar.style.top  = top  + 'px';
+  bar.style.left = left + 'px';
+}
+function _hideCellActions(){
+  document.getElementById('cell-actions').style.display = 'none';
+  _focusedCell = null;
+}
+function cellActionLeft(){
+  if(!_focusedCell) return;
+  const {cell,pageNum,ti} = _focusedCell;
+  tblAction(pageNum, ti, 'insert-cell-before', cell);
+  _hideCellActions();
+}
+function cellActionRight(){
+  if(!_focusedCell) return;
+  const {cell,pageNum,ti} = _focusedCell;
+  tblAction(pageNum, ti, 'insert-cell-after', cell);
+  _hideCellActions();
+}
+function cellActionDel(){
+  if(!_focusedCell) return;
+  const {cell,pageNum,ti} = _focusedCell;
+  tblAction(pageNum, ti, 'delete-cell', cell);
+  _hideCellActions();
+}
+document.addEventListener('mousedown', e=>{
+  if(!e.target.closest('#cell-actions')&&!e.target.closest('.tbl-edit td,.tbl-edit th'))
+    _hideCellActions();
+  if(!e.target.closest('#tbl-ctx-menu'))
+    document.getElementById('tbl-ctx-menu').style.display='none';
+});
 
 function showTblCtx(e, pageNum, ti){
   e.preventDefault();
