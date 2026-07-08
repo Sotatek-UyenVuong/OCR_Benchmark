@@ -202,7 +202,9 @@ body { font-family: -apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
 .tab.active { background:var(--accent); color:#fff; }
 .editor-body { flex:1; overflow-y:auto; padding:12px; }
 .editor-body.table-mode { padding:0; overflow-y:auto; display:block; }
-.hot-wrapper { flex:1; min-height:0; }
+.hot-wrapper { min-height:0; overflow:auto; }
+/* HOT scrollbar always visible when needed */
+.hot-wrapper .wtHolder { overflow:auto !important; }
 .text-area { width:100%; background:var(--bg); border:1px solid var(--border); color:var(--text);
              font-family:"JetBrains Mono","Fira Code",monospace; font-size:12px; line-height:1.65;
              padding:10px 12px; resize:vertical; outline:none; min-height:200px; border-radius:6px; }
@@ -1076,7 +1078,6 @@ function _htmlToHotData(html){
   const rows=[...table.querySelectorAll('tr')];
   if(!rows.length) return null;
 
-  // Build data array + merge cells config
   let maxCols=0;
   rows.forEach(r=>{
     let c=0;
@@ -1085,23 +1086,27 @@ function _htmlToHotData(html){
   });
   if(!maxCols) maxCols=1;
 
-  const data=[], merges=[], occupied={};
+  const data=[], merges=[];
   rows.forEach((row,ri)=>{
     const rowData=new Array(maxCols).fill('');
     let ci=0;
     row.querySelectorAll('td,th').forEach(cell=>{
-      while(occupied[`${ri},${ci}`]) ci++;
+      // Find next empty slot
+      while(ci < maxCols && rowData[ci] !== '') ci++;
+      if(ci >= maxCols) return;
       const cs=+(cell.getAttribute('colspan')||1);
       const rs=+(cell.getAttribute('rowspan')||1);
-      rowData[ci]=cell.textContent.trim();
+      const text=cell.textContent.trim();
+      rowData[ci]=text;
       if(cs>1||rs>1){
         merges.push({row:ri,col:ci,rowspan:rs,colspan:cs});
-        for(let r2=ri;r2<ri+rs;r2++) for(let c2=ci;c2<ci+cs;c2++) if(r2!==ri||c2!==ci) occupied[`${r2},${c2}`]=true;
       }
       ci+=cs;
     });
     data.push(rowData);
   });
+  // Ensure all rows have same length
+  data.forEach(r=>{ while(r.length<maxCols) r.push(''); });
   return {data, merges, maxCols};
 }
 
