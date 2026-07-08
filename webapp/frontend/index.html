@@ -6,10 +6,10 @@
 <title>OCR Benchmark</title>
 <script src="https://cdn.jsdelivr.net/npm/pdfjs-dist@4.4.168/build/pdf.min.mjs" type="module" id="pdfjs-script"></script>
 <!-- Jspreadsheet CE: Excel-like table editor -->
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/jspreadsheet-ce/dist/jspreadsheet.min.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/jspreadsheet-ce/dist/jspreadsheet.css">
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/jsuites/dist/jsuites.min.css">
 <script src="https://cdn.jsdelivr.net/npm/jsuites/dist/jsuites.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/jspreadsheet-ce/dist/jspreadsheet.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/jspreadsheet-ce/dist/index.min.js"></script>
 <style>
 * { box-sizing: border-box; margin: 0; padding: 0; }
 :root {
@@ -1083,8 +1083,11 @@ function _htmlToJssData(html){
 }
 
 function _jssToHtml(jss){
-  const data=jss.getData();
-  const merges=jss.getMerge ? jss.getMerge() : {};
+  // jspreadsheet CE v5: instance có thể là array hoặc object
+  const inst = Array.isArray(jss) ? jss[0] : jss;
+  const data = inst.getData ? inst.getData() : (jss.getData ? jss.getData() : []);
+  // getMerge may not exist in all versions — fallback to empty
+  const merges = (inst.getMerge ? inst.getMerge() : null) || {};
   const nRows=data.length, nCols=(data[0]||[]).length;
   const skip={};
   let html='<table>';
@@ -1113,6 +1116,14 @@ function _buildJss(pageNum, ti, html){
   container.innerHTML='';
   const parsed=_htmlToJssData(html);
   if(!parsed){ container.innerHTML='<div style="padding:12px;color:var(--muted)">Empty table</div>'; return; }
+
+  // Safety: check jspreadsheet is loaded
+  if(typeof jspreadsheet === 'undefined'){
+    container.innerHTML='<div style="padding:12px;color:var(--orange)">Loading spreadsheet library…</div>';
+    setTimeout(()=>_buildJss(pageNum, ti, html), 500);
+    return;
+  }
+
   const onChange=()=>{
     const jss=_jssInstances[key]; if(!jss) return;
     const newHtml=_jssToHtml(jss);
@@ -1121,18 +1132,24 @@ function _buildJss(pageNum, ti, html){
     const ta=document.getElementById(`th-${pageNum}-${ti}`); if(ta) ta.value=newHtml;
     const cc=document.getElementById(`cell-count-${pageNum}-${ti}`); if(cc) cc.textContent=`${S.editorData[pageNum].tables[ti].cells.length} cells`;
   };
-  const jss=jspreadsheet(container,{
-    data:parsed.data, columns:parsed.columns, mergeCells:parsed.mergeCells,
-    rowHeaders:true, columnResize:true, rowResize:true,
-    allowInsertRow:true, allowInsertColumn:true,
-    allowDeleteRow:true, allowDeleteColumn:true,
-    contextMenu:true, columnSorting:false,
-    onchange:onChange, onmerge:onChange,
-    ondeleterow:onChange, oninsertrow:onChange,
-    ondeletecol:onChange, oninsertcol:onChange,
-    onundo:onChange, onredo:onChange,
-  });
-  _jssInstances[key]=jss;
+
+  try {
+    const jss=jspreadsheet(container,{
+      data:parsed.data, columns:parsed.columns, mergeCells:parsed.mergeCells,
+      rowHeaders:true, columnResize:true, rowResize:true,
+      allowInsertRow:true, allowInsertColumn:true,
+      allowDeleteRow:true, allowDeleteColumn:true,
+      contextMenu:true, columnSorting:false,
+      onchange:onChange, onmerge:onChange,
+      ondeleterow:onChange, oninsertrow:onChange,
+      ondeletecol:onChange, oninsertcol:onChange,
+      onundo:onChange, onredo:onChange,
+    });
+    _jssInstances[key]=jss;
+  } catch(e) {
+    console.error('jspreadsheet init error:', e);
+    container.innerHTML=`<div style="padding:12px;color:var(--red)">Spreadsheet error: ${e.message}</div>`;
+  }
 }
 
 function buildEditableTable(html, pageNum, ti){
