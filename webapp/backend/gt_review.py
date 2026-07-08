@@ -62,6 +62,7 @@ def _iter_draft_files():
         gt_saved = gt_path.exists()
         gt_status = ""
         gt_reviewer = ""
+        gt_updated = ""
         if gt_saved:
             try:
                 import json as _json
@@ -69,6 +70,7 @@ def _iter_draft_files():
                     _gt = _json.load(_f)
                 gt_status   = _gt.get("status", "")
                 gt_reviewer = _gt.get("reviewer", "")
+                gt_updated  = _gt.get("updated_at", "")
             except Exception:
                 pass
 
@@ -85,6 +87,7 @@ def _iter_draft_files():
             "gt_saved": gt_saved,
             "gt_status": gt_status,
             "gt_reviewer": gt_reviewer,
+            "gt_updated": gt_updated,
             "gt_path": str(gt_path.relative_to(PROJECT_ROOT)) if gt_saved else None,
         }
 

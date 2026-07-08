@@ -202,6 +202,37 @@ body { font-family: -apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
 .modal input:focus, .modal select:focus { border-color:var(--accent); }
 .modal-footer { display:flex; justify-content:flex-end; gap:8px; margin-top:4px; }
 
+/* ── dashboard overlay ── */
+.dashboard-overlay { position:fixed; inset:0; background:rgba(0,0,0,.65); z-index:900;
+                     display:flex; align-items:flex-start; justify-content:center;
+                     padding:24px 16px; overflow-y:auto; }
+.dashboard-box { background:var(--surface); border:1px solid var(--border); border-radius:12px;
+                 width:100%; max-width:960px; display:flex; flex-direction:column;
+                 box-shadow:0 8px 40px rgba(0,0,0,.5); }
+.dashboard-header { padding:14px 20px; background:var(--surface2); border-bottom:1px solid var(--border);
+                    border-radius:12px 12px 0 0; display:flex; align-items:center; gap:10px; }
+.dashboard-header h2 { font-size:15px; font-weight:700; flex:1; }
+.db-stats { display:grid; grid-template-columns:repeat(4,1fr); border-bottom:1px solid var(--border); }
+.db-stat { padding:14px 20px; border-right:1px solid var(--border); }
+.db-stat:last-child { border-right:none; }
+.db-stat-label { font-size:11px; font-weight:600; text-transform:uppercase;
+                 letter-spacing:.05em; color:var(--muted); margin-bottom:4px; }
+.db-stat-val { font-size:22px; font-weight:700; }
+.db-table-wrap { overflow-x:auto; }
+.db-table { width:100%; border-collapse:collapse; font-size:13px; }
+.db-table th { padding:9px 14px; background:var(--surface2); color:var(--muted);
+               font-weight:700; text-align:left; border-bottom:1px solid var(--border);
+               white-space:nowrap; font-size:11px; text-transform:uppercase; letter-spacing:.05em; }
+.db-table td { padding:9px 14px; border-bottom:1px solid #1e2132; vertical-align:middle; }
+.db-table tr:last-child td { border-bottom:none; }
+.db-table tr:hover td { background:#1e2132; cursor:pointer; }
+.status-pill { display:inline-flex; align-items:center; gap:5px; padding:2px 9px;
+               border-radius:99px; font-size:11px; font-weight:600; }
+.pill-done   { background:#1e3a2f; color:var(--green); }
+.pill-prog   { background:#3a2a1a; color:var(--orange); }
+.pill-new    { background:#2d3250; color:var(--muted); }
+.pill-ocr    { background:#1e2a4a; color:var(--accent); }
+
 /* ── toast ── */
 #toast { position:fixed; bottom:20px; right:20px; padding:10px 18px; border-radius:8px;
          font-size:13px; font-weight:600; display:none; z-index:9999;
@@ -224,6 +255,8 @@ body { font-family: -apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
     <span class="badge badge-green" id="stat-eval">— evaluated</span>
     <span class="badge badge-orange" id="stat-pending">— pending</span>
     <div style="flex:1"></div>
+    <button class="btn btn-ghost" onclick="showDashboard()" id="btn-dashboard"
+      style="padding:5px 12px;font-size:12px">📊 Dashboard</button>
     <button class="btn btn-ghost" onclick="refreshAll()" style="padding:5px 12px;font-size:12px">↻ Refresh</button>
   </div>
 
@@ -316,6 +349,53 @@ body { font-family: -apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
 </div>
 
 <div id="toast"></div>
+
+<!-- Dashboard overlay -->
+<div id="dashboard-overlay" class="dashboard-overlay" style="display:none" onclick="if(event.target===this)hideDashboard()">
+  <div class="dashboard-box">
+    <div class="dashboard-header">
+      <h2>📊 GT Review Dashboard</h2>
+      <span id="db-updated" style="font-size:11px;color:var(--muted)"></span>
+      <button class="btn btn-ghost" style="padding:4px 10px;font-size:12px" onclick="refreshDashboard()">↻</button>
+      <button class="btn btn-ghost" style="padding:4px 10px;font-size:12px" onclick="hideDashboard()">✕</button>
+    </div>
+    <div class="db-stats">
+      <div class="db-stat">
+        <div class="db-stat-label">Total files</div>
+        <div class="db-stat-val" id="db-total">—</div>
+      </div>
+      <div class="db-stat">
+        <div class="db-stat-label">🟢 Done</div>
+        <div class="db-stat-val" style="color:var(--green)" id="db-done">—</div>
+      </div>
+      <div class="db-stat">
+        <div class="db-stat-label">🟠 In progress</div>
+        <div class="db-stat-val" style="color:var(--orange)" id="db-prog">—</div>
+      </div>
+      <div class="db-stat">
+        <div class="db-stat-label">⚪ Not started</div>
+        <div class="db-stat-val" style="color:var(--muted)" id="db-new">—</div>
+      </div>
+    </div>
+    <div class="db-table-wrap">
+      <table class="db-table">
+        <thead>
+          <tr>
+            <th>File</th>
+            <th>UC Type</th>
+            <th>Lang</th>
+            <th>OCR</th>
+            <th>GT Status</th>
+            <th>Reviewer</th>
+            <th>Eval</th>
+            <th>Updated</th>
+          </tr>
+        </thead>
+        <tbody id="db-tbody"></tbody>
+      </table>
+    </div>
+  </div>
+</div>
 
 <!-- Save GT modal -->
 <div id="save-modal" class="modal-backdrop" style="display:none" onclick="if(event.target===this)closeSaveModal()">
@@ -1100,6 +1180,109 @@ function buildPageTable(pages, type){
       </tr>`).join('')}</tbody>
     </table>`;
   return card;
+}
+
+// ═══════════════════════════════════════════════════════════════
+// Dashboard
+// ═══════════════════════════════════════════════════════════════
+
+function showDashboard(){
+  document.getElementById('dashboard-overlay').style.display = 'flex';
+  refreshDashboard();
+}
+function hideDashboard(){
+  document.getElementById('dashboard-overlay').style.display = 'none';
+}
+
+async function refreshDashboard(){
+  // Lấy danh sách PDF + trạng thái
+  const [pdfsRes, filesRes] = await Promise.all([
+    fetch('/api/ocr/pdfs'),
+    fetch('/api/gt/files'),
+  ]);
+  const pdfs  = await pdfsRes.json();   // [{doc_id, uc_type, lang, ocr_done, eval_done, ...}]
+  const files = await filesRes.json();  // {files: [{doc_id, gt_saved, gt_status, gt_reviewer, ...}]}
+
+  // Build lookup: doc_id → gt metadata
+  const gtMap = {};
+  for(const f of (files.files||[])){
+    const key = `${f.doc_id}|${f.uc_type}|${f.lang}`;
+    if(!gtMap[key] || f.gt_saved) gtMap[key] = f;
+  }
+
+  // Đọc thêm updated_at từ GT JSON nếu saved
+  // (đã có trong files API qua gt_status + gt_reviewer)
+
+  let cntDone=0, cntProg=0, cntNew=0;
+
+  const rows = pdfs.map(p => {
+    const key  = `${p.doc_id}|${p.uc_type}|${p.lang}`;
+    const gtF  = gtMap[key] || {};
+    const status   = gtF.gt_status   || (gtF.gt_saved ? 'unknown' : '');
+    const reviewer = gtF.gt_reviewer || '';
+    const updated  = gtF.gt_updated  || '';
+    const gtSaved  = gtF.gt_saved || false;
+    const ocrDone  = p.ocr_done?.marker || false;
+    const evalDone = p.eval_done?.marker || false;
+
+    if(status === 'done')        cntDone++;
+    else if(status === 'in_progress') cntProg++;
+    else                         cntNew++;
+
+    return {p, status, reviewer, updated, gtSaved, ocrDone, evalDone};
+  });
+
+  // Stats
+  document.getElementById('db-total').textContent = pdfs.length;
+  document.getElementById('db-done').textContent  = cntDone;
+  document.getElementById('db-prog').textContent  = cntProg;
+  document.getElementById('db-new').textContent   = cntNew;
+  document.getElementById('db-updated').textContent =
+    'Updated ' + new Date().toLocaleTimeString();
+
+  // Table rows
+  const tbody = document.getElementById('db-tbody');
+  tbody.innerHTML = '';
+
+  // Sort: done last, in_progress middle, not started first
+  const order = {'': 0, 'in_progress': 1, 'done': 2, 'unknown': 1};
+  rows.sort((a,b) => (order[a.status]||0) - (order[b.status]||0));
+
+  for(const {p, status, reviewer, updated, gtSaved, ocrDone, evalDone} of rows){
+    const tr = document.createElement('tr');
+    tr.onclick = () => { hideDashboard(); selectFileById(p); };
+
+    const statusPill = status === 'done'
+      ? `<span class="status-pill pill-done">🟢 Done</span>`
+      : status === 'in_progress'
+      ? `<span class="status-pill pill-prog">🟠 In progress</span>`
+      : `<span class="status-pill pill-new">⚪ Not started</span>`;
+
+    const ocrPill  = ocrDone
+      ? `<span class="status-pill pill-ocr">✓ OCR</span>`
+      : `<span class="status-pill pill-new">—</span>`;
+
+    const evalPill = evalDone
+      ? `<span class="status-pill pill-done">✓ Eval</span>`
+      : `<span class="status-pill pill-new">—</span>`;
+
+    tr.innerHTML = `
+      <td style="font-weight:600">${p.doc_id}</td>
+      <td>${p.uc_type}</td>
+      <td>${p.lang}</td>
+      <td>${ocrPill}</td>
+      <td>${statusPill}</td>
+      <td style="color:var(--muted)">${reviewer || '—'}</td>
+      <td>${evalPill}</td>
+      <td style="color:var(--muted);font-size:11px">${updated ? updated.replace('T',' ').replace('Z','') : '—'}</td>`;
+    tbody.appendChild(tr);
+  }
+}
+
+// Click row trong dashboard → chọn file và mở step 2
+function selectFileById(p){
+  const f = S.pdfs.find(x => x.doc_id===p.doc_id && x.uc_type===p.uc_type && x.lang===p.lang);
+  if(f) selectFile(f);
 }
 
 // ═══════════════════════════════════════════════════════════════
