@@ -409,11 +409,19 @@ body { font-family: -apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
 <div id="tbl-ctx-menu">
   <button onclick="tblCtx('insert-row-above')">↑ Insert row above</button>
   <button onclick="tblCtx('insert-row-below')">↓ Insert row below</button>
-  <button onclick="tblCtx('delete-row')">🗑 Delete row</button>
+  <button onclick="tblCtx('delete-row')" style="color:var(--red)">🗑 Delete row</button>
   <div class="ctx-sep"></div>
-  <button onclick="tblCtx('insert-col-left')">← Insert column left</button>
-  <button onclick="tblCtx('insert-col-right')">→ Insert column right</button>
-  <button onclick="tblCtx('delete-col')">🗑 Delete column</button>
+  <button onclick="tblCtx('insert-col-left')">← Insert col left</button>
+  <button onclick="tblCtx('insert-col-right')">→ Insert col right</button>
+  <button onclick="tblCtx('delete-col')" style="color:var(--red)">🗑 Delete col</button>
+  <div class="ctx-sep"></div>
+  <button onclick="tblCtx('insert-cell-before')">+ Cell before</button>
+  <button onclick="tblCtx('insert-cell-after')">+ Cell after</button>
+  <button onclick="tblCtx('delete-cell')" style="color:var(--red)">🗑 Delete cell</button>
+  <div class="ctx-sep"></div>
+  <button onclick="tblCtx('merge-right')">⊞ Merge right</button>
+  <button onclick="tblCtx('merge-down')">⊟ Merge down</button>
+  <button onclick="tblCtx('split-cell')">⊠ Split cell</button>
   <div class="ctx-sep"></div>
   <button onclick="tblCtx('toggle-header')">⇅ Toggle th/td</button>
 </div>
@@ -1081,14 +1089,24 @@ function buildEditableTable(html, pageNum, ti){
   });
 
   const toolbar = `<div class="tbl-toolbar">
-    <button onclick="tblAction(${pageNum},${ti},'insert-row-below')">+ Row ↓</button>
-    <button onclick="tblAction(${pageNum},${ti},'insert-row-above')">+ Row ↑</button>
-    <button onclick="tblAction(${pageNum},${ti},'delete-row')" style="color:var(--red)">− Row</button>
+    <button id="btn-undo-${pageNum}-${ti}" onclick="tblUndo(${pageNum},${ti})" disabled title="Ctrl+Z">↩ Undo</button>
+    <button id="btn-redo-${pageNum}-${ti}" onclick="tblRedo(${pageNum},${ti})" disabled title="Ctrl+Y">↪ Redo</button>
     <div style="width:1px;background:var(--border);margin:0 2px"></div>
-    <button onclick="tblAction(${pageNum},${ti},'insert-col-right')">+ Col →</button>
-    <button onclick="tblAction(${pageNum},${ti},'insert-col-left')">+ Col ←</button>
-    <button onclick="tblAction(${pageNum},${ti},'delete-col')" style="color:var(--red)">− Col</button>
+    <button onclick="tblAction(${pageNum},${ti},'insert-row-below')">+Row↓</button>
+    <button onclick="tblAction(${pageNum},${ti},'insert-row-above')">+Row↑</button>
+    <button onclick="tblAction(${pageNum},${ti},'delete-row')" style="color:var(--red)">−Row</button>
     <div style="width:1px;background:var(--border);margin:0 2px"></div>
+    <button onclick="tblAction(${pageNum},${ti},'insert-col-right')">+Col→</button>
+    <button onclick="tblAction(${pageNum},${ti},'insert-col-left')">+Col←</button>
+    <button onclick="tblAction(${pageNum},${ti},'delete-col')" style="color:var(--red)">−Col</button>
+    <div style="width:1px;background:var(--border);margin:0 2px"></div>
+    <button onclick="tblAction(${pageNum},${ti},'insert-cell-after')">+Cell→</button>
+    <button onclick="tblAction(${pageNum},${ti},'insert-cell-before')">+Cell←</button>
+    <button onclick="tblAction(${pageNum},${ti},'delete-cell')" style="color:var(--red)">−Cell</button>
+    <div style="width:1px;background:var(--border);margin:0 2px"></div>
+    <button onclick="tblAction(${pageNum},${ti},'merge-right')">Merge→</button>
+    <button onclick="tblAction(${pageNum},${ti},'merge-down')">Merge↓</button>
+    <button onclick="tblAction(${pageNum},${ti},'split-cell')">Split</button>
     <button onclick="tblAction(${pageNum},${ti},'toggle-header')">th↔td</button>
   </div>`;
 
@@ -1454,9 +1472,21 @@ function selectFileById(p){
 // Ctrl+S shortcut → mở save modal
 // ═══════════════════════════════════════════════════════════════
 document.addEventListener('keydown',e=>{
+  // Ctrl+S → save modal (step 3)
   if((e.ctrlKey||e.metaKey)&&e.key==='s'){
     e.preventDefault();
     if(S.step===3&&!document.getElementById('btn-save-eval').disabled) saveAndEval();
+    return;
+  }
+  // Ctrl+Z / Ctrl+Y trong table editor
+  const cell = document.activeElement?.closest('.tbl-edit td, .tbl-edit th');
+  if(cell && (e.ctrlKey||e.metaKey)){
+    const tv = cell.closest('[id^="tv-"]');
+    if(!tv) return;
+    const [,pageNum,ti] = tv.id.match(/tv-(\d+)-(\d+)/)||[];
+    if(!pageNum) return;
+    if(e.key==='z'){ e.preventDefault(); tblUndo(+pageNum,+ti); }
+    if(e.key==='y'){ e.preventDefault(); tblRedo(+pageNum,+ti); }
   }
 });
 
@@ -1464,7 +1494,51 @@ document.addEventListener('keydown',e=>{
 // Table structure editing
 // ═══════════════════════════════════════════════════════════════
 
-let _ctxTarget = null;  // { pageNum, ti, cell } — cell đang right-click
+// ── Undo/Redo stack ───────────────────────────────────────────
+const _undoStack = {};
+const _redoStack = {};
+const MAX_UNDO   = 30;
+
+function _pushUndo(pageNum, ti, html){
+  const k=`${pageNum}|${ti}`;
+  (_undoStack[k]=_undoStack[k]||[]).push(html);
+  if(_undoStack[k].length>MAX_UNDO) _undoStack[k].shift();
+  _redoStack[k]=[];
+  _updateUndoBtns(pageNum,ti);
+}
+function tblUndo(pageNum,ti){
+  const k=`${pageNum}|${ti}`;
+  if(!_undoStack[k]?.length) return;
+  (_redoStack[k]=_redoStack[k]||[]).push(S.editorData[pageNum]?.tables[ti]?.html||'');
+  _applyHtml(pageNum,ti,_undoStack[k].pop());
+  _updateUndoBtns(pageNum,ti);
+}
+function tblRedo(pageNum,ti){
+  const k=`${pageNum}|${ti}`;
+  if(!_redoStack[k]?.length) return;
+  (_undoStack[k]=_undoStack[k]||[]).push(S.editorData[pageNum]?.tables[ti]?.html||'');
+  _applyHtml(pageNum,ti,_redoStack[k].pop());
+  _updateUndoBtns(pageNum,ti);
+}
+function _applyHtml(pageNum,ti,html){
+  S.editorData[pageNum].tables[ti].html=html;
+  S.editorData[pageNum].tables[ti].cells=parseCells(html);
+  const tv=document.getElementById(`tv-${pageNum}-${ti}`);
+  if(tv) tv.innerHTML=buildEditableTable(html,pageNum,ti);
+  const ta=document.getElementById(`th-${pageNum}-${ti}`);
+  if(ta) ta.value=html;
+  const cc=document.getElementById(`cell-count-${pageNum}-${ti}`);
+  if(cc) cc.textContent=`${S.editorData[pageNum].tables[ti].cells.length} cells`;
+}
+function _updateUndoBtns(pageNum,ti){
+  const k=`${pageNum}|${ti}`;
+  const u=document.getElementById(`btn-undo-${pageNum}-${ti}`);
+  const r=document.getElementById(`btn-redo-${pageNum}-${ti}`);
+  if(u) u.disabled=!_undoStack[k]?.length;
+  if(r) r.disabled=!_redoStack[k]?.length;
+}
+
+let _ctxTarget = null;
 
 function showTblCtx(e, pageNum, ti){
   e.preventDefault();
@@ -1485,67 +1559,117 @@ document.addEventListener('click', ()=>{
   document.getElementById('tbl-ctx-menu').style.display='none';
 });
 
-// Core: thực hiện thao tác cấu trúc trên live DOM table rồi sync về data
+// ── Core action ───────────────────────────────────────────────
 function tblAction(pageNum, ti, action, targetCell=null){
   const tv    = document.getElementById(`tv-${pageNum}-${ti}`);
   const table = tv?.querySelector('table');
   if(!table) return;
 
-  // Nếu không có targetCell, dùng cell đang focus hoặc cell đầu tiên
+  // Snapshot trước khi thay đổi
+  _pushUndo(pageNum, ti, S.editorData[pageNum]?.tables[ti]?.html || '');
+
   const activeCell = targetCell
     || document.activeElement?.closest(`#tv-${pageNum}-${ti} td, #tv-${pageNum}-${ti} th`)
     || table.querySelector('td,th');
-  if(!activeCell && action.includes('row') || !activeCell && action.includes('col') || !activeCell && action==='toggle-header') return;
 
-  const row   = activeCell?.closest('tr');
-  const rows  = [...table.querySelectorAll('tr')];
-  const rowIdx = row ? rows.indexOf(row) : -1;
-  const cells  = row ? [...row.querySelectorAll('td,th')] : [];
-  const colIdx = activeCell ? cells.indexOf(activeCell) : 0;
+  const row      = activeCell?.closest('tr');
+  const rows     = [...table.querySelectorAll('tr')];
+  const cells    = row ? [...row.querySelectorAll('td,th')] : [];
+  const colIdx   = activeCell ? cells.indexOf(activeCell) : 0;
   const colCount = rows[0] ? rows[0].querySelectorAll('td,th').length : 1;
 
   if(action === 'insert-row-below' || action === 'insert-row-above'){
     const newRow = document.createElement('tr');
     for(let c=0;c<colCount;c++){
-      const td=document.createElement('td');
-      td.textContent='';
-      newRow.appendChild(td);
+      const td=document.createElement('td'); td.textContent=''; newRow.appendChild(td);
     }
     if(action==='insert-row-below' && row) row.after(newRow);
     else if(row) row.before(newRow);
-    else table.querySelector('tbody,table')?.appendChild(newRow);
+    else (table.querySelector('tbody')||table).appendChild(newRow);
   }
   else if(action === 'delete-row'){
     if(rows.length > 1) row?.remove();
-    else alert('Bảng cần ít nhất 1 hàng');
-    return _syncTableFromDom(pageNum, ti, tv);
+    else { _undoStack[`${pageNum}|${ti}`]?.pop(); return; }
   }
   else if(action === 'insert-col-right' || action === 'insert-col-left'){
     rows.forEach((r,ri)=>{
       const rCells=[...r.querySelectorAll('td,th')];
-      const refCell = rCells[colIdx];
-      const newCell = document.createElement(ri===0&&table.querySelector('th')?'th':'td');
-      newCell.textContent='';
-      if(action==='insert-col-right' && refCell) refCell.after(newCell);
-      else if(refCell) refCell.before(newCell);
-      else r.appendChild(newCell);
+      const refCell=rCells[colIdx];
+      const nc=document.createElement(ri===0&&table.querySelector('th')?'th':'td');
+      nc.textContent='';
+      if(action==='insert-col-right'&&refCell) refCell.after(nc);
+      else if(refCell) refCell.before(nc);
+      else r.appendChild(nc);
     });
   }
   else if(action === 'delete-col'){
-    if(colCount > 1){
-      rows.forEach(r=>{
-        const rCells=[...r.querySelectorAll('td,th')];
-        rCells[colIdx]?.remove();
-      });
-    } else { alert('Bảng cần ít nhất 1 cột'); return; }
+    if(colCount > 1) rows.forEach(r=>[...r.querySelectorAll('td,th')][colIdx]?.remove());
+    else { _undoStack[`${pageNum}|${ti}`]?.pop(); return; }
+  }
+  // ── Thêm / xóa ô đơn lẻ ────────────────────────────────────
+  else if(action === 'insert-cell-after'||action === 'insert-cell-before'){
+    if(activeCell){
+      const nc=document.createElement(activeCell.tagName.toLowerCase());
+      nc.textContent='';
+      action==='insert-cell-after' ? activeCell.after(nc) : activeCell.before(nc);
+    }
+  }
+  else if(action === 'delete-cell'){
+    if(activeCell){
+      const r=activeCell.closest('tr');
+      if((r?.querySelectorAll('td,th').length||0)>1) activeCell.remove();
+      else { _undoStack[`${pageNum}|${ti}`]?.pop(); return; }
+    }
+  }
+  // ── Merge / Split ─────────────────────────────────────────
+  else if(action === 'merge-right'){
+    const next=activeCell?.nextElementSibling;
+    if(activeCell&&next&&'TD TH'.includes(next.tagName)){
+      activeCell.setAttribute('colspan',+( activeCell.getAttribute('colspan')||1)+1);
+      activeCell.textContent=(activeCell.textContent+' '+next.textContent).trim();
+      next.remove();
+    }
+  }
+  else if(action === 'merge-down'){
+    if(activeCell&&row){
+      const ri=rows.indexOf(row);
+      const ci=cells.indexOf(activeCell);
+      const below=[...rows[ri+1]?.querySelectorAll('td,th')||[]][ci];
+      if(below){
+        activeCell.setAttribute('rowspan',+(activeCell.getAttribute('rowspan')||1)+1);
+        activeCell.textContent=(activeCell.textContent+' '+below.textContent).trim();
+        below.remove();
+      }
+    }
+  }
+  else if(action === 'split-cell'){
+    if(activeCell){
+      const cs=+(activeCell.getAttribute('colspan')||1);
+      const rs=+(activeCell.getAttribute('rowspan')||1);
+      if(cs>1){
+        activeCell.removeAttribute('colspan');
+        for(let i=1;i<cs;i++){
+          const nc=document.createElement(activeCell.tagName.toLowerCase());
+          nc.textContent=''; activeCell.after(nc);
+        }
+      } else if(rs>1){
+        activeCell.removeAttribute('rowspan');
+        const ri=rows.indexOf(row);
+        for(let r2=1;r2<rs;r2++){
+          const tr=rows[ri+r2]; if(!tr) continue;
+          const nc=document.createElement(activeCell.tagName.toLowerCase());
+          nc.textContent=''; tr.insertBefore(nc,tr.firstChild);
+        }
+      }
+    }
   }
   else if(action === 'toggle-header'){
     if(activeCell){
-      const newTag = activeCell.tagName.toLowerCase()==='td' ? 'th' : 'td';
-      const newCell = document.createElement(newTag);
-      newCell.innerHTML = activeCell.innerHTML;
-      [...activeCell.attributes].forEach(a=>newCell.setAttribute(a.name,a.value));
-      activeCell.replaceWith(newCell);
+      const newTag=activeCell.tagName.toLowerCase()==='td'?'th':'td';
+      const nc=document.createElement(newTag);
+      nc.innerHTML=activeCell.innerHTML;
+      [...activeCell.attributes].forEach(a=>nc.setAttribute(a.name,a.value));
+      activeCell.replaceWith(nc);
     }
   }
 
