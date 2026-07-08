@@ -963,9 +963,22 @@ function renderPage(pageNum){
     // ── table editor ──
     const tables=page.tables||[];
     if(!tables.length){
-      body.innerHTML=`<div class="empty" style="height:200px">
+      // Tìm trang gần nhất có table để gợi ý
+      const pagesWithTables = Object.values(S.editorData)
+        .filter(p => (p.tables||[]).length > 0)
+        .sort((a,b) => a.page_num - b.page_num);
+      const jumpBtns = pagesWithTables.map(p =>
+        `<button class="btn btn-ghost" style="padding:3px 10px;font-size:12px"
+          onclick="document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
+                   document.getElementById('tab-${p.page_num}')?.classList.add('active');
+                   renderPage(${p.page_num})">
+          P${p.page_num} (${p.tables.length} table${p.tables.length>1?'s':''})
+        </button>`
+      ).join('');
+      body.innerHTML=`<div class="empty" style="height:200px;flex-direction:column;gap:10px">
         <p>No tables on page ${pageNum}</p>
-        <span style="font-size:12px;color:var(--muted)">Switch to Text mode to edit text content</span>
+        <span style="font-size:12px;color:var(--muted)">Switch to 📝 Text mode or jump to a page with tables:</span>
+        ${pagesWithTables.length ? `<div style="display:flex;gap:6px;flex-wrap:wrap;justify-content:center">${jumpBtns}</div>` : ''}
       </div>`;
       return;
     }
@@ -1578,21 +1591,38 @@ window.PDF.activateBlock = function(pn, blockId, type) {
   window.PDF.activeBlock = { pn, blockId, type };
 
   // Switch editor mode to match block type
-  if(type === 'table') {
-    window.setEditorMode('table');
-  } else {
-    window.setEditorMode('text');
-  }
+  const targetMode = type === 'table' ? 'table' : 'text';
+  window.setEditorMode(targetMode);
 
   // Jump to correct page tab
   const tab = document.getElementById(`tab-${pn}`);
-  if(tab && !tab.classList.contains('active')) {
+  if(tab) {
     document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
     tab.classList.add('active');
     window.renderPage(pn);
   }
 
-  // Scroll editor to top (page already shown)
+  // If table mode but this page has no tables, find nearest page that does
+  if(targetMode === 'table'){
+    const page = S.editorData[pn];
+    if(!page || !(page.tables||[]).length){
+      // Find nearest page with tables
+      const pagesWithTables = Object.values(S.editorData)
+        .filter(p => (p.tables||[]).length > 0)
+        .sort((a,b) => Math.abs(a.page_num - pn) - Math.abs(b.page_num - pn));
+      if(pagesWithTables.length){
+        const nearest = pagesWithTables[0];
+        const nearTab = document.getElementById(`tab-${nearest.page_num}`);
+        if(nearTab){
+          document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+          nearTab.classList.add('active');
+          window.renderPage(nearest.page_num);
+        }
+      }
+    }
+  }
+
+  // Scroll editor to top
   document.getElementById('editor-body')?.scrollTo({ top: 0, behavior: 'smooth' });
 };
 
