@@ -203,15 +203,8 @@ body { font-family: -apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
 .editor-body { flex:1; overflow-y:auto; padding:12px; }
 .editor-body.table-mode { padding:0; overflow-y:auto; display:block; }
 .hot-wrapper {
-  overflow:auto;
-  max-height: calc(100vh - 200px);
-  scrollbar-width:thin;
-  scrollbar-color:var(--border) var(--bg);
+  overflow:hidden;  /* HOT tự quản lý scroll nội bộ qua wtHolder */
 }
-.hot-wrapper::-webkit-scrollbar { width:8px; height:8px; }
-.hot-wrapper::-webkit-scrollbar-track { background:var(--bg); }
-.hot-wrapper::-webkit-scrollbar-thumb { background:var(--border); border-radius:4px; }
-.hot-wrapper::-webkit-scrollbar-thumb:hover { background:var(--accent); }
 .text-area { width:100%; background:var(--bg); border:1px solid var(--border); color:var(--text);
              font-family:"JetBrains Mono","Fira Code",monospace; font-size:12px; line-height:1.65;
              padding:10px 12px; resize:vertical; outline:none; min-height:200px; border-radius:6px; }
@@ -1166,10 +1159,13 @@ function _buildJss(pageNum, ti, html){
   const parsed=_htmlToHotData(html);
   if(!parsed){ container.innerHTML='<div style="padding:12px;color:var(--muted)">Empty table</div>'; return; }
 
-  // Để HOT tự tính chiều cao theo số row — không giới hạn
-  container.style.height = 'auto';
-  container.style.overflow = 'auto';
-  container.style.maxHeight = (window.innerHeight - 200) + 'px';
+  // Set height cố định để HOT tạo scrollbar nội bộ
+  const editorPanel = document.getElementById('editor-panel');
+  const panelH = editorPanel?.offsetHeight || window.innerHeight;
+  // Trừ: panel-hdr(40) + page-tabs(36) + table-label-row(36)
+  const hotH = Math.max(200, panelH - 112);
+  container.style.height = hotH + 'px';
+  container.style.overflow = 'hidden';
 
   const onChange=(_change, source)=>{
     if(source==='loadData') return;
@@ -1196,7 +1192,7 @@ function _buildJss(pageNum, ti, html){
       allowRemoveColumn: true,
       undo: true,
       redo: true,
-      height: 'auto',
+      height: hotH,
       stretchH: 'none',
       autoRowSize: false,
       autoColumnSize: false,
