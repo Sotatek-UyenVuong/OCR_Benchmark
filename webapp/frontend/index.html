@@ -5,11 +5,9 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>OCR Benchmark</title>
 <script src="https://cdn.jsdelivr.net/npm/pdfjs-dist@4.4.168/build/pdf.min.mjs" type="module" id="pdfjs-script"></script>
-<!-- jexcel v4: Excel-like table editor (stable API, MIT) -->
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/jexcel@4.6.1/dist/jexcel.min.css">
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/jsuites/dist/jsuites.min.css">
-<script src="https://cdn.jsdelivr.net/npm/jsuites/dist/jsuites.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/jexcel@4.6.1/dist/jexcel.min.js"></script>
+<!-- Handsontable CE v14: Excel-like grid editor -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/handsontable@14.6.1/dist/handsontable.full.min.css">
+<script src="https://cdn.jsdelivr.net/npm/handsontable@14.6.1/dist/handsontable.full.min.js"></script>
 <style>
 * { box-sizing: border-box; margin: 0; padding: 0; }
 :root {
@@ -150,7 +148,20 @@ body { font-family: -apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
 .jss_contextmenu_item:hover { background:var(--border) !important; }
 .jss_table thead td { background:var(--surface2) !important; font-weight:700 !important; color:var(--accent) !important; }
 
-/* legacy .tbl-edit still used for Raw preview */
+/* ── Handsontable dark theme ── */
+.hot-wrapper { border:1px solid var(--border); border-radius:6px; overflow:hidden; }
+.handsontable td, .handsontable th, .handsontable .colHeader {
+  background:var(--bg)!important; color:var(--text)!important;
+  border-color:var(--border)!important; font-size:12px!important; }
+.handsontable thead th { background:var(--surface2)!important; color:var(--accent)!important; font-weight:700!important; }
+.handsontable .htCore td.current { background:#1e2a4a!important; }
+.handsontable .htCore td.highlight { background:rgba(124,131,255,.1)!important; }
+.handsontable .htCore td.area { background:rgba(124,131,255,.08)!important; }
+.handsontable .rowHeader { background:var(--surface2)!important; color:var(--muted)!important; }
+.htContextMenu table tbody tr td { color:var(--text)!important; background:var(--surface)!important; }
+.htContextMenu table tbody tr td.current,.htContextMenu table tbody tr td:hover { background:var(--border)!important; }
+
+/* ── legacy .tbl-edit still used for Raw preview ── */
 .tbl-edit { border-collapse:collapse; width:100%; font-size:12px; }
 .tbl-edit td, .tbl-edit th { border:1px solid #4a5080; padding:5px 8px; }
 .tbl-edit th { background:#1e2a4a; color:var(--accent); }
@@ -1046,10 +1057,10 @@ function onHtmlInput(pageNum,ti){
   if(cc) cc.textContent=`${S.editorData[pageNum].tables[ti].cells.length} cells`;
 }
 
-// ── Jspreadsheet registry ─────────────────────────────────────
+// ── Handsontable registry ─────────────────────────────────────
 const _jssInstances = {};
 
-function _htmlToJssData(html){
+function _htmlToHotData(html){
   if(!html.trim()) return null;
   const doc=new DOMParser().parseFromString(html,'text/html');
   const table=doc.querySelector('table');
@@ -1057,11 +1068,16 @@ function _htmlToJssData(html){
   const rows=[...table.querySelectorAll('tr')];
   if(!rows.length) return null;
 
+  // Build data array + merge cells config
   let maxCols=0;
-  rows.forEach(r=>{let c=0; r.querySelectorAll('td,th').forEach(cell=>{c+=+(cell.getAttribute('colspan')||1);}); if(c>maxCols)maxCols=c;});
+  rows.forEach(r=>{
+    let c=0;
+    r.querySelectorAll('td,th').forEach(cell=>{ c+=+(cell.getAttribute('colspan')||1); });
+    if(c>maxCols) maxCols=c;
+  });
   if(!maxCols) maxCols=1;
 
-  const data=[], mergeCells={}, occupied={};
+  const data=[], merges=[], occupied={};
   rows.forEach((row,ri)=>{
     const rowData=new Array(maxCols).fill('');
     let ci=0;
@@ -1071,30 +1087,36 @@ function _htmlToJssData(html){
       const rs=+(cell.getAttribute('rowspan')||1);
       rowData[ci]=cell.textContent.trim();
       if(cs>1||rs>1){
-        mergeCells[`${String.fromCharCode(65+ci)}${ri+1}`]=[rs,cs];
+        merges.push({row:ri,col:ci,rowspan:rs,colspan:cs});
         for(let r2=ri;r2<ri+rs;r2++) for(let c2=ci;c2<ci+cs;c2++) if(r2!==ri||c2!==ci) occupied[`${r2},${c2}`]=true;
       }
       ci+=cs;
     });
     data.push(rowData);
   });
-  const columns=Array.from({length:maxCols},(_,i)=>({title:String.fromCharCode(65+i), width:Math.max(80,Math.floor(520/maxCols))}));
-  return {data, columns, mergeCells};
+  return {data, merges, maxCols};
 }
 
-function _jssToHtml(jss){
-  const data = jss.getData ? jss.getData() : [];
-  // jexcel v4: options.mergeCells
-  const merges = jss.options?.mergeCells || {};
+function _hotToHtml(hot, mergesConfig){
+  const data=hot.getData();
   const nRows=data.length, nCols=(data[0]||[]).length;
+  // Build merge lookup: row,col → {rowspan,colspan}
+  const mergeLookup={};
+  (mergesConfig||[]).forEach(m=>{ mergeLookup[`${m.row},${m.col}`]=m; });
+  // Also read live merges from HOT
+  try {
+    const liveMerges=hot.getPlugin('mergeCells').mergedCellsCollection?.mergedCells||[];
+    liveMerges.forEach(m=>{ mergeLookup[`${m.row},${m.col}`]={row:m.row,col:m.col,rowspan:m.rowspan,colspan:m.colspan}; });
+  } catch(e){}
+
   const skip={};
   let html='<table>';
   for(let r=0;r<nRows;r++){
     html+='<tr>';
     for(let c=0;c<nCols;c++){
       if(skip[`${r},${c}`]) continue;
-      const ref=`${String.fromCharCode(65+c)}${r+1}`;
-      const m=merges[ref]; const rs=m?m[0]:1; const cs=m?m[1]:1;
+      const m=mergeLookup[`${r},${c}`];
+      const rs=m?m.rowspan:1; const cs=m?m.colspan:1;
       if(rs>1||cs>1) for(let dr=0;dr<rs;dr++) for(let dc=0;dc<cs;dc++) if(dr||dc) skip[`${r+dr},${c+dc}`]=true;
       const attrs=[rs>1?`rowspan="${rs}"`:'', cs>1?`colspan="${cs}"`:''].filter(Boolean).join(' ');
       const tag=r===0?'th':'td';
@@ -1106,39 +1128,31 @@ function _jssToHtml(jss){
   return html+'</table>';
 }
 
-// Dark theme CSS overrides for jexcel
-const jexcelStyle=document.createElement('style');
-jexcelStyle.textContent=`
-  .jexcel_container{background:var(--bg)!important}
-  .jexcel td{background:var(--bg)!important;color:var(--text)!important;border-color:var(--border)!important}
-  .jexcel thead td{background:var(--surface2)!important;color:var(--accent)!important;font-weight:700}
-  .jexcel .highlight{background:rgba(124,131,255,.15)!important}
-  .jexcel .selected{background:rgba(124,131,255,.2)!important}
-  .jexcel_corner{background:var(--surface2)!important;border-color:var(--border)!important}
-  .jexcel_contextmenu{background:var(--surface)!important;color:var(--text)!important;border-color:var(--border)!important}
-  .jexcel_contextmenu li:hover{background:var(--border)!important}
-`;
-document.head.appendChild(jexcelStyle);
-
 function _buildJss(pageNum, ti, html){
   const key=`${pageNum}-${ti}`;
   const container=document.getElementById(`jss-${pageNum}-${ti}`);
   if(!container) return;
+
+  // Destroy old instance
   if(_jssInstances[key]){ try{_jssInstances[key].destroy();}catch(e){} delete _jssInstances[key]; }
   container.innerHTML='';
-  const parsed=_htmlToJssData(html);
-  if(!parsed){ container.innerHTML='<div style="padding:12px;color:var(--muted)">Empty table</div>'; return; }
 
-  // Safety: check jexcel is loaded
-  if(typeof jexcel === 'undefined'){
-    container.innerHTML='<div style="padding:12px;color:var(--orange)">Loading spreadsheet library…</div>';
+  if(typeof Handsontable === 'undefined'){
+    container.innerHTML='<div style="padding:12px;color:var(--orange)">Loading spreadsheet…</div>';
     setTimeout(()=>_buildJss(pageNum, ti, html), 500);
     return;
   }
 
-  const onChange=()=>{
-    const jss=_jssInstances[key]; if(!jss) return;
-    const newHtml=_jssToHtml(jss);
+  const parsed=_htmlToHotData(html);
+  if(!parsed){ container.innerHTML='<div style="padding:12px;color:var(--muted)">Empty table</div>'; return; }
+
+  // Wrapper div for height
+  container.style.maxHeight='400px'; container.style.overflow='hidden';
+
+  const onChange=(_change, source)=>{
+    if(source==='loadData') return;
+    const hot=_jssInstances[key]; if(!hot) return;
+    const newHtml=_hotToHtml(hot, parsed.merges);
     S.editorData[pageNum].tables[ti].html=newHtml;
     S.editorData[pageNum].tables[ti].cells=parseCells(newHtml);
     const ta=document.getElementById(`th-${pageNum}-${ti}`); if(ta) ta.value=newHtml;
@@ -1146,38 +1160,44 @@ function _buildJss(pageNum, ti, html){
   };
 
   try {
-    const jss=jexcel(container,{
-      data:parsed.data,
-      columns:parsed.columns,
-      mergeCells:parsed.mergeCells,
-      allowInsertRow:true,
-      allowInsertColumn:true,
-      allowDeleteRow:true,
-      allowDeleteColumn:true,
-      contextMenu:true,
-      columnSorting:false,
-      onchange:onChange,
-      onmerge:onChange,
-      ondeleterow:onChange,
-      oninsertrow:onChange,
-      ondeletecol:onChange,
-      oninsertcol:onChange,
-      onundo:onChange,
-      onredo:onChange,
+    const hot=new Handsontable(container, {
+      data: parsed.data,
+      rowHeaders: true,
+      colHeaders: true,
+      contextMenu: true,
+      manualRowResize: true,
+      manualColumnResize: true,
+      mergeCells: parsed.merges,
+      allowInsertRow: true,
+      allowInsertColumn: true,
+      allowRemoveRow: true,
+      allowRemoveColumn: true,
+      undo: true,
+      redo: true,
+      licenseKey: 'non-commercial-and-evaluation',
+      afterChange: onChange,
+      afterCreateRow: onChange,
+      afterRemoveRow: onChange,
+      afterCreateCol: onChange,
+      afterRemoveCol: onChange,
+      afterMergeCells: onChange,
+      afterUnmergeCells: onChange,
+      afterUndo: onChange,
+      afterRedo: onChange,
     });
-    _jssInstances[key]=jss;
-  } catch(e) {
-    console.error('jexcel init error:', e);
-    container.innerHTML=`<div style="padding:12px;color:var(--red)">Spreadsheet error: ${e.message}</div>`;
+    _jssInstances[key]=hot;
+  } catch(e){
+    console.error('Handsontable init error:', e);
+    container.innerHTML=`<div style="padding:12px;color:var(--red)">Error: ${e.message}</div>`;
   }
 }
 
 function buildEditableTable(html, pageNum, ti){
   setTimeout(()=>_buildJss(pageNum, ti, html), 0);
-  return `<div id="jss-${pageNum}-${ti}" style="min-height:40px"></div>`;
+  return `<div id="jss-${pageNum}-${ti}" class="hot-wrapper" style="min-height:60px"></div>`;
 }
 
-function onCellEdit(){}  // no-op — jss handles via onchange
+function onCellEdit(){}  // no-op — HOT handles via afterChange
 
 function toggleRawHtml(pageNum,ti){
   const jssDiv=document.getElementById(`jss-${pageNum}-${ti}`);
@@ -1201,7 +1221,7 @@ function toggleRawHtml(pageNum,ti){
 }
 function togglePreview(pageNum,ti){ toggleRawHtml(pageNum,ti); }
 
-// Stub old functions no longer needed
+// Stubs no longer needed
 function tblAction(){}
 function tblUndo(){}
 function tblRedo(){}
