@@ -807,43 +807,8 @@ async function renderReview(){
   S.textData  = {};
   S.tableData = {};
 
-  for(const d of results){
-    if(!d) continue;
-    const source = d.existing_gt || d.draft;
-    if(d.split === 'text' || d.split === 'unified'){
-      for(const p of (source.pages||[])){
-        S.textData[p.page_num] = clone(p);
-        // Đảm bảo có full_text
-        if(S.textData[p.page_num].full_text === undefined)
-          S.textData[p.page_num].full_text = '';
-      }
-    }
-    if(d.split === 'table'){
-      for(const p of (source.pages||[])){
-        S.tableData[p.page_num] = clone(p);
-      }
-    }
-    // unified: copy tables vào tableData cũng
-    if(d.split === 'unified'){
-      for(const p of (source.pages||[])){
-        if((p.tables||[]).length > 0){
-          S.tableData[p.page_num] = clone(p);
-        }
-      }
-    }
-  }
-
-  // Merge tableData vào textData (mỗi page có cả text lẫn tables)
-  const allPageNums = new Set([
-    ...Object.keys(S.textData).map(Number),
-    ...Object.keys(S.tableData).map(Number),
-  ]);
-  for(const pn of allPageNums){
-    if(!S.textData[pn]) S.textData[pn] = {page_num:pn, full_text:''};
-    if(S.tableData[pn])
-      S.textData[pn].tables = S.tableData[pn].tables;
-  }
-  S.editorData = S.textData;
+  for(const d of results) applyLoadResult(d, S.textData, S.tableData);
+  S.editorData = mergeEditorPages(S.textData, S.tableData);
 
   // Default mode: text
   S.editorSplit = 'text';
@@ -865,6 +830,56 @@ async function loadDraft(f, split){
     d.split = split;
     return d;
   }catch{ return null; }
+}
+
+// Merge load results into editor state.
+// GT đã lưu ưu tiên full_text; tables lấy từ GT nếu có, không thì fallback draft OCR.
+function applyLoadResult(d, textData, tableData){
+  if(!d) return;
+  const draftPages = Object.fromEntries((d.draft?.pages||[]).map(p=>[p.page_num,p]));
+  const gtPages    = Object.fromEntries((d.existing_gt?.pages||[]).map(p=>[p.page_num,p]));
+
+  if(d.split === 'text'){
+    const source = d.existing_gt || d.draft;
+    for(const p of (source?.pages||[])){
+      textData[p.page_num] = clone(p);
+      if(textData[p.page_num].full_text === undefined)
+        textData[p.page_num].full_text = '';
+    }
+  }
+  if(d.split === 'table'){
+    const pnums = new Set([...Object.keys(draftPages), ...Object.keys(gtPages)].map(Number));
+    for(const pn of pnums){
+      const gt = gtPages[pn], dr = draftPages[pn];
+      const tables = (gt?.tables?.length) ? gt.tables : (dr?.tables || []);
+      if(tables.length)
+        tableData[pn] = { page_num: pn, tables: clone(tables) };
+    }
+  }
+  if(d.split === 'unified'){
+    const source = d.existing_gt || d.draft;
+    for(const p of (source?.pages||[])){
+      textData[p.page_num] = clone(p);
+      if(textData[p.page_num].full_text === undefined)
+        textData[p.page_num].full_text = '';
+      const gt = gtPages[p.page_num], dr = draftPages[p.page_num];
+      const tables = (gt?.tables?.length) ? gt.tables : (dr?.tables || []);
+      if(tables.length)
+        tableData[p.page_num] = { page_num: p.page_num, tables: clone(tables) };
+    }
+  }
+}
+
+function mergeEditorPages(textData, tableData){
+  const allPageNums = new Set([
+    ...Object.keys(textData).map(Number),
+    ...Object.keys(tableData).map(Number),
+  ]);
+  for(const pn of allPageNums){
+    if(!textData[pn]) textData[pn] = {page_num:pn, full_text:''};
+    if(tableData[pn]) textData[pn].tables = tableData[pn].tables;
+  }
+  return textData;
 }
 
 // ── Editor chrome: mode toggle + page tabs ─────────────────────
@@ -1628,35 +1643,8 @@ const _patchedRenderReview = async function() {
   const results = await Promise.all(loads);
   S.textData = {}; S.tableData = {};
 
-  for(const d of results){
-    if(!d) continue;
-    const source = d.existing_gt || d.draft;
-    if(d.split === 'text' || d.split === 'unified'){
-      for(const p of (source.pages||[])){
-        S.textData[p.page_num] = clone(p);
-        if(S.textData[p.page_num].full_text === undefined)
-          S.textData[p.page_num].full_text = '';
-      }
-    }
-    if(d.split === 'table'){
-      for(const p of (source.pages||[]))
-        S.tableData[p.page_num] = clone(p);
-    }
-    if(d.split === 'unified'){
-      for(const p of (source.pages||[]))
-        if((p.tables||[]).length > 0) S.tableData[p.page_num] = clone(p);
-    }
-  }
-
-  const allPageNums = new Set([
-    ...Object.keys(S.textData).map(Number),
-    ...Object.keys(S.tableData).map(Number),
-  ]);
-  for(const pn of allPageNums){
-    if(!S.textData[pn]) S.textData[pn] = {page_num:pn, full_text:''};
-    if(S.tableData[pn]) S.textData[pn].tables = S.tableData[pn].tables;
-  }
-  S.editorData = S.textData;
+  for(const d of results) applyLoadResult(d, S.textData, S.tableData);
+  S.editorData = mergeEditorPages(S.textData, S.tableData);
   S.editorSplit = 'text';
   buildEditorChrome();
 
