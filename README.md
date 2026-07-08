@@ -1,5 +1,118 @@
 # OCR Benchmark
 
+## Quickstart
+
+### 1. Clone & cài dependencies
+
+```bash
+git clone https://github.com/Sotatek-UyenVuong/OCR_Benchmark.git
+cd OCR_Benchmark
+
+# Cài uv (nếu chưa có)
+curl -LsSf https://astral.sh/uv/install.sh | sh
+
+# Cài dependencies
+uv sync
+```
+
+### 2. Cấu hình API keys
+
+Tạo file `.env` ở root:
+
+```env
+MARKER_API_KEY=your_marker_api_key      # https://www.datalab.to
+OPENAI_API_KEY=your_openai_key          # tuỳ chọn
+OPEN_ROUTER=your_openrouter_key         # tuỳ chọn
+```
+
+### 3. Chuẩn bị dataset
+
+Đặt PDF vào đúng cấu trúc thư mục:
+
+```
+raw/
+├── scan/vi/        scan_vi_001.pdf, scan_vi_002.pdf, ...
+├── scan/en/        scan_en_001.pdf, ...
+├── scan/ja/        ...
+├── table/vi/       table_vi_001.pdf, ...
+├── table/en/       ...
+├── table/ja/       ...
+├── text_layer/vi/  textlayer_vi_001.pdf, ...
+├── text_layer/en/  ...
+└── text_layer/ja/  ...
+```
+
+> Nếu có dataset sẵn với tên file không chuẩn, dùng script tổ chức lại:
+> ```bash
+> # Copy từ "data sota/" → raw/ và đổi tên về format chuẩn
+> python3 scripts/reorganize_raw.py --execute --copy
+> python3 scripts/rename_raw.py --execute
+> ```
+
+### 4. Chạy Web App
+
+```bash
+uv run uvicorn webapp.backend.main:app --host 0.0.0.0 --port 8000 --reload
+```
+
+Mở trình duyệt: **http://localhost:8000**
+
+---
+
+## Luồng sử dụng Web App
+
+```
+[1] Select File   — chọn PDF từ danh sách
+       ↓
+[2] Run OCR       — chọn model (Marker), click "Run OCR"
+                    (idempotent: nếu đã chạy rồi sẽ skip)
+       ↓
+[3] Review GT     — PDF bên trái với bbox highlight
+                    Editor bên phải (📝 Text / 📊 Table)
+                    • Click vùng trên PDF → jump tới block tương ứng
+                    • Sửa text/HTML bảng trực tiếp
+                    • Ctrl+S hoặc "Save GT & Evaluate"
+       ↓
+[4] Scores        — CER, WER, nWER (text) + TEDS (table)
+                    Breakdown per page
+```
+
+---
+
+## Chạy CLI (không dùng web)
+
+### Chạy OCR cho 1 file
+
+```bash
+uv run python -m ocr_benchmark.ocr_model.marker_convert \
+  raw/scan/en/scan_en_001.pdf \
+  --uc split \
+  --doc-id scan_en_001 \
+  -l en \
+  -m balanced \
+  -o raw/scan/en/marker_output
+```
+
+`--uc` options: `scan` | `table` | `text_layer` | `split` (tách cả text lẫn table)
+
+### Chạy batch benchmark
+
+```bash
+uv run python -m ocr_benchmark.runner \
+  --gt_dir ground_truth/ \
+  --pred_dir predictions/marker/ \
+  --model marker \
+  --output_dir benchmark_results/
+```
+
+### Chạy tests
+
+```bash
+uv run pytest tests/ -v
+```
+
+---
+
 ## Use Cases
 
 | UC | Tên | Mô tả |
