@@ -11,8 +11,8 @@ dist/
 build/
 .pytest_cache/
 
-# Raw data — PDFs và marker output (lớn, không commit)
-raw/
+# Raw data — commit PDF gốc, bỏ marker output cache
+raw/**/marker_output/
 # Uncommit nếu muốn track ground_truth:
 # ground_truth/
 # predictions/
