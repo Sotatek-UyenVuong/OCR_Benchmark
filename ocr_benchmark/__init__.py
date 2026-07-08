@@ -1,0 +1,1 @@
+"""OCR Benchmark — evaluation toolkit."""

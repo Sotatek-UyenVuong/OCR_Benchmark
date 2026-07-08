@@ -1,0 +1,28 @@
+# Environment
+.env
+.venv/
+venv/
+
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+dist/
+build/
+.pytest_cache/
+
+# Raw data — PDFs và marker output (lớn, không commit)
+raw/
+# Uncommit nếu muốn track ground_truth:
+# ground_truth/
+# predictions/
+# benchmark_results/
+
+# Editor / OS
+.vscode/
+.kiro/
+.DS_Store
+*.swp
+
+# uv
+uv.lock

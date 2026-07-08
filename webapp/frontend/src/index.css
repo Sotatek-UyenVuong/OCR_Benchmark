@@ -1,0 +1,34 @@
+@import url('https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;500;600;700&family=Fira+Sans:wght@300;400;500;600;700&display=swap');
+@import "tailwindcss";
+
+:root {
+  --color-primary: #1E40AF;
+  --color-secondary: #3B82F6;
+  --color-accent: #D97706;
+  --color-background: #F8FAFC;
+  --color-surface: #FFFFFF;
+  --color-border: #DBEAFE;
+  --color-muted: #E9EEF6;
+  --color-text: #1E3A8A;
+  --color-text-muted: #64748B;
+
+  /* diff colors */
+  --color-sub: rgba(239, 68, 68, 0.25);
+  --color-del: rgba(234, 179, 8, 0.30);
+  --color-ins: rgba(59, 130, 246, 0.25);
+  --color-match: rgba(34, 197, 94, 0.15);
+}
+
+body {
+  font-family: 'Fira Sans', system-ui, sans-serif;
+  background: var(--color-background);
+  color: var(--color-text);
+}
+
+.font-mono { font-family: 'Fira Code', monospace; }
+
+/* PDF annotation highlight classes */
+.diff-sub   { background: var(--color-sub);   border-bottom: 2px solid #EF4444; }
+.diff-del   { background: var(--color-del);   border-bottom: 2px solid #EAB308; }
+.diff-ins   { background: var(--color-ins);   border-bottom: 2px solid #3B82F6; }
+.diff-match { background: var(--color-match); }
