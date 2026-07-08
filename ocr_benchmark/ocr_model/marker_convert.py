@@ -98,6 +98,7 @@ def _poll(check_url: str, headers: dict, poll_timeout: int, interval: int = 3) -
 # Block types Marker dùng cho bảng / biểu mẫu — đều có HTML dạng <table>
 TABLE_BLOCK_TYPES = {"Table", "Form"}
 
+
 def _extract_blocks_from_marker(marker_json: dict) -> list[dict]:
     """
     Flatten all blocks from Marker JSON response into a list of
@@ -124,8 +125,8 @@ def _extract_blocks_from_marker(marker_json: dict) -> list[dict]:
         "metadata": {...}
       }
     """
-    # Block types Marker dùng cho bảng / biểu mẫu — đều có HTML dạng <table>
-TABLE_BLOCK_TYPES = {"Table", "Form"}
+    # Block types to skip — no useful text content for OCR evaluation
+    SKIP_BLOCK_TYPES = {
         "Picture", "Figure", "Image",   # image blocks
         "Caption",                       # image captions
         "PageHeader",                    # usually just a logo/watermark

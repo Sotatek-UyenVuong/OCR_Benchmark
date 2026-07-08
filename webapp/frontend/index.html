@@ -127,9 +127,17 @@ body { font-family: -apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
 .progress-fill { height:100%; border-radius:2px; background:var(--accent); transition:width .4s; }
 
 /* ── step 3: review GT ── */
-.review-body { display:grid; grid-template-columns:1fr 1fr; flex:1; overflow:hidden; }
-.pdf-panel { display:flex; flex-direction:column; border-right:1px solid var(--border); overflow:hidden; }
-.editor-panel { display:flex; flex-direction:column; overflow:hidden; }
+.review-body { display:flex; flex-direction:row; flex:1; overflow:hidden; position:relative; }
+.pdf-panel { display:flex; flex-direction:column; overflow:hidden; min-width:200px; }
+.editor-panel { display:flex; flex-direction:column; overflow:hidden; flex:1; min-width:200px; }
+
+/* ── resizer handle ── */
+.resizer { width:5px; background:var(--border); cursor:col-resize; flex-shrink:0;
+           transition:background .15s; position:relative; z-index:10; }
+.resizer:hover, .resizer.dragging { background:var(--accent); }
+.resizer::after { content:'⋮'; position:absolute; top:50%; left:50%;
+                  transform:translate(-50%,-50%); color:var(--muted); font-size:14px;
+                  pointer-events:none; }
 .panel-hdr { padding:8px 14px; background:var(--surface2); border-bottom:1px solid var(--border);
              font-size:11px; font-weight:700; text-transform:uppercase; letter-spacing:.06em;
              color:var(--muted); display:flex; align-items:center; justify-content:space-between; }
@@ -143,6 +151,15 @@ body { font-family: -apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
 .pdf-overlay rect.hl-table { stroke:#22c55e; }
 .pdf-overlay rect.active{ fill:rgba(124,131,255,.2); }
 .pdf-overlay rect.active.hl-table{ fill:rgba(34,197,94,.2); }
+
+/* zoom bar */
+.zoom-bar { display:flex; align-items:center; gap:6px; padding:5px 10px;
+            background:var(--surface2); border-bottom:1px solid var(--border); flex-shrink:0; }
+.zoom-bar button { background:var(--border); border:none; color:var(--text); width:26px; height:26px;
+                   border-radius:5px; cursor:pointer; font-size:14px; display:flex;
+                   align-items:center; justify-content:center; }
+.zoom-bar button:hover { background:var(--accent); }
+.zoom-label { font-size:12px; font-weight:600; color:var(--muted); min-width:42px; text-align:center; }
 .pdf-frame iframe { width:100%; height:100%; border:none; }
 .page-tabs { display:flex; gap:3px; padding:7px 12px; background:var(--surface2);
              border-bottom:1px solid var(--border); flex-wrap:wrap; }
@@ -305,18 +322,29 @@ body { font-family: -apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
 
       <!-- Step 3: review GT -->
       <div class="panel" id="panel-3">
-        <div class="review-body">
-          <div class="pdf-panel">
+        <div class="review-body" id="review-body">
+          <div class="pdf-panel" id="pdf-panel" style="width:50%">
             <div class="panel-hdr">
               PDF Preview
               <span id="pdf-page-info" style="font-weight:400;text-transform:none;letter-spacing:0;font-size:11px"></span>
             </div>
-            <!-- PDF.js viewer: canvas + SVG overlay stacked -->
+            <!-- Zoom controls -->
+            <div class="zoom-bar">
+              <button onclick="zoomOut()" title="Thu nhỏ">−</button>
+              <span class="zoom-label" id="zoom-label">150%</span>
+              <button onclick="zoomIn()" title="Phóng to">+</button>
+              <button onclick="zoomFit()" title="Fit width" style="width:auto;padding:0 8px;font-size:11px;font-weight:600">Fit</button>
+            </div>
+            <!-- PDF.js viewer -->
             <div id="pdf-frame" style="flex:1;overflow-y:auto;overflow-x:hidden;background:#525659;position:relative;">
               <div class="empty"><p>No PDF loaded</p></div>
             </div>
           </div>
-          <div class="editor-panel">
+
+          <!-- Drag handle -->
+          <div class="resizer" id="resizer"></div>
+
+          <div class="editor-panel" id="editor-panel">
             <div class="panel-hdr">
               Ground Truth Editor
               <span id="editor-mode-lbl" style="font-weight:400;text-transform:none;letter-spacing:0"></span>
@@ -1296,6 +1324,106 @@ document.addEventListener('keydown',e=>{
 });
 
 // ═══════════════════════════════════════════════════════════════
+// Resizer — kéo divider trái/phải
+// ═══════════════════════════════════════════════════════════════
+(function(){
+  const resizer     = document.getElementById('resizer');
+  const pdfPanel    = document.getElementById('pdf-panel');
+  const reviewBody  = document.getElementById('review-body');
+  let dragging = false, startX = 0, startW = 0;
+
+  resizer.addEventListener('mousedown', e => {
+    dragging = true;
+    startX   = e.clientX;
+    startW   = pdfPanel.offsetWidth;
+    resizer.classList.add('dragging');
+    document.body.style.cursor = 'col-resize';
+    document.body.style.userSelect = 'none';
+  });
+
+  document.addEventListener('mousemove', e => {
+    if(!dragging) return;
+    const totalW = reviewBody.offsetWidth;
+    const newW   = Math.max(180, Math.min(totalW - 200, startW + e.clientX - startX));
+    pdfPanel.style.width = newW + 'px';
+    pdfPanel.style.flex  = 'none';
+  });
+
+  document.addEventListener('mouseup', () => {
+    if(!dragging) return;
+    dragging = false;
+    resizer.classList.remove('dragging');
+    document.body.style.cursor = '';
+    document.body.style.userSelect = '';
+  });
+})();
+
+// ═══════════════════════════════════════════════════════════════
+// Zoom controls
+// ═══════════════════════════════════════════════════════════════
+const ZOOM_STEPS = [0.5, 0.75, 1.0, 1.25, 1.5, 1.75, 2.0, 2.5, 3.0];
+
+function _updateZoomLabel(){
+  document.getElementById('zoom-label').textContent =
+    Math.round(window.PDF.SCALE * 100) + '%';
+}
+
+async function _rerender(){
+  if(!window.PDF.doc || !window.PDF._lastUrl) return;
+  const frame   = document.getElementById('pdf-frame');
+  const scrollY = frame.scrollTop;
+
+  // Re-render từng page trực tiếp lên canvas đã có — không xoá DOM
+  const doc = window.PDF.doc;
+  for(let pn = 1; pn <= doc.numPages; pn++){
+    const canvas   = window.PDF.canvases[pn];
+    const svg      = window.PDF.overlays[pn];
+    const wrap     = document.getElementById(`pdf-page-${pn}`);
+    if(!canvas) continue;
+
+    const page     = await doc.getPage(pn);
+    const viewport = page.getViewport({ scale: window.PDF.SCALE });
+
+    canvas.width  = viewport.width;
+    canvas.height = viewport.height;
+    svg.setAttribute('viewBox', `0 0 ${viewport.width} ${viewport.height}`);
+    svg.setAttribute('width',  viewport.width);
+    svg.setAttribute('height', viewport.height);
+    wrap.style.width = viewport.width + 'px';
+
+    await page.render({ canvasContext: canvas.getContext('2d'), viewport }).promise;
+  }
+
+  // Redraw bboxes với scale mới
+  window.PDF.drawAllBboxes();
+
+  // Restore scroll tương đối
+  frame.scrollTop = scrollY;
+}
+
+function zoomIn(){
+  const next = ZOOM_STEPS.find(s => s > window.PDF.SCALE);
+  if(next){ window.PDF.SCALE = next; _updateZoomLabel(); _rerender(); }
+}
+
+function zoomOut(){
+  const prev = [...ZOOM_STEPS].reverse().find(s => s < window.PDF.SCALE);
+  if(prev){ window.PDF.SCALE = prev; _updateZoomLabel(); _rerender(); }
+}
+
+function zoomFit(){
+  // Fit width: tính scale sao cho canvas width = panel width - 16px padding
+  const panelW = document.getElementById('pdf-frame').offsetWidth - 16;
+  if(!window.PDF.doc) return;
+  window.PDF.doc.getPage(1).then(page => {
+    const baseViewport = page.getViewport({ scale: 1.0 });
+    window.PDF.SCALE = Math.max(0.5, Math.min(3.0, panelW / baseViewport.width));
+    _updateZoomLabel();
+    _rerender();
+  });
+}
+
+// ═══════════════════════════════════════════════════════════════
 // Boot
 // ═══════════════════════════════════════════════════════════════
 refreshAll();
@@ -1322,6 +1450,7 @@ window.PDF = {
 
 // ── render all pages ──────────────────────────────────────────
 window.PDF.renderDocument = async function(url) {
+  window.PDF._lastUrl = url;   // lưu để re-render khi zoom
   const frame = document.getElementById('pdf-frame');
   frame.innerHTML = '<div style="padding:20px;color:var(--muted);text-align:center">Loading PDF…</div>';
 
