@@ -5,11 +5,11 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>OCR Benchmark</title>
 <script src="https://cdn.jsdelivr.net/npm/pdfjs-dist@4.4.168/build/pdf.min.mjs" type="module" id="pdfjs-script"></script>
-<!-- Jspreadsheet CE: Excel-like table editor -->
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/jspreadsheet-ce/dist/jspreadsheet.css">
+<!-- jexcel v4: Excel-like table editor (stable API, MIT) -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/jexcel@4.6.1/dist/jexcel.min.css">
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/jsuites/dist/jsuites.min.css">
 <script src="https://cdn.jsdelivr.net/npm/jsuites/dist/jsuites.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/jspreadsheet-ce/dist/index.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/jexcel@4.6.1/dist/jexcel.min.js"></script>
 <style>
 * { box-sizing: border-box; margin: 0; padding: 0; }
 :root {
@@ -1083,9 +1083,9 @@ function _htmlToJssData(html){
 }
 
 function _jssToHtml(jss){
-  // jspreadsheet CE v5: instance là worksheet object
   const data = jss.getData ? jss.getData() : [];
-  const merges = (jss.options?.mergeCells) || {};
+  // jexcel v4: options.mergeCells
+  const merges = jss.options?.mergeCells || {};
   const nRows=data.length, nCols=(data[0]||[]).length;
   const skip={};
   let html='<table>';
@@ -1106,6 +1106,20 @@ function _jssToHtml(jss){
   return html+'</table>';
 }
 
+// Dark theme CSS overrides for jexcel
+const jexcelStyle=document.createElement('style');
+jexcelStyle.textContent=`
+  .jexcel_container{background:var(--bg)!important}
+  .jexcel td{background:var(--bg)!important;color:var(--text)!important;border-color:var(--border)!important}
+  .jexcel thead td{background:var(--surface2)!important;color:var(--accent)!important;font-weight:700}
+  .jexcel .highlight{background:rgba(124,131,255,.15)!important}
+  .jexcel .selected{background:rgba(124,131,255,.2)!important}
+  .jexcel_corner{background:var(--surface2)!important;border-color:var(--border)!important}
+  .jexcel_contextmenu{background:var(--surface)!important;color:var(--text)!important;border-color:var(--border)!important}
+  .jexcel_contextmenu li:hover{background:var(--border)!important}
+`;
+document.head.appendChild(jexcelStyle);
+
 function _buildJss(pageNum, ti, html){
   const key=`${pageNum}-${ti}`;
   const container=document.getElementById(`jss-${pageNum}-${ti}`);
@@ -1115,8 +1129,8 @@ function _buildJss(pageNum, ti, html){
   const parsed=_htmlToJssData(html);
   if(!parsed){ container.innerHTML='<div style="padding:12px;color:var(--muted)">Empty table</div>'; return; }
 
-  // Safety: check jspreadsheet is loaded
-  if(typeof jspreadsheet === 'undefined'){
+  // Safety: check jexcel is loaded
+  if(typeof jexcel === 'undefined'){
     container.innerHTML='<div style="padding:12px;color:var(--orange)">Loading spreadsheet library…</div>';
     setTimeout(()=>_buildJss(pageNum, ti, html), 500);
     return;
@@ -1132,14 +1146,16 @@ function _buildJss(pageNum, ti, html){
   };
 
   try {
-    const jss=jspreadsheet(container,{
-      worksheets:[{
-        data:parsed.data,
-        columns:parsed.columns,
-        mergeCells:parsed.mergeCells,
-        tableOverflow:true,
-        tableWidth:'100%',
-      }],
+    const jss=jexcel(container,{
+      data:parsed.data,
+      columns:parsed.columns,
+      mergeCells:parsed.mergeCells,
+      allowInsertRow:true,
+      allowInsertColumn:true,
+      allowDeleteRow:true,
+      allowDeleteColumn:true,
+      contextMenu:true,
+      columnSorting:false,
       onchange:onChange,
       onmerge:onChange,
       ondeleterow:onChange,
@@ -1149,10 +1165,9 @@ function _buildJss(pageNum, ti, html){
       onundo:onChange,
       onredo:onChange,
     });
-    // v5 returns array of worksheet instances
-    _jssInstances[key] = Array.isArray(jss) ? jss[0] : jss;
+    _jssInstances[key]=jss;
   } catch(e) {
-    console.error('jspreadsheet init error:', e);
+    console.error('jexcel init error:', e);
     container.innerHTML=`<div style="padding:12px;color:var(--red)">Spreadsheet error: ${e.message}</div>`;
   }
 }
