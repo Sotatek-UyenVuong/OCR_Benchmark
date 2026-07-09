@@ -995,6 +995,9 @@ function renderTabs(pages){
 }
 
 function renderPage(pageNum){
+  // Trước khi xóa DOM, flush tất cả HOT instances hiện tại về editorData
+  _flushAllHotInstances();
+
   const body=document.getElementById('editor-body');
   const page=S.editorData[pageNum];
   if(!page){ body.innerHTML='<div class="empty"><p>Page not found</p></div>'; return; }
@@ -1084,6 +1087,22 @@ function onHtmlInput(pageNum,ti){
 
 // ── Handsontable registry ─────────────────────────────────────
 const _jssInstances = {};
+
+// Flush tất cả HOT instances về editorData — gọi trước khi switch page hoặc save
+function _flushAllHotInstances(){
+  for(const [key, hot] of Object.entries(_jssInstances)){
+    if(!hot) continue;
+    try{
+      const [pageNum, ti] = key.split('-').map(Number);
+      if(!S.editorData[pageNum]?.tables?.[ti]) continue;
+      const newHtml = _hotToHtml(hot, S.editorData[pageNum].tables[ti]._parsedMerges||[]);
+      if(newHtml && newHtml !== '<table></table>'){
+        S.editorData[pageNum].tables[ti].html  = newHtml;
+        S.editorData[pageNum].tables[ti].cells = parseCells(newHtml);
+      }
+    } catch(e){ console.warn('flush HOT error:', e); }
+  }
+}
 
 function _htmlToHotData(html){
   if(!html.trim()) return null;
@@ -1225,6 +1244,10 @@ function _buildJss(pageNum, ti, html){
       afterRedo: onChange,
     });
     _jssInstances[key]=hot;
+    // Lưu merges config để dùng khi flush
+    hot._parsedMerges = parsed.merges;
+    if(S.editorData[pageNum]?.tables?.[ti])
+      S.editorData[pageNum].tables[ti]._parsedMerges = parsed.merges;
     // Sau 2 frames: gọi render() để HOT tính lại kích thước đúng
     requestAnimationFrame(()=>requestAnimationFrame(()=>{
       try{ hot.render(); }catch(e){}
@@ -1376,13 +1399,15 @@ async function confirmSave(){
   const status   = document.getElementById('input-status').value;
   closeSaveModal();
 
-  // Lưu reviewer vào localStorage để prefill lần sau
   if(reviewer) localStorage.setItem('ocr_reviewer', reviewer);
 
   const f = S.selected;
   const btn = document.getElementById('btn-save-eval');
   btn.disabled = true; btn.textContent = '⏳ Saving…';
   info('Saving GT…', 'status-info');
+
+  // Flush tất cả HOT instances về editorData trước khi build GT
+  _flushAllHotInstances();
 
   // Build unified GT
   const pages = Object.values(S.editorData)
