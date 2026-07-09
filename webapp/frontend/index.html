@@ -1485,6 +1485,16 @@ async function confirmSave(){
     });
   const gtData = {doc_id: f.doc_id, pages};
 
+  // Debug log — xem data trước khi POST
+  for(const p of pages){
+    if(p.tables?.length){
+      p.tables.forEach((t,i)=>{
+        console.log(`[save] page=${p.page_num} table=${i} html.len=${t.html?.length}`);
+        console.log(`[save] snippet:`, t.html?.slice(0,120));
+      });
+    }
+  }
+
   try {
     // 1. Save GT
     const saveRes = await fetch('/api/gt/save', {
