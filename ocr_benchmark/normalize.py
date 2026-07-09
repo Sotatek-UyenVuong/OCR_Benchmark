@@ -159,12 +159,22 @@ def normalize_ocr_text(
     s = re.sub(r"`([^`]*)`", r"\1", s)
     s = re.sub(r"[*_]{1,3}", " ", s)
     s = re.sub(r"(?<!\S)#{1,6}(?!\S)", " ", s)
-    s = re.sub(r"[■□▪▫●○◦•∙·]", "", s)
+    # Strip Unicode bullet/dingbat glyphs (So=Symbol/Other, Po=Punct/Other bullets)
+    # This covers ■□▪▫●○◦•∙· and any new variants without needing to hardcode them
+    s = re.sub(r"[\u2022\u2023\u2024\u2025\u2026\u2027"   # bullet variants
+               r"\u2043\u204c\u204d\u2219\u25e6"           # more bullets
+               r"\u25a0-\u25ff"                            # geometric shapes (▪▫●○□■)
+               r"\u2700-\u27bf"                            # dingbats
+               r"\u00b7\u00b8]", "", s)                    # middle dot, cedilla
 
-    # 9. Normalize layout separators
-    for old, new in [("•"," "),("–","-"),("—","-"),("／","/"),(
-            "·"," "),("∙"," "),("●"," "),("•"," ")]:
-        s = s.replace(old, new)
+    # 9. Normalize layout separators using Unicode category approach
+    # Dashes: normalize all Unicode dashes to hyphen-minus
+    # Covers –—‒―⁃‐‑‒–—―  (U+2010..U+2015, U+2212, U+FE58, U+FE63, U+FF0D)
+    s = re.sub(r"[\u2010-\u2015\u2212\ufe58\ufe63\uff0d]", "-", s)
+    # Fullwidth slash
+    s = re.sub(r"[\uff0f\uff3c]", "/", s)
+    # Bullet chars that survived above (•·∙) → space
+    s = re.sub(r"[\u2022\u00b7\u2219\u22c5\u2027]", " ", s)
 
     # 10. Number-aware punctuation
     s = re.sub(r"(?<=\d),\s+(?=\d)", ",", s)
