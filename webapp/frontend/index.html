@@ -1133,7 +1133,6 @@ function _flushAllHotInstances(){
       if(!S.editorData[pageNum]?.tables?.[ti]) continue;
       const merges = S.editorData[pageNum].tables[ti]._parsedMerges || [];
       const newHtml = _hotToHtml(hot, merges);
-      console.log(`[flush] key=${key} rows=${hot.getData().length} html.len=${newHtml.length}`);
       if(newHtml && newHtml.length > 20){  // > "<table></table>"
         S.editorData[pageNum].tables[ti].html  = newHtml;
         S.editorData[pageNum].tables[ti].cells = parseCells(newHtml);
@@ -1184,18 +1183,18 @@ function _htmlToHotData(html){
 
 function _hotToHtml(hot, mergesConfig){
   const data=hot.getData();
-  // Debug: log raw data để xem HOT đang giữ gì
-  console.log('[_hotToHtml] data[0]:', JSON.stringify(data[0]));
-  console.log('[_hotToHtml] data[2]:', JSON.stringify(data[2])); // row có "Hi"
   const nRows=data.length, nCols=(data[0]||[]).length;
-  // Build merge lookup: row,col → {rowspan,colspan}
+  // Build merge lookup CHỈ từ live HOT merges — bỏ mergesConfig cũ
+  // vì mergesConfig giữ merge cũ từ HTML gốc, không reflect edits
   const mergeLookup={};
-  (mergesConfig||[]).forEach(m=>{ mergeLookup[`${m.row},${m.col}`]=m; });
-  // Also read live merges from HOT
   try {
-    const liveMerges=hot.getPlugin('mergeCells').mergedCellsCollection?.mergedCells||[];
+    const liveMerges=hot.getPlugin('mergeCells')?.mergedCellsCollection?.mergedCells||[];
     liveMerges.forEach(m=>{ mergeLookup[`${m.row},${m.col}`]={row:m.row,col:m.col,rowspan:m.rowspan,colspan:m.colspan}; });
   } catch(e){}
+  // mergesConfig chỉ dùng làm fallback nếu HOT plugin không khả dụng
+  if(Object.keys(mergeLookup).length === 0 && mergesConfig?.length){
+    mergesConfig.forEach(m=>{ mergeLookup[`${m.row},${m.col}`]=m; });
+  }
 
   const skip={};
   let html='<table>';
@@ -1492,8 +1491,7 @@ async function confirmSave(){
   for(const p of pages){
     if(p.tables?.length){
       p.tables.forEach((t,i)=>{
-        console.log(`[save] page=${p.page_num} table=${i} html.len=${t.html?.length}`);
-        console.log(`[save] snippet:`, t.html?.slice(0,120));
+        // debug removed
       });
     }
   }
