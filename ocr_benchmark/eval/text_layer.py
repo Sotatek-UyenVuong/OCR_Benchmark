@@ -4,9 +4,11 @@ Primary metrics: CER + Layout IoU
 """
 
 from __future__ import annotations
-from ..metrics.cer import compute_cer
+from ..metrics.uet_metrics import normalize_ocr_text
 from ..metrics.iou import compute_layout_iou
-from ..normalize import normalize_for_text_benchmark
+
+# Import the shared CER detail helper from scan
+from .scan import _compute_cer_detail
 
 
 def eval_text_layer(
@@ -36,22 +38,22 @@ def eval_text_layer(
     gt_text_raw = gt_page.get("full_text", "")
     gt_blocks = gt_page.get("blocks", [])
 
-    gt_text = normalize_for_text_benchmark(gt_text_raw)
-    pred_text_norm = normalize_for_text_benchmark(pred_full_text)
+    gt_text = normalize_ocr_text(gt_text_raw)
+    pred_text_norm = normalize_ocr_text(pred_full_text)
 
-    cer_result = compute_cer(gt_text, pred_text_norm, doc_id, page_num, include_alignment)
+    cer_info = _compute_cer_detail(gt_text, pred_text_norm, include_alignment)
     iou_result = compute_layout_iou(gt_blocks, pred_blocks, doc_id, page_num, iou_threshold)
 
     return {
         "doc_id": doc_id,
         "page_num": page_num,
         # Primary
-        "cer": cer_result["cer"],
-        "cer_detail": cer_result["cer_detail"],
+        "cer": cer_info["cer"],
+        "cer_detail": cer_info["cer_detail"],
         "mean_iou": iou_result["mean_iou"],
         # Debug
         "ground_truth": gt_text,
         "prediction": pred_text_norm,
-        "char_alignment": cer_result.get("char_alignment"),
+        "char_alignment": cer_info.get("char_alignment"),
         "blocks": iou_result["blocks"],
     }

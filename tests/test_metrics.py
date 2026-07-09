@@ -7,12 +7,67 @@ import sys
 import os
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), ".."))
 
-from ocr_benchmark.metrics.cer import compute_cer
-from ocr_benchmark.metrics.wer import compute_wer, compute_nwer
+# Import normalizers from uet_metrics (replaces old cer/wer/teds modules)
+from ocr_benchmark.metrics.uet_metrics import normalize_ocr_text
 from ocr_benchmark.metrics.pcs import compute_pcs, compute_punct_miou, compute_cap_miou
-from ocr_benchmark.metrics.teds import compute_teds
 from ocr_benchmark.metrics.iou import compute_layout_iou
+
+# Normalizer aliases (normalize_for_text_benchmark still exists in normalize.py)
 from ocr_benchmark.normalize import normalize_for_text_benchmark, normalize_for_nwer
+
+# Use eval/scan internals to expose the old dict-returning API for tests
+from ocr_benchmark.eval.scan import (
+    _compute_cer_detail,
+    _compute_wer_detail,
+    _compute_nwer,
+)
+# Use eval/table internals for compute_teds
+from ocr_benchmark.eval.table import _compute_teds
+
+
+# ---------------------------------------------------------------------------
+# Adapter functions to match original test expectations
+# ---------------------------------------------------------------------------
+
+def compute_cer(ground_truth, prediction, doc_id="", page_num=1, include_alignment=False):
+    """Adapter: returns old compute_cer() dict schema."""
+    result = _compute_cer_detail(ground_truth, prediction, include_alignment)
+    return {
+        "doc_id": doc_id,
+        "page_num": page_num,
+        "cer": result["cer"],
+        "cer_detail": result["cer_detail"],
+        "ground_truth": ground_truth,
+        "prediction": prediction,
+        "char_alignment": result.get("char_alignment"),
+    }
+
+
+def compute_wer(ground_truth, prediction, doc_id="", page_num=1):
+    """Adapter: returns old compute_wer() dict schema."""
+    result = _compute_wer_detail(ground_truth, prediction)
+    return {
+        "doc_id": doc_id,
+        "page_num": page_num,
+        "wer": result["wer"],
+        "wer_detail": result["wer_detail"],
+        "ground_truth": ground_truth,
+        "prediction": prediction,
+    }
+
+
+def compute_nwer(ground_truth, prediction, doc_id="", page_num=1):
+    """Adapter: returns old compute_nwer() dict schema."""
+    return {
+        "doc_id": doc_id,
+        "page_num": page_num,
+        "nwer": _compute_nwer(ground_truth, prediction),
+    }
+
+
+def compute_teds(gt_html, pred_html, doc_id="", page_num=1, table_id=1):
+    """Adapter: returns old compute_teds() dict schema."""
+    return _compute_teds(gt_html, pred_html, doc_id, page_num, table_id)
 
 
 # ---------------------------------------------------------------------------

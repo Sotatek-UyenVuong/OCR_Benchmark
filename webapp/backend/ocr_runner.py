@@ -25,11 +25,32 @@ import sys
 PROJECT_ROOT = Path(__file__).resolve().parents[2]
 sys.path.insert(0, str(PROJECT_ROOT))
 
-from ocr_benchmark.eval.scan import eval_scan
+from ocr_benchmark.eval.scan import eval_scan, _compute_wer_detail as _wer_detail_fn, _compute_nwer as _nwer_fn
 from ocr_benchmark.eval.table import eval_table
 from ocr_benchmark.eval.text_layer import eval_text_layer
-from ocr_benchmark.metrics.wer import compute_wer, compute_nwer
 from ocr_benchmark.normalize import normalize_for_text_benchmark
+
+
+def compute_wer(gt_text: str, pred_text: str, doc_id: str = "", page_num: int = 1) -> dict:
+    """Compatibility wrapper returning old compute_wer() dict schema."""
+    info = _wer_detail_fn(gt_text, pred_text)
+    return {
+        "doc_id": doc_id,
+        "page_num": page_num,
+        "wer": info["wer"],
+        "wer_detail": info["wer_detail"],
+        "ground_truth": gt_text,
+        "prediction": pred_text,
+    }
+
+
+def compute_nwer(gt_text: str, pred_text: str, doc_id: str = "", page_num: int = 1) -> dict:
+    """Compatibility wrapper returning old compute_nwer() dict schema."""
+    return {
+        "doc_id": doc_id,
+        "page_num": page_num,
+        "nwer": _nwer_fn(gt_text, pred_text),
+    }
 from .config import PROJECT_ROOT, RAW_ROOT, GT_ROOT, PRED_ROOT, RESULT_ROOT, MARKER_SUBDIR
 
 router = APIRouter(prefix="/api/ocr", tags=["OCR"])

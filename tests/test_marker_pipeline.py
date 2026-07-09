@@ -33,9 +33,44 @@ from ocr_benchmark.eval.scan import eval_scan
 from ocr_benchmark.eval.table import eval_table
 from ocr_benchmark.eval.text_layer import eval_text_layer
 from ocr_benchmark.normalize import normalize_for_text_benchmark
-from ocr_benchmark.metrics.cer import compute_cer
-from ocr_benchmark.metrics.wer import compute_wer, compute_nwer
-from ocr_benchmark.metrics.teds import compute_teds
+
+# Adapters for old dict-returning metric functions used in tests
+from ocr_benchmark.eval.scan import (
+    _compute_cer_detail,
+    _compute_wer_detail,
+    _compute_nwer,
+)
+from ocr_benchmark.eval.table import _compute_teds
+
+
+def compute_cer(ground_truth, prediction, doc_id="", page_num=1, include_alignment=False):
+    result = _compute_cer_detail(ground_truth, prediction, include_alignment)
+    return {
+        "doc_id": doc_id, "page_num": page_num,
+        "cer": result["cer"], "cer_detail": result["cer_detail"],
+        "ground_truth": ground_truth, "prediction": prediction,
+        "char_alignment": result.get("char_alignment"),
+    }
+
+
+def compute_wer(ground_truth, prediction, doc_id="", page_num=1):
+    result = _compute_wer_detail(ground_truth, prediction)
+    return {
+        "doc_id": doc_id, "page_num": page_num,
+        "wer": result["wer"], "wer_detail": result["wer_detail"],
+        "ground_truth": ground_truth, "prediction": prediction,
+    }
+
+
+def compute_nwer(ground_truth, prediction, doc_id="", page_num=1):
+    return {
+        "doc_id": doc_id, "page_num": page_num,
+        "nwer": _compute_nwer(ground_truth, prediction),
+    }
+
+
+def compute_teds(gt_html, pred_html, doc_id="", page_num=1, table_id=1):
+    return _compute_teds(gt_html, pred_html, doc_id, page_num, table_id)
 
 
 # ─────────────────────────────────────────────────────────────────
