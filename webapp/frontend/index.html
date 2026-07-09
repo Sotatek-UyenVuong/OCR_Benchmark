@@ -1534,13 +1534,16 @@ async function confirmSave(){
   for(const p of pages){
     if(p.tables?.length){
       p.tables.forEach((t,i)=>{
-        // debug removed
+        const hasHi = t.html?.includes('Hi');
+        console.log(`[save-pre-post] page=${p.page_num} table=${i} html.len=${t.html?.length} hasHi=${hasHi}`);
+        if(hasHi) console.log('[save-pre-post] HI FOUND in table', i, 'snippet:', t.html?.slice(0,200));
       });
     }
   }
 
   try {
     // 1. Save GT
+    console.log('[confirmSave] posting gtData pages:', pages.map(p=>({pn:p.page_num,tables:p.tables?.length||0})));
     const saveRes = await fetch('/api/gt/save', {
       method: 'POST',
       headers: {'Content-Type': 'application/json'},
@@ -1551,6 +1554,7 @@ async function confirmSave(){
     });
     if(!saveRes.ok) throw new Error((await saveRes.json()).detail || 'Save failed');
     const saveData = await saveRes.json();
+    console.log('[confirmSave] server response:', saveData);
 
     const statusIcon = status === 'done' ? '🟢' : '🟠';
     toast(`✅ Saved ${statusIcon} ${status}${reviewer ? ' · ' + reviewer : ''}`);
