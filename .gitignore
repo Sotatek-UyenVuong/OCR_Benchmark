@@ -13,10 +13,11 @@ build/
 
 # Raw data — commit PDF gốc, bỏ marker output cache
 raw/**/marker_output/
-# Uncommit nếu muốn track ground_truth:
-# ground_truth/
-# predictions/
-# benchmark_results/
+
+# Data directories — không commit, tạo tự động khi chạy
+ground_truth/
+predictions/
+benchmark_results/
 
 # Editor / OS
 .vscode/
