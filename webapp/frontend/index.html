@@ -1184,6 +1184,9 @@ function _htmlToHotData(html){
 
 function _hotToHtml(hot, mergesConfig){
   const data=hot.getData();
+  // Debug: log raw data để xem HOT đang giữ gì
+  console.log('[_hotToHtml] data[0]:', JSON.stringify(data[0]));
+  console.log('[_hotToHtml] data[2]:', JSON.stringify(data[2])); // row có "Hi"
   const nRows=data.length, nCols=(data[0]||[]).length;
   // Build merge lookup: row,col → {rowspan,colspan}
   const mergeLookup={};
