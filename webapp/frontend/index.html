@@ -1288,6 +1288,7 @@ function toggleRawHtml(pageNum,ti){
   if(!ta||!btn) return;
   const showingRaw=ta.style.display!=='none';
   if(showingRaw){
+    // Raw → Visual
     const html=ta.value;
     S.editorData[pageNum].tables[ti].html=html;
     S.editorData[pageNum].tables[ti].cells=parseCells(html);
@@ -1296,6 +1297,19 @@ function toggleRawHtml(pageNum,ti){
     _buildJss(pageNum, ti, html);
     btn.style.background=''; btn.style.color='';
   } else {
+    // Visual → Raw: flush HOT → textarea trước khi show
+    const key=`${pageNum}-${ti}`;
+    const hot=_jssInstances[key];
+    if(hot){
+      try{
+        const freshHtml=_hotToHtml(hot, S.editorData[pageNum].tables[ti]._parsedMerges||[]);
+        if(freshHtml && freshHtml.length>20){
+          S.editorData[pageNum].tables[ti].html=freshHtml;
+          S.editorData[pageNum].tables[ti].cells=parseCells(freshHtml);
+          ta.value=freshHtml;
+        }
+      }catch(e){}
+    }
     if(jssDiv) jssDiv.style.display='none';
     ta.style.display='block';
     btn.style.background='var(--accent)'; btn.style.color='#fff';
