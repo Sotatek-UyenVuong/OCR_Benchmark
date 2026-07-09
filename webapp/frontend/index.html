@@ -605,6 +605,12 @@ function filterFiles(q){
 }
 
 function selectFile(pdf){
+  // Destroy tất cả HOT instances của file cũ trước khi chuyển file
+  for(const [key, hot] of Object.entries(_jssInstances)){
+    try{ hot.destroy(); }catch(e){}
+  }
+  Object.keys(_jssInstances).forEach(k=>delete _jssInstances[k]);
+
   S.selected = pdf;
   // Update sidebar highlight
   document.querySelectorAll('.file-item').forEach(el=>el.classList.remove('active'));
@@ -1158,24 +1164,39 @@ function _htmlToHotData(html){
   if(!maxCols) maxCols=1;
 
   const data=[], merges=[];
+  // occupied: track cells taken by rowspan across rows
+  const rowspanOccupied = {};  // `${row},${col}` → true
+
   rows.forEach((row,ri)=>{
     const rowData=new Array(maxCols).fill('');
     let ci=0;
+
     row.querySelectorAll('td,th').forEach(cell=>{
-      // Find next empty slot
-      while(ci < maxCols && rowData[ci] !== '') ci++;
+      // Skip cells occupied by rowspan from above
+      while(ci < maxCols && rowspanOccupied[`${ri},${ci}`]) ci++;
       if(ci >= maxCols) return;
+
       const cs=+(cell.getAttribute('colspan')||1);
       const rs=+(cell.getAttribute('rowspan')||1);
       const text=cell.textContent.trim();
       rowData[ci]=text;
+
       if(cs>1||rs>1){
         merges.push({row:ri,col:ci,rowspan:rs,colspan:cs});
+        // Mark future cells as occupied
+        for(let dr=0;dr<rs;dr++){
+          for(let dc=0;dc<cs;dc++){
+            if(dr!==0||dc!==0){
+              rowspanOccupied[`${ri+dr},${ci+dc}`]=true;
+            }
+          }
+        }
       }
       ci+=cs;
     });
     data.push(rowData);
   });
+
   // Ensure all rows have same length
   data.forEach(r=>{ while(r.length<maxCols) r.push(''); });
   return {data, merges, maxCols};
