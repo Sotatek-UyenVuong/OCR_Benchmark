@@ -146,32 +146,47 @@ def _compute_teds(
 ) -> dict:
     """
     Compute TEDS between two HTML table strings, with full detail schema.
-    Preserves the original teds.py return format for backward compatibility.
+    Uses UET's grid normalization (teds_similarity_table) which:
+    1. Converts HTML → cell grid (normalizing rowspan/colspan)
+    2. Computes TEDS on the flattened grid representation
+    This avoids edit_distance > tree_size issue with complex span structures.
     """
-    gt_tree = _parse_html_to_tree(gt_html)
+    # Use UET's teds_similarity_table which normalizes via grid conversion
+    try:
+        from ocr_benchmark.metrics.uet_metrics import (
+            teds_similarity_table, extract_html_tables
+        )
+        gt_grids  = extract_html_tables(gt_html)
+        pred_grids = extract_html_tables(pred_html)
+        if gt_grids and pred_grids:
+            teds = teds_similarity_table(gt_grids[0], pred_grids[0])
+        elif not gt_grids and not pred_grids:
+            teds = 1.0
+        else:
+            teds = 0.0
+    except Exception:
+        # Fallback to raw tree edit distance
+        gt_tree  = _parse_html_to_tree(gt_html)
+        pred_tree = _parse_html_to_tree(pred_html)
+        if gt_tree is None and pred_tree is None:
+            teds = 1.0
+        else:
+            gt_size   = _tree_size(gt_tree)   if gt_tree   else 0
+            pred_size = _tree_size(pred_tree) if pred_tree else 0
+            edit_dist = _ted(gt_tree, pred_tree)
+            denom = max(gt_size, pred_size)
+            teds = max(0.0, min(1.0, 1.0 - edit_dist / denom)) if denom > 0 else 1.0
+
+    # Keep tree sizes for teds_detail (informational)
+    gt_tree   = _parse_html_to_tree(gt_html)
     pred_tree = _parse_html_to_tree(pred_html)
-
-    if gt_tree is None and pred_tree is None:
-        return {
-            "doc_id": doc_id, "page_num": page_num, "table_id": table_id,
-            "teds": 1.0,
-            "teds_detail": {"edit_distance": 0, "gt_tree_size": 0, "pred_tree_size": 0},
-            "ground_truth_html": gt_html,
-            "prediction_html": pred_html,
-            "cell_diff": [],
-        }
-
-    gt_size = _tree_size(gt_tree) if gt_tree else 0
+    gt_size   = _tree_size(gt_tree)   if gt_tree   else 0
     pred_size = _tree_size(pred_tree) if pred_tree else 0
-    edit_dist = _ted(gt_tree, pred_tree)
+    edit_dist = _ted(gt_tree, pred_tree) if (gt_tree or pred_tree) else 0
 
-    denom = max(gt_size, pred_size)
-    teds = 1.0 - (edit_dist / denom) if denom > 0 else 1.0
-    teds = max(0.0, min(1.0, teds))
-
-    gt_cells = _extract_cells(gt_html)
+    gt_cells   = _extract_cells(gt_html)
     pred_cells = _extract_cells(pred_html)
-    cell_diff = _build_cell_diff(gt_cells, pred_cells)
+    cell_diff  = _build_cell_diff(gt_cells, pred_cells)
 
     return {
         "doc_id": doc_id,
