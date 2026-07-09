@@ -1614,24 +1614,29 @@ function renderScores(data){
   // Text scores
   if(data.text){
     const s=data.text.summary;
-    body.appendChild(buildScoreCard('📝 Text Evaluation (CER / WER)', [
-      {label:'CER',  val:s.avg_cer,  lower:true},
-      {label:'WER',  val:s.avg_wer,  lower:true},
-      {label:'nWER', val:s.avg_nwer, lower:true},
+    body.appendChild(buildScoreCard('📝 Text Evaluation', [
+      {label:'CER',         val:s.avg_cer,                      lower:true},
+      {label:'WER',         val:s.avg_wer,                      lower:true},
+      {label:'nWER',        val:s.avg_nwer,                     lower:true},
+      {label:'Char F1',     val:s.avg_char_f1,                  lower:false},
+      {label:'Word F1',     val:s.avg_word_f1,                  lower:false},
+      {label:'Edit Sim',    val:s.avg_normalized_edit_similarity, lower:false},
       ...(s.avg_mean_iou!==undefined?[{label:'IoU',val:s.avg_mean_iou,lower:false}]:[]),
-      {label:'Pages', val:s.n_pages, raw:true},
+      {label:'Pages',       val:s.n_pages,                      raw:true},
     ]));
-
-    // Per-page table
     body.appendChild(buildPageTable(data.text.pages, 'text'));
   }
 
-  // Table scores
   if(data.table){
     const s=data.table.summary;
-    body.appendChild(buildScoreCard('📊 Table Evaluation (TEDS)', [
-      {label:'Avg TEDS', val:s.avg_teds, lower:false},
-      {label:'Pages', val:s.n_pages, raw:true},
+    body.appendChild(buildScoreCard('📊 Table Evaluation', [
+      {label:'Avg TEDS',       val:s.avg_teds,                lower:false},
+      {label:'Cell Exact F1',  val:s.avg_cell_exact_f1,       lower:false},
+      {label:'Cell Text Sim',  val:s.avg_cell_text_similarity, lower:false},
+      {label:'Row Count Sim',  val:s.avg_row_count_similarity, lower:false},
+      {label:'Col Count Sim',  val:s.avg_col_count_similarity, lower:false},
+      {label:'Table Count F1', val:s.table_count_f1,           lower:false},
+      {label:'Pages',          val:s.n_pages,                  raw:true},
     ]));
     body.appendChild(buildPageTable(data.table.pages, 'table'));
   }
@@ -1663,8 +1668,8 @@ function buildPageTable(pages, type){
   card.style.marginTop='8px';
 
   const cols = type==='table'
-    ? ['Page','Avg TEDS']
-    : ['Page','CER','WER','nWER'];
+    ? ['Page','Avg TEDS','Cell F1','Cell Sim']
+    : ['Page','CER','WER','nWER','Char F1','Word F1'];
 
   card.innerHTML=`<div class="card-block-title" style="padding:8px 16px">Per-page detail</div>
     <table class="page-table">
@@ -1672,10 +1677,14 @@ function buildPageTable(pages, type){
       <tbody>${pages.map(p=>`<tr>
         <td>P${p.page_num}</td>
         ${type==='table'
-          ?`<td class="${scoreClass(p.avg_teds,false)}">${(p.avg_teds*100).toFixed(1)}%</td>`
+          ?`<td class="${scoreClass(p.avg_teds,false)}">${(p.avg_teds*100).toFixed(1)}%</td>
+            <td>${((p.table_cell_exact_f1_mean||0)*100).toFixed(1)}%</td>
+            <td>${((p.table_cell_text_similarity_mean||0)*100).toFixed(1)}%</td>`
           :`<td class="${scoreClass(p.cer,true)}">${(p.cer*100).toFixed(2)}%</td>
             <td class="${scoreClass(p.wer,true)}">${((p.wer||0)*100).toFixed(2)}%</td>
-            <td class="${scoreClass(p.nwer,true)}">${((p.nwer||0)*100).toFixed(2)}%</td>`}
+            <td class="${scoreClass(p.nwer,true)}">${((p.nwer||0)*100).toFixed(2)}%</td>
+            <td class="${scoreClass(p.char_f1||0,false)}">${((p.char_f1||0)*100).toFixed(1)}%</td>
+            <td class="${scoreClass(p.word_f1||0,false)}">${((p.word_f1||0)*100).toFixed(1)}%</td>`}
       </tr>`).join('')}</tbody>
     </table>`;
   return card;

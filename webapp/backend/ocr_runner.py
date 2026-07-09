@@ -28,6 +28,7 @@ sys.path.insert(0, str(PROJECT_ROOT))
 from ocr_benchmark.eval.scan import eval_scan, _compute_wer_detail as _wer_detail_fn, _compute_nwer as _nwer_fn
 from ocr_benchmark.eval.table import eval_table
 from ocr_benchmark.eval.text_layer import eval_text_layer
+from ocr_benchmark.metrics.uet_metrics import compute_all_metrics, compute_table_metrics_from_html
 from ocr_benchmark.normalize import normalize_for_text_benchmark
 
 
@@ -263,29 +264,30 @@ def run_eval(req: EvalRequest):
             pred_page = pred_pages.get(pnum, {})
             pred_text = pred_page.get("full_text", "")
 
+            # Use UET metrics for full metric set
+            r = compute_all_metrics(gt_page, pred_page)
+            r["doc_id"] = req.doc_id
+            r["page_num"] = pnum
+
             if req.uc_type == "text_layer":
-                r = eval_text_layer(
+                iou_r = eval_text_layer(
                     gt_page,
                     pred_blocks=pred_page.get("blocks", []),
                     pred_full_text=pred_text,
                     doc_id=req.doc_id,
-                    include_alignment=True,
                 )
-            else:
-                r = eval_scan(gt_page, pred_text=pred_text, doc_id=req.doc_id, include_alignment=True)
-                # Add WER/nWER
-                gt_norm = normalize_for_text_benchmark(gt_page.get("full_text", ""))
-                pred_norm = normalize_for_text_benchmark(pred_text)
-                r.update(compute_wer(gt_norm, pred_norm, req.doc_id, pnum))
-                r["nwer"] = compute_nwer(gt_norm, pred_norm, req.doc_id, pnum)["nwer"]
+                r["mean_iou"] = iou_r.get("mean_iou", 0)
 
             page_results.append(r)
 
         summary = {
-            "avg_cer": _safe_mean([r["cer"] for r in page_results]),
-            "avg_wer": _safe_mean([r.get("wer", 0) for r in page_results]),
-            "avg_nwer": _safe_mean([r.get("nwer", 0) for r in page_results]),
-            "n_pages": len(page_results),
+            "avg_cer":                     _safe_mean([r.get("cer", 0)                        for r in page_results]),
+            "avg_wer":                     _safe_mean([r.get("wer", 0)                        for r in page_results]),
+            "avg_nwer":                    _safe_mean([r.get("nwer", 0)                       for r in page_results]),
+            "avg_char_f1":                 _safe_mean([r.get("char_f1", 0)                    for r in page_results]),
+            "avg_word_f1":                 _safe_mean([r.get("word_f1", 0)                    for r in page_results]),
+            "avg_normalized_edit_similarity": _safe_mean([r.get("normalized_edit_similarity", 0) for r in page_results]),
+            "n_pages":                     len(page_results),
         }
         if req.uc_type == "text_layer":
             summary["avg_mean_iou"] = _safe_mean([r.get("mean_iou", 0) for r in page_results])
@@ -314,12 +316,23 @@ def run_eval(req: EvalRequest):
                 table_results.append(r)
 
             if table_results:
+                # UET table metrics (TEDS + cell metrics) từ HTML trực tiếp
+                gt_html_list   = [t["html"] for p in gt_data.get("pages",[]) for t in (p.get("tables") or []) if t.get("html")]
+                pred_html_list = [t["html"] for p in table_pred_data.get("pages",[]) for t in (p.get("tables") or []) if t.get("html")]
+                uet_tbl = compute_table_metrics_from_html(gt_html_list, pred_html_list)
+
                 results["table"] = {
                     "summary": {
-                        "avg_teds": _safe_mean([r["avg_teds"] for r in table_results]),
+                        "avg_teds":                      _safe_mean([r["avg_teds"] for r in table_results]),
+                        "avg_cell_exact_f1":             uet_tbl.get("table_cell_exact_f1_mean", 0),
+                        "avg_cell_text_similarity":      uet_tbl.get("table_cell_text_similarity_mean", 0),
+                        "avg_row_count_similarity":      uet_tbl.get("table_row_count_similarity_mean", 0),
+                        "avg_col_count_similarity":      uet_tbl.get("table_col_count_similarity_mean", 0),
+                        "table_count_f1":                uet_tbl.get("table_count_f1", 0),
                         "n_pages": len(table_results),
                     },
                     "pages": table_results,
+                    "uet": uet_tbl,
                 }
 
     # ── Save result ───────────────────────────────────────────────────────
