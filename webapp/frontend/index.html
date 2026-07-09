@@ -1210,8 +1210,10 @@ function _buildJss(pageNum, ti, html){
       afterRedo: onChange,
     });
     _jssInstances[key]=hot;
-    // Sau khi DOM settle, updateSettings để HOT tính lại kích thước
-    setTimeout(()=>{ try{ hot.updateSettings({}); }catch(e){} }, 50);
+    // Sau 2 frames: gọi render() để HOT tính lại kích thước đúng
+    requestAnimationFrame(()=>requestAnimationFrame(()=>{
+      try{ hot.render(); }catch(e){}
+    }));
   } catch(e){
     console.error('Handsontable init error:', e);
     container.innerHTML=`<div style="padding:12px;color:var(--red)">Error: ${e.message}</div>`;
@@ -1219,7 +1221,8 @@ function _buildJss(pageNum, ti, html){
 }
 
 function buildEditableTable(html, pageNum, ti){
-  setTimeout(()=>_buildJss(pageNum, ti, html), 0);
+  // Dùng requestAnimationFrame để đảm bảo DOM đã mount trước khi HOT init
+  requestAnimationFrame(()=>requestAnimationFrame(()=>_buildJss(pageNum, ti, html)));
   return `<div id="jss-${pageNum}-${ti}" class="hot-wrapper"></div>`;
 }
 
