@@ -406,6 +406,7 @@ body { font-family: -apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
     <!-- action bar -->
     <div class="action-bar">
       <div class="info" id="action-info">Select a file to start</div>
+      <span id="autosave-indicator" style="font-size:11px;color:var(--green);opacity:0;transition:opacity .5s;margin-right:4px"></span>
       <button class="btn btn-ghost" id="btn-back" onclick="prevStep()" disabled style="padding:6px 12px">← Back</button>
       <button class="btn btn-ghost" id="btn-copy-draft" onclick="copyDraft()" disabled>↺ Load Fresh OCR</button>
       <button class="btn btn-danger" id="btn-delete-gt" onclick="deleteGT()" disabled style="display:none">🗑 Delete GT</button>
@@ -1070,11 +1071,46 @@ function renderPage(pageNum){
   }
 }
 
+// ── Auto-save draft (no eval) after 2s debounce ──────────────
+let _autoSaveTimer = null;
+function _scheduleAutoSave(){
+  clearTimeout(_autoSaveTimer);
+  _autoSaveTimer = setTimeout(async()=>{
+    if(!S.selected) return;
+    _flushAllHotInstances();
+    const f=S.selected;
+    const pages=Object.values(S.editorData)
+      .sort((a,b)=>a.page_num-b.page_num)
+      .map(p=>{
+        const out={page_num:p.page_num, full_text:p.full_text||''};
+        if((p.tables||[]).length>0) out.tables=p.tables;
+        return out;
+      });
+    const gtData={doc_id:f.doc_id, pages};
+    // Đọc reviewer/status từ localStorage (nếu có) hoặc dùng giá trị hiện tại
+    const reviewer=localStorage.getItem('ocr_reviewer')||'';
+    const status=S._lastGTStatus||'in_progress';
+    try{
+      await fetch('/api/gt/save',{
+        method:'POST',
+        headers:{'Content-Type':'application/json'},
+        body:JSON.stringify({doc_id:f.doc_id,uc_type:f.uc_type,lang:f.lang,
+          gt_data:gtData,reviewer,status})
+      });
+      // Silent save — chỉ hiện indicator nhỏ, không toast
+      const el=document.getElementById('autosave-indicator');
+      if(el){ el.textContent='✓ Saved'; el.style.opacity='1';
+        setTimeout(()=>el.style.opacity='0',2000); }
+    }catch(e){ console.warn('Auto-save failed:', e); }
+  }, 2000);
+}
+
 function onTextInput(pageNum){
   const v=document.getElementById(`ta-${pageNum}`).value;
   S.editorData[pageNum].full_text=v;
   const cc=document.getElementById(`cc-${pageNum}`);
   if(cc) cc.textContent=`${v.length} chars`;
+  _scheduleAutoSave();
 }
 function onHtmlInput(pageNum,ti){
   const v=document.getElementById(`th-${pageNum}-${ti}`).value;
@@ -1211,6 +1247,7 @@ function _buildJss(pageNum, ti, html){
     S.editorData[pageNum].tables[ti].cells=parseCells(newHtml);
     const ta=document.getElementById(`th-${pageNum}-${ti}`); if(ta) ta.value=newHtml;
     const cc=document.getElementById(`cell-count-${pageNum}-${ti}`); if(cc) cc.textContent=`${S.editorData[pageNum].tables[ti].cells.length} cells`;
+    _scheduleAutoSave();
   };
 
   try {
