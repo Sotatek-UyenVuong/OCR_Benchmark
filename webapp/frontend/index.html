@@ -1135,7 +1135,10 @@ function _flushAllHotInstances(){
   for(const [key, hot] of Object.entries(_jssInstances)){
     if(!hot) continue;
     try{
-      const [pageNum, ti] = key.split('-').map(Number);
+      // key format: docId-pageNum-ti
+      const parts = key.split('-');
+      const ti      = +parts[parts.length-1];
+      const pageNum = +parts[parts.length-2];
       if(!S.editorData[pageNum]?.tables?.[ti]) continue;
       const merges = S.editorData[pageNum].tables[ti]._parsedMerges || [];
       const newHtml = _hotToHtml(hot, merges);
@@ -1237,8 +1240,9 @@ function _hotToHtml(hot, mergesConfig){
 }
 
 function _buildJss(pageNum, ti, html){
-  const key=`${pageNum}-${ti}`;
-  const container=document.getElementById(`jss-${pageNum}-${ti}`);
+  const docId = S.selected?.doc_id || 'unknown';
+  const key=`${docId}-${pageNum}-${ti}`;
+  const container=document.getElementById(`jss-${docId}-${pageNum}-${ti}`);
   if(!container) return;
 
   // Destroy old instance
@@ -1316,10 +1320,13 @@ function _buildJss(pageNum, ti, html){
       try{
         const initHtml = _hotToHtml(hot, parsed.merges);
         if(initHtml && initHtml.length > 20 && S.editorData[pageNum]?.tables?.[ti]){
-          S.editorData[pageNum].tables[ti].html  = initHtml;
-          S.editorData[pageNum].tables[ti].cells = parseCells(initHtml);
-          const ta = document.getElementById(`th-${pageNum}-${ti}`);
-          if(ta) ta.value = initHtml;
+          // Chỉ update nếu vẫn là file này
+          if(S.selected?.doc_id === docId){
+            S.editorData[pageNum].tables[ti].html  = initHtml;
+            S.editorData[pageNum].tables[ti].cells = parseCells(initHtml);
+            const ta = document.getElementById(`th-${pageNum}-${ti}`);
+            if(ta) ta.value = initHtml;
+          }
         }
       } catch(e){}
     });
@@ -1334,15 +1341,17 @@ function _buildJss(pageNum, ti, html){
 }
 
 function buildEditableTable(html, pageNum, ti){
-  // Dùng requestAnimationFrame để đảm bảo DOM đã mount trước khi HOT init
+  const docId = S.selected?.doc_id || 'unknown';
+  const elemId = `jss-${docId}-${pageNum}-${ti}`;
   requestAnimationFrame(()=>requestAnimationFrame(()=>_buildJss(pageNum, ti, html)));
-  return `<div id="jss-${pageNum}-${ti}" class="hot-wrapper"></div>`;
+  return `<div id="${elemId}" class="hot-wrapper"></div>`;
 }
 
 function onCellEdit(){}  // no-op — HOT handles via afterChange
 
 function toggleRawHtml(pageNum,ti){
-  const jssDiv=document.getElementById(`jss-${pageNum}-${ti}`);
+  const docId = S.selected?.doc_id || 'unknown';
+  const jssDiv=document.getElementById(`jss-${docId}-${pageNum}-${ti}`);
   const ta=document.getElementById(`th-${pageNum}-${ti}`);
   const btn=document.getElementById(`btn-raw-${pageNum}-${ti}`);
   if(!ta||!btn) return;
@@ -1358,7 +1367,8 @@ function toggleRawHtml(pageNum,ti){
     btn.style.background=''; btn.style.color='';
   } else {
     // Visual → Raw: flush HOT → textarea trước khi show
-    const key=`${pageNum}-${ti}`;
+    const docId = S.selected?.doc_id || 'unknown';
+    const key=`${docId}-${pageNum}-${ti}`;
     const hot=_jssInstances[key];
     if(hot){
       try{
