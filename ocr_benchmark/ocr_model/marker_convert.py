@@ -3,7 +3,9 @@
 marker_convert.py
 -----------------
 Convert a local file OR a remote URL to Markdown, JSON, and HTML
-using the Datalab Marker API (https://www.datalab.to/api/v1/marker).
+using the Datalab Convert API (https://www.datalab.to/api/v1/convert).
+
+Note: API endpoint changed from /api/v1/marker to /api/v1/convert.
 
 Also exports structured prediction metadata matching the benchmark schema:
   - scan     → {"pages": [{"page_num": int, "full_text": str}]}
@@ -35,7 +37,8 @@ load_dotenv()
 
 # Load MARKER_API_KEY (with fallback to legacy API_KEY)
 API_KEY: str = os.getenv("MARKER_API_KEY") or os.getenv("API_KEY", "")
-API_URL: str = "https://www.datalab.to/api/v1/marker"
+# New endpoint: /api/v1/convert (previously /api/v1/marker)
+API_URL: str = "https://www.datalab.to/api/v1/convert"
 
 SUPPORTED_EXTENSIONS = {
     ".pdf", ".doc", ".docx", ".xls", ".xlsx",
@@ -618,30 +621,26 @@ def convert(
         )
 
     output_dir.mkdir(parents=True, exist_ok=True)
-    headers = {"X-Api-Key": API_KEY}
+    # New API uses X-API-Key (uppercase)
+    headers = {"X-API-Key": API_KEY}
 
-    # ── Payload ──────────────────────────────────────────────────────────────
-    formats = ",".join(
-        f for f, want in [("markdown", save_md), ("json", save_json), ("html", save_html)]
-        if want
-    ) or "markdown"
-
-    additional_config = {
-        "keep_pageheader_in_output": True,
-        "keep_pagefooter_in_output": True,
-        "keep_spreadsheet_formatting": False,
-    }
+    # ── Payload — /api/v1/convert params ─────────────────────────────────────
+    # output_format: "markdown" | "html" | "json" | "chunks"
+    # Only 1 format per request in convert API
+    # Use "json" to get block-level data for prediction, fallback to markdown
+    output_format = "json" if (save_json or save_prediction) else ("html" if save_html else "markdown")
 
     payload: dict = {
-        "langs": langs,
-        "force_ocr": str(force_ocr).lower(),
-        "format_lines": "false",
-        "paginate": str(paginate).lower(),
+        "output_format": output_format,
         "mode": mode,
-        "output_format": formats,
+        "paginate": str(paginate).lower(),
         "skip_cache": "false",
-        "additional_config": json.dumps(additional_config),
+        "disable_image_extraction": "true",
     }
+
+    # Language hint (optional, helps OCR accuracy)
+    if langs:
+        payload["language"] = langs.split(",")[0]  # convert API takes single lang
 
     # ── Upload / submit ───────────────────────────────────────────────────────
     last_error: Exception | None = None
@@ -653,7 +652,7 @@ def convert(
                 stem = _stem_from_url(source)
                 response = requests.post(
                     API_URL,
-                    data={**payload, "url": source},
+                    data={**payload, "file_url": source},  # convert API uses file_url
                     headers=headers,
                     timeout=timeout,
                 )
@@ -695,37 +694,48 @@ def convert(
         raise RuntimeError(f"No result after retries: {last_error}")
 
     # ── Poll ──────────────────────────────────────────────────────────────────
-    lookup_key = result.get("lookup_key") or result.get("request_id")
-    check_url = result.get("request_check_url") or f"{API_URL}/{lookup_key}"
+    # Convert API returns request_id + request_check_url
+    request_id = result.get("request_id") or result.get("lookup_key")
+    check_url = result.get("request_check_url") or f"{API_URL}/{request_id}"
 
-    if not lookup_key:
-        raise RuntimeError(f"No lookup_key in API response. Keys: {list(result.keys())}")
+    if not request_id:
+        raise RuntimeError(f"No request_id in API response. Keys: {list(result.keys())}")
 
     print(f"⏳ Processing", end="", flush=True)
     final = _poll(check_url, headers, poll_timeout=timeout * 2)
 
-    # ── Save raw Marker outputs ───────────────────────────────────────────────
+    # ── Save raw Convert API outputs ─────────────────────────────────────────
     outputs: dict[str, Path] = {}
 
-    if save_md and final.get("markdown"):
-        path = output_dir / f"{stem}.md"
-        path.write_text(final["markdown"], encoding="utf-8")
-        outputs["markdown"] = path
-        print(f"✅ Markdown  → {path}")
+    # Convert API trả markdown/html/json tùy output_format
+    if save_md:
+        md_content = final.get("markdown", "")
+        if not md_content and output_format != "markdown":
+            # Nếu request format là json, markdown không có — skip
+            pass
+        elif md_content:
+            path = output_dir / f"{stem}.md"
+            path.write_text(md_content, encoding="utf-8")
+            outputs["markdown"] = path
+            print(f"✅ Markdown  → {path}")
 
-    if save_json and final.get("json"):
+    if save_json:
+        # Convert API: json output là object trực tiếp (children/blocks structure)
+        json_content = final.get("json") or final
         path = output_dir / f"{stem}.json"
         path.write_text(
-            json.dumps(final["json"], ensure_ascii=False, indent=2), encoding="utf-8"
+            json.dumps(json_content, ensure_ascii=False, indent=2), encoding="utf-8"
         )
         outputs["json"] = path
         print(f"✅ JSON      → {path}")
 
-    if save_html and final.get("html"):
-        path = output_dir / f"{stem}.html"
-        path.write_text(final["html"], encoding="utf-8")
-        outputs["html"] = path
-        print(f"✅ HTML      → {path}")
+    if save_html:
+        html_content = final.get("html", "")
+        if html_content:
+            path = output_dir / f"{stem}.html"
+            path.write_text(html_content, encoding="utf-8")
+            outputs["html"] = path
+            print(f"✅ HTML      → {path}")
 
     if save_full:
         path = output_dir / f"{stem}_full_response.json"
@@ -737,7 +747,9 @@ def convert(
 
     # ── Build & save prediction metadata ─────────────────────────────────────
     if uc_type and save_prediction:
-        marker_json = final.get("json") or {}
+        # Convert API: json field IS the root object (children/blocks)
+        # Marker cũ: final["json"] là nested object
+        marker_json = final.get("json") or final
         effective_doc_id = doc_id or stem
         prediction = build_prediction_metadata(marker_json, uc_type, doc_id=effective_doc_id)
 
