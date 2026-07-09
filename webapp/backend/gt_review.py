@@ -275,6 +275,16 @@ def get_bboxes(
     return {"pages": pages_out}
 
 
+@router.delete("/gt/{uc_type}/{lang}/{doc_id}")
+def delete_gt(uc_type: str, lang: str, doc_id: str):
+    """Xóa GT đã lưu để reset về draft mới."""
+    gt_path = GT_ROOT / uc_type / lang / f"{doc_id}.json"
+    if not gt_path.exists():
+        raise HTTPException(404, "GT not found")
+    gt_path.unlink()
+    return {"success": True, "deleted": str(gt_path.relative_to(PROJECT_ROOT))}
+
+
 
 def review_status():
     """Overview of review progress per UC."""

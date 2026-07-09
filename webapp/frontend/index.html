@@ -407,7 +407,8 @@ body { font-family: -apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
     <div class="action-bar">
       <div class="info" id="action-info">Select a file to start</div>
       <button class="btn btn-ghost" id="btn-back" onclick="prevStep()" disabled style="padding:6px 12px">← Back</button>
-      <button class="btn btn-ghost" id="btn-copy-draft" onclick="copyDraft()" disabled>Reset Draft</button>
+      <button class="btn btn-ghost" id="btn-copy-draft" onclick="copyDraft()" disabled>↺ Load Fresh OCR</button>
+      <button class="btn btn-danger" id="btn-delete-gt" onclick="deleteGT()" disabled style="display:none">🗑 Delete GT</button>
       <button class="btn btn-success" id="btn-save-eval" onclick="saveAndEval()" disabled>💾 Save GT &amp; Evaluate</button>
       <button class="btn btn-primary" id="btn-next" onclick="nextStep()" disabled>Next →</button>
     </div>
@@ -545,6 +546,11 @@ function goStep(n){
   document.getElementById('btn-next').disabled = n>=4 || !canAdvance(n);
   document.getElementById('btn-save-eval').disabled = n!==3 || !S.selected?.ocr_done?.marker;
   document.getElementById('btn-copy-draft').disabled = n!==3;
+  const delBtn = document.getElementById('btn-delete-gt');
+  if(delBtn){
+    delBtn.disabled = n!==3;
+    delBtn.style.display = (n===3 && S.selected?.gt_saved) ? '' : 'none';
+  }
   if(n===3) renderReview();
   if(n===4 && S.scores) renderScores(S.scores);
   updateStepInfo();
@@ -799,6 +805,13 @@ function pollJob(){
       statusBox.innerHTML='✅ OCR complete! Prediction files saved.';
       S.selected.ocr_done={marker:true};
       toast('✅ OCR complete');
+      // Nếu là force re-run, xóa GT cũ để editor load draft mới
+      if(force && S.selected.gt_saved){
+        const f=S.selected;
+        await fetch(`/api/gt/gt/${f.uc_type}/${f.lang}/${f.doc_id}`, {method:'DELETE'}).catch(()=>{});
+        S.selected.gt_saved = false;
+        toast('🗑 GT cũ đã xóa — editor sẽ load OCR output mới');
+      }
       await refreshAll();
       buildStep2();
     } else if(job.status==='error'){
@@ -872,13 +885,15 @@ async function loadDraft(f, split){
 
 // Merge load results into editor state.
 // GT đã lưu ưu tiên full_text; tables lấy từ GT nếu có, không thì fallback draft OCR.
-function applyLoadResult(d, textData, tableData){
+// useGT=true: load GT (default khi không re-run OCR)
+// useGT=false: load fresh draft (sau khi force re-run OCR)
+function applyLoadResult(d, textData, tableData, useGT=true){
   if(!d) return;
   const draftPages = Object.fromEntries((d.draft?.pages||[]).map(p=>[p.page_num,p]));
   const gtPages    = Object.fromEntries((d.existing_gt?.pages||[]).map(p=>[p.page_num,p]));
 
   if(d.split === 'text'){
-    const source = d.existing_gt || d.draft;
+    const source = (useGT && d.existing_gt) ? d.existing_gt : d.draft;
     for(const p of (source?.pages||[])){
       textData[p.page_num] = clone(p);
       if(textData[p.page_num].full_text === undefined)
@@ -889,19 +904,19 @@ function applyLoadResult(d, textData, tableData){
     const pnums = new Set([...Object.keys(draftPages), ...Object.keys(gtPages)].map(Number));
     for(const pn of pnums){
       const gt = gtPages[pn], dr = draftPages[pn];
-      const tables = (gt?.tables?.length) ? gt.tables : (dr?.tables || []);
+      const tables = (useGT && gt?.tables?.length) ? gt.tables : (dr?.tables || []);
       if(tables.length)
         tableData[pn] = { page_num: pn, tables: clone(tables) };
     }
   }
   if(d.split === 'unified'){
-    const source = d.existing_gt || d.draft;
+    const source = (useGT && d.existing_gt) ? d.existing_gt : d.draft;
     for(const p of (source?.pages||[])){
       textData[p.page_num] = clone(p);
       if(textData[p.page_num].full_text === undefined)
         textData[p.page_num].full_text = '';
       const gt = gtPages[p.page_num], dr = draftPages[p.page_num];
-      const tables = (gt?.tables?.length) ? gt.tables : (dr?.tables || []);
+      const tables = (useGT && gt?.tables?.length) ? gt.tables : (dr?.tables || []);
       if(tables.length)
         tableData[p.page_num] = { page_num: p.page_num, tables: clone(tables) };
     }
@@ -1281,9 +1296,40 @@ function parseCells(html){
 }
 
 async function copyDraft(){
-  if(!S.selected||!confirm('Reset editor to original Marker output?')) return;
-  await renderReview();
-  toast('Draft restored');
+  if(!S.selected||!confirm('Load fresh OCR output? Current edits will be lost.')) return;
+  // Reload editor từ draft (bỏ qua GT)
+  const f=S.selected;
+  const loads=[];
+  if(f.has_text_pred||!f.has_table_pred) loads.push(loadDraft(f,'text'));
+  if(f.has_table_pred) loads.push(loadDraft(f,'table'));
+  if(!loads.length) loads.push(loadDraft(f,'unified'));
+  const results=await Promise.all(loads);
+  S.textData={}; S.tableData={};
+  for(const d of results) applyLoadResult(d, S.textData, S.tableData, false); // false = dùng draft
+  S.editorData=mergeEditorPages(S.textData, S.tableData);
+  S.editorSplit='text';
+  buildEditorChrome();
+  toast('↺ Loaded fresh OCR output');
+}
+
+async function deleteGT(){
+  const f=S.selected;
+  if(!f||!confirm(`Delete saved GT for ${f.doc_id}? This cannot be undone.`)) return;
+  try{
+    const res=await fetch(`/api/gt/gt/${f.uc_type}/${f.lang}/${f.doc_id}`,{method:'DELETE'});
+    if(!res.ok) throw new Error((await res.json()).detail||'Delete failed');
+    S.selected.gt_saved=false;
+    toast('🗑 GT deleted — editor now shows fresh OCR output');
+    // Reload editor từ draft
+    await copyDraft();
+    await refreshAll();
+    // Update nút
+    const delBtn=document.getElementById('btn-delete-gt');
+    if(delBtn) delBtn.style.display='none';
+    info('GT deleted — review OCR output and save when ready','status-info');
+  }catch(e){
+    toast(e.message,true);
+  }
 }
 </script>
 
