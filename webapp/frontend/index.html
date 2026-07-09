@@ -605,11 +605,18 @@ function filterFiles(q){
 }
 
 function selectFile(pdf){
-  // Destroy tất cả HOT instances của file cũ trước khi chuyển file
+  // Destroy tất cả HOT instances của file cũ
   for(const [key, hot] of Object.entries(_jssInstances)){
     try{ hot.destroy(); }catch(e){}
   }
   Object.keys(_jssInstances).forEach(k=>delete _jssInstances[k]);
+
+  // Reset toàn bộ editor state — QUAN TRỌNG để tránh data cũ lẫn sang file mới
+  S.editorData = {};
+  S.textData   = {};
+  S.tableData  = {};
+  S.scores     = null;
+  S._lastGTStatus = '';
 
   S.selected = pdf;
   // Update sidebar highlight
@@ -786,7 +793,7 @@ async function runOCR(force=false){
     }
 
     S.jobId=data.job_id;
-    pollJob();
+    pollJob(force);
   } catch(e){
     statusBox.className='ocr-status error';
     statusBox.innerHTML=`❌ ${e.message}`;
@@ -794,7 +801,7 @@ async function runOCR(force=false){
   }
 }
 
-function pollJob(){
+function pollJob(force=false){
   if(S.pollTimer) clearInterval(S.pollTimer);
   S.pollTimer=setInterval(async()=>{
     if(!S.jobId) return;
