@@ -1208,30 +1208,42 @@ function _htmlToHotData(html){
 function _hotToHtml(hot, mergesConfig){
   const data=hot.getData();
   const nRows=data.length, nCols=(data[0]||[]).length;
-  // Build merge lookup CHỈ từ live HOT merges — bỏ mergesConfig cũ
-  // vì mergesConfig giữ merge cũ từ HTML gốc, không reflect edits
+
+  // Lấy live merges từ HOT
   const mergeLookup={};
   try {
     const liveMerges=hot.getPlugin('mergeCells')?.mergedCellsCollection?.mergedCells||[];
-    liveMerges.forEach(m=>{ mergeLookup[`${m.row},${m.col}`]={row:m.row,col:m.col,rowspan:m.rowspan,colspan:m.colspan}; });
+    liveMerges.forEach(m=>{ mergeLookup[`${m.row},${m.col}`]={rowspan:m.rowspan,colspan:m.colspan}; });
   } catch(e){}
-  // mergesConfig chỉ dùng làm fallback nếu HOT plugin không khả dụng
   if(Object.keys(mergeLookup).length === 0 && mergesConfig?.length){
-    mergesConfig.forEach(m=>{ mergeLookup[`${m.row},${m.col}`]=m; });
+    // Chỉ dùng fallback nếu HOT plugin thực sự không available
+    try{ hot.getPlugin('mergeCells'); }
+    catch(e){ mergesConfig.forEach(m=>{ mergeLookup[`${m.row},${m.col}`]={rowspan:m.rowspan,colspan:m.colspan}; }); }
   }
 
+  // Build skip map từ merge lookup
   const skip={};
+  for(const [pos, m] of Object.entries(mergeLookup)){
+    const [r,c]=pos.split(',').map(Number);
+    for(let dr=0;dr<m.rowspan;dr++){
+      for(let dc=0;dc<m.colspan;dc++){
+        if(dr||dc) skip[`${r+dr},${c+dc}`]=true;
+      }
+    }
+  }
+
   let html='<table>';
   for(let r=0;r<nRows;r++){
     html+='<tr>';
     for(let c=0;c<nCols;c++){
       if(skip[`${r},${c}`]) continue;
       const m=mergeLookup[`${r},${c}`];
-      const rs=m?m.rowspan:1; const cs=m?m.colspan:1;
-      if(rs>1||cs>1) for(let dr=0;dr<rs;dr++) for(let dc=0;dc<cs;dc++) if(dr||dc) skip[`${r+dr},${c+dc}`]=true;
+      const rs=m?m.rowspan:1;
+      const cs=m?m.colspan:1;
       const attrs=[rs>1?`rowspan="${rs}"`:'', cs>1?`colspan="${cs}"`:''].filter(Boolean).join(' ');
       const tag=r===0?'th':'td';
-      const val=String(data[r][c]||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+      // Lấy giá trị từ getData() - đây là source of truth
+      const val=String(data[r][c]??'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
       html+=`<${tag}${attrs?' '+attrs:''}>${val}</${tag}>`;
     }
     html+='</tr>';
