@@ -1095,8 +1095,10 @@ function _flushAllHotInstances(){
     try{
       const [pageNum, ti] = key.split('-').map(Number);
       if(!S.editorData[pageNum]?.tables?.[ti]) continue;
-      const newHtml = _hotToHtml(hot, S.editorData[pageNum].tables[ti]._parsedMerges||[]);
-      if(newHtml && newHtml !== '<table></table>'){
+      const merges = S.editorData[pageNum].tables[ti]._parsedMerges || [];
+      const newHtml = _hotToHtml(hot, merges);
+      console.log(`[flush] key=${key} rows=${hot.getData().length} html.len=${newHtml.length}`);
+      if(newHtml && newHtml.length > 20){  // > "<table></table>"
         S.editorData[pageNum].tables[ti].html  = newHtml;
         S.editorData[pageNum].tables[ti].cells = parseCells(newHtml);
       }
@@ -1248,6 +1250,19 @@ function _buildJss(pageNum, ti, html){
     hot._parsedMerges = parsed.merges;
     if(S.editorData[pageNum]?.tables?.[ti])
       S.editorData[pageNum].tables[ti]._parsedMerges = parsed.merges;
+
+    // Sync ngay lần đầu — đảm bảo editorData luôn có HTML đúng ngay cả khi không edit
+    requestAnimationFrame(()=>{
+      try{
+        const initHtml = _hotToHtml(hot, parsed.merges);
+        if(initHtml && initHtml.length > 20 && S.editorData[pageNum]?.tables?.[ti]){
+          S.editorData[pageNum].tables[ti].html  = initHtml;
+          S.editorData[pageNum].tables[ti].cells = parseCells(initHtml);
+          const ta = document.getElementById(`th-${pageNum}-${ti}`);
+          if(ta) ta.value = initHtml;
+        }
+      } catch(e){}
+    });
     // Sau 2 frames: gọi render() để HOT tính lại kích thước đúng
     requestAnimationFrame(()=>requestAnimationFrame(()=>{
       try{ hot.render(); }catch(e){}
