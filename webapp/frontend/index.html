@@ -506,7 +506,8 @@ const S = {
 };
 
 const MODELS = [
-  { id:'marker', name:'Marker OCR', tier:'Open source — datalab.to' },
+  { id:'marker',  name:'Marker OCR',  tier:'datalab.to',   available:true  },
+  { id:'mistral', name:'Mistral OCR', tier:'mistral.ai',   available:false, note:'Coming soon' },
 ];
 
 // ═══════════════════════════════════════════════════════════════
@@ -721,10 +722,11 @@ function buildStep2(){
       <div class="card-block-body">
         <div class="model-list">
           ${MODELS.map(m=>`
-            <label class="model-opt ${S.model===m.id?'selected':''}" onclick="selectModel('${m.id}')">
-              <input type="radio" name="model" value="${m.id}" ${S.model===m.id?'checked':''}>
+            <label class="model-opt ${S.model===m.id?'selected':''} ${!m.available?'disabled':''}"
+              ${m.available?`onclick="selectModel('${m.id}')"`:''} style="${!m.available?'opacity:.45;cursor:not-allowed':''}" title="${m.note||''}">
+              <input type="radio" name="model" value="${m.id}" ${S.model===m.id?'checked':''} ${!m.available?'disabled':''}>
               <div>
-                <div class="mn">${m.name}</div>
+                <div class="mn">${m.name} ${!m.available?'<span style="font-size:10px;color:var(--orange)">'+m.note+'</span>':''}</div>
                 <div class="mt">${m.tier}</div>
               </div>
             </label>`).join('')}
@@ -1476,7 +1478,7 @@ async function copyDraft(){
   if(!S.selected) return;
 
   // Dialog chọn OCR model để load draft từ
-  const modelChoice = await showOcrSourcePicker();
+  const modelChoice = await showOcrSourcePicker('Replace GT with OCR draft from:');
   if(!modelChoice) return;  // user cancelled
 
   if(!confirm(`Load fresh OCR output from ${modelChoice}? Current edits will be lost.`)) return;
@@ -1497,54 +1499,35 @@ async function copyDraft(){
   toast(`↺ Loaded OCR output from ${modelChoice}`);
 }
 
-function showOcrSourcePicker(){
+function showOcrSourcePicker(title='Load OCR Draft From'){
   return new Promise(resolve=>{
-    // Tạo simple picker modal
     const overlay = document.createElement('div');
     overlay.style.cssText='position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:2000;display:flex;align-items:center;justify-content:center';
+
+    const modelBtns = MODELS.map(m=>`
+      <button class="btn ${m.available?'btn-ghost':'btn-ghost'}"
+        style="justify-content:flex-start;${!m.available?'opacity:.4;cursor:not-allowed':''}"
+        data-model="${m.id}" ${!m.available?'disabled':''}>
+        ${m.id==='marker'?'🔬':'✨'} ${m.name}
+        ${!m.available?`<span style="font-size:10px;color:var(--orange);margin-left:6px">${m.note}</span>`:''}
+      </button>`).join('');
+
     overlay.innerHTML=`
-      <div style="background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:20px;min-width:280px;display:flex;flex-direction:column;gap:12px">
-        <div style="font-size:14px;font-weight:700">Load OCR Draft From</div>
-        <div style="display:flex;flex-direction:column;gap:6px" id="ocr-source-list">
-          <button class="btn btn-ghost" style="justify-content:flex-start" onclick="this.closest('[data-picker]').dataset.choice='marker'">
-            🔬 Marker OCR (datalab.to)
-          </button>
-          <button class="btn btn-ghost" style="justify-content:flex-start;opacity:.4" disabled title="Coming soon">
-            ✨ Mistral OCR (coming soon)
-          </button>
-        </div>
-        <div style="display:flex;justify-content:flex-end;gap:8px">
-          <button class="btn btn-ghost" onclick="this.closest('[data-picker]').dataset.choice='cancel'">Cancel</button>
+      <div style="background:var(--surface);border:1px solid var(--border);border-radius:10px;
+                  padding:20px;min-width:300px;display:flex;flex-direction:column;gap:12px">
+        <div style="font-size:14px;font-weight:700">${title}</div>
+        <div style="display:flex;flex-direction:column;gap:6px" id="ocr-picker-list">${modelBtns}</div>
+        <div style="display:flex;justify-content:flex-end">
+          <button class="btn btn-ghost" id="ocr-picker-cancel">Cancel</button>
         </div>
       </div>`;
-    overlay.setAttribute('data-picker','');
-    overlay.addEventListener('click', e=>{
-      if(e.target===overlay) { document.body.removeChild(overlay); resolve(null); }
-    });
 
-    // Watch for choice
-    const observer = new MutationObserver(()=>{
-      const choice = overlay.dataset.choice;
-      if(choice){
-        observer.disconnect();
-        document.body.removeChild(overlay);
-        resolve(choice === 'cancel' ? null : choice);
-      }
-    });
-    observer.observe(overlay, {attributes:true, attributeFilter:['data-choice']});
-
-    // Also handle button clicks
-    overlay.querySelectorAll('#ocr-source-list button:not([disabled])').forEach(btn=>{
-      btn.onclick = ()=>{ overlay.dataset.choice = btn.onclick.toString().match(/'(\w+)'/)?.[1] || 'marker'; };
-    });
-
-    // Simpler: use event delegation
-    overlay.querySelector('#ocr-source-list').onclick = e=>{
-      const btn = e.target.closest('button:not([disabled])');
-      if(btn) overlay.dataset.choice = btn.textContent.includes('Marker') ? 'marker' : 'cancel';
+    overlay.querySelector('#ocr-picker-list').onclick = e=>{
+      const btn=e.target.closest('button:not([disabled])');
+      if(btn){ document.body.removeChild(overlay); resolve(btn.dataset.model); }
     };
-    overlay.querySelector('.btn-ghost:last-child').onclick = ()=>{ overlay.dataset.choice='cancel'; };
-
+    overlay.querySelector('#ocr-picker-cancel').onclick = ()=>{ document.body.removeChild(overlay); resolve(null); };
+    overlay.onclick = e=>{ if(e.target===overlay){ document.body.removeChild(overlay); resolve(null); } };
     document.body.appendChild(overlay);
   });
 }
