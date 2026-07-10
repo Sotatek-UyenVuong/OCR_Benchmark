@@ -106,6 +106,22 @@ def list_pdfs():
         marker_unified_pred = RAW_ROOT / uc_type / lang / MARKER_SUBDIR / f"{doc_id}_prediction.json"
         marker_done = marker_text_pred.exists() or marker_unified_pred.exists()
 
+        # Check Mistral prediction exists
+        mistral_text_pred = RAW_ROOT / uc_type / lang / MARKER_SUBDIR / f"{doc_id}_text_prediction.json"
+        # Mistral saves to same folder — check for mistral marker in full_response
+        mistral_done = (RAW_ROOT / uc_type / lang / MARKER_SUBDIR / f"{doc_id}_full_response.json").exists()
+        # More accurate: check if full_response is from mistral
+        try:
+            fr = RAW_ROOT / uc_type / lang / MARKER_SUBDIR / f"{doc_id}_full_response.json"
+            if fr.exists():
+                import json as _j
+                _data = _j.loads(fr.read_text())
+                _model = str(_data.get("model","")).lower()
+                mistral_done = "mistral" in _model
+                marker_done = marker_done and "mistral" not in _model
+        except Exception:
+            mistral_done = False
+
         # Check GT saved
         gt_file = _gt_path(uc_type, lang, doc_id)
 
@@ -189,18 +205,34 @@ async def _run_ocr_job(job_id: str, req: RunOCRRequest, pdf_path: Path):
 
         # Run in thread pool to avoid blocking event loop
         loop = asyncio.get_event_loop()
-        outputs = await loop.run_in_executor(None, lambda: convert(
-            source=str(pdf_path),
-            output_dir=out_dir,
-            langs=langs,
-            mode=req.ocr_mode,
-            uc_type="split",
-            doc_id=req.doc_id,
-            save_full=True,
-            save_md=True,
-            save_json=True,
-            save_html=False,
-        ))
+
+        if req.model == "mistral":
+            from ocr_benchmark.ocr_model.mistral_convert import convert as mistral_convert
+            outputs = await loop.run_in_executor(None, lambda: mistral_convert(
+                source=str(pdf_path),
+                output_dir=out_dir,
+                langs=langs,
+                mode=req.ocr_mode,
+                uc_type="split",
+                doc_id=req.doc_id,
+                save_full=True,
+                save_md=True,
+            ))
+        else:
+            # Default: Marker
+            from ocr_benchmark.ocr_model.marker_convert import convert as marker_convert
+            outputs = await loop.run_in_executor(None, lambda: marker_convert(
+                source=str(pdf_path),
+                output_dir=out_dir,
+                langs=langs,
+                mode=req.ocr_mode,
+                uc_type="split",
+                doc_id=req.doc_id,
+                save_full=True,
+                save_md=True,
+                save_json=True,
+                save_html=False,
+            ))
 
         _jobs[job_id]["status"] = "done"
         _jobs[job_id]["message"] = "OCR complete"
