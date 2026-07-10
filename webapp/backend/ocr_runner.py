@@ -54,6 +54,15 @@ def compute_nwer(gt_text: str, pred_text: str, doc_id: str = "", page_num: int =
     }
 from .config import PROJECT_ROOT, RAW_ROOT, GT_ROOT, PRED_ROOT, RESULT_ROOT, MARKER_SUBDIR
 
+# Model → output subfolder mapping
+MODEL_SUBDIR = {
+    "marker":  "marker_output",
+    "mistral": "mistral_output",
+}
+
+def _model_subdir(model: str) -> str:
+    return MODEL_SUBDIR.get(model, "marker_output")
+
 router = APIRouter(prefix="/api/ocr", tags=["OCR"])
 
 # In-memory job status: job_id → { status, message, progress }
@@ -100,33 +109,27 @@ def list_pdfs():
         uc_type, lang, filename = parts
         doc_id = pdf.stem
 
-        # Check marker prediction exists
-        marker_text_pred = RAW_ROOT / uc_type / lang / MARKER_SUBDIR / f"{doc_id}_text_prediction.json"
-        marker_table_pred = RAW_ROOT / uc_type / lang / MARKER_SUBDIR / f"{doc_id}_table_prediction.json"
-        marker_unified_pred = RAW_ROOT / uc_type / lang / MARKER_SUBDIR / f"{doc_id}_prediction.json"
-        marker_done = marker_text_pred.exists() or marker_unified_pred.exists()
+        # Check per-model prediction status
+        ocr_done = {}
+        has_text_pred_by_model = {}
+        has_table_pred_by_model = {}
+        for m, subdir in MODEL_SUBDIR.items():
+            text_pred  = RAW_ROOT / uc_type / lang / subdir / f"{doc_id}_text_prediction.json"
+            table_pred = RAW_ROOT / uc_type / lang / subdir / f"{doc_id}_table_prediction.json"
+            unified    = RAW_ROOT / uc_type / lang / subdir / f"{doc_id}_prediction.json"
+            done = text_pred.exists() or unified.exists()
+            ocr_done[m] = done
+            has_text_pred_by_model[m]  = text_pred.exists() or unified.exists()
+            has_table_pred_by_model[m] = table_pred.exists()
 
-        # Check Mistral prediction exists
-        mistral_text_pred = RAW_ROOT / uc_type / lang / MARKER_SUBDIR / f"{doc_id}_text_prediction.json"
-        # Mistral saves to same folder — check for mistral marker in full_response
-        mistral_done = (RAW_ROOT / uc_type / lang / MARKER_SUBDIR / f"{doc_id}_full_response.json").exists()
-        # More accurate: check if full_response is from mistral
-        try:
-            fr = RAW_ROOT / uc_type / lang / MARKER_SUBDIR / f"{doc_id}_full_response.json"
-            if fr.exists():
-                import json as _j
-                _data = _j.loads(fr.read_text())
-                _model = str(_data.get("model","")).lower()
-                mistral_done = "mistral" in _model
-                marker_done = marker_done and "mistral" not in _model
-        except Exception:
-            mistral_done = False
+        # Legacy compat: has_text_pred / has_table_pred for default model (marker)
+        marker_subdir = MODEL_SUBDIR["marker"]
 
         # Check GT saved
         gt_file = _gt_path(uc_type, lang, doc_id)
 
-        # Check eval result
-        eval_file = _result_path("marker", uc_type, lang, doc_id)
+        # Check eval result per model
+        eval_done = {m: _result_path(m, uc_type, lang, doc_id).exists() for m in MODEL_SUBDIR}
 
         pdfs.append({
             "doc_id": doc_id,
@@ -134,12 +137,13 @@ def list_pdfs():
             "lang": lang,
             "lang_label": _lang_label(lang),
             "pdf_url": f"/api/gt/pdf/{uc_type}/{lang}/{filename}",
-            "ocr_done": {"marker": marker_done},
+            "ocr_done": ocr_done,
             "gt_saved": gt_file.exists(),
-            "eval_done": {"marker": eval_file.exists()},
-            # split info
-            "has_text_pred": marker_text_pred.exists(),
-            "has_table_pred": marker_table_pred.exists(),
+            "eval_done": eval_done,
+            "has_text_pred":  has_text_pred_by_model.get("marker", False),
+            "has_table_pred": has_table_pred_by_model.get("marker", False),
+            "has_text_pred_by_model":  has_text_pred_by_model,
+            "has_table_pred_by_model": has_table_pred_by_model,
         })
     return pdfs
 
@@ -164,16 +168,19 @@ async def run_ocr(req: RunOCRRequest, background_tasks: BackgroundTasks):
     if not pdf_path.exists():
         raise HTTPException(404, f"PDF not found: {pdf_path.relative_to(PROJECT_ROOT)}")
 
-    # Check if already done
-    text_pred = RAW_ROOT / req.uc_type / req.lang / MARKER_SUBDIR / f"{req.doc_id}_text_prediction.json"
-    unified_pred = RAW_ROOT / req.uc_type / req.lang / MARKER_SUBDIR / f"{req.doc_id}_prediction.json"
+    # Check if already done for THIS model
+    model_subdir = _model_subdir(req.model)
+    out_dir = RAW_ROOT / req.uc_type / req.lang / model_subdir
+
+    text_pred   = out_dir / f"{req.doc_id}_text_prediction.json"
+    unified_pred = out_dir / f"{req.doc_id}_prediction.json"
     already_done = text_pred.exists() or unified_pred.exists()
 
     if already_done and not req.force:
         return {
             "job_id": None,
             "status": "skipped",
-            "message": "OCR already done. Use force=true to re-run.",
+            "message": f"OCR ({req.model}) already done. Use force=true to re-run.",
             "text_pred_path": str(text_pred.relative_to(PROJECT_ROOT)) if text_pred.exists() else None,
         }
 
@@ -198,7 +205,7 @@ async def _run_ocr_job(job_id: str, req: RunOCRRequest, pdf_path: Path):
         lang_map = {"vi": "vi,en", "en": "en", "ja": "ja,en"}
         langs = lang_map.get(req.lang, req.lang)
 
-        out_dir = RAW_ROOT / req.uc_type / req.lang / MARKER_SUBDIR
+        out_dir = RAW_ROOT / req.uc_type / req.lang / _model_subdir(req.model)
 
         _jobs[job_id]["message"] = "Processing…"
         _jobs[job_id]["progress"] = 30
@@ -278,10 +285,11 @@ def run_eval(req: EvalRequest):
 
     # ── text eval ──────────────────────────────────────────────────────────
     if req.split in ("text", "both"):
-        text_pred_file = RAW_ROOT / req.uc_type / req.lang / MARKER_SUBDIR / f"{req.doc_id}_text_prediction.json"
+        model_subdir = _model_subdir(req.model)
+        text_pred_file = RAW_ROOT / req.uc_type / req.lang / model_subdir / f"{req.doc_id}_text_prediction.json"
         # Fallback to unified
         if not text_pred_file.exists():
-            text_pred_file = RAW_ROOT / req.uc_type / req.lang / MARKER_SUBDIR / f"{req.doc_id}_prediction.json"
+            text_pred_file = RAW_ROOT / req.uc_type / req.lang / model_subdir / f"{req.doc_id}_prediction.json"
         if not text_pred_file.exists():
             raise HTTPException(404, "Text prediction not found — run OCR first")
 
@@ -328,7 +336,8 @@ def run_eval(req: EvalRequest):
 
     # ── table eval ────────────────────────────────────────────────────────
     if req.split in ("table", "both"):
-        table_pred_file = RAW_ROOT / req.uc_type / req.lang / MARKER_SUBDIR / f"{req.doc_id}_table_prediction.json"
+        model_subdir = _model_subdir(req.model)
+        table_pred_file = RAW_ROOT / req.uc_type / req.lang / model_subdir / f"{req.doc_id}_table_prediction.json"
         if not table_pred_file.exists():
             if req.split == "table":
                 raise HTTPException(404, "Table prediction not found — run OCR first")

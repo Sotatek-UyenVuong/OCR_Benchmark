@@ -126,9 +126,13 @@ def load_draft(
     uc_type: str = Query(...),
     lang:    str = Query(...),
     split:   str = Query(default="text"),
+    model:   str = Query(default="marker"),
 ):
     """Load a draft prediction file and its corresponding GT (if exists)."""
-    # Locate draft file
+    # Resolve subdir based on model
+    from webapp.backend.ocr_runner import _model_subdir
+    subdir = _model_subdir(model)
+
     if split == "text":
         draft_name = f"{doc_id}_text_prediction.json"
     elif split == "table":
@@ -136,7 +140,7 @@ def load_draft(
     else:
         draft_name = f"{doc_id}_prediction.json"
 
-    draft_path = RAW_ROOT / uc_type / lang / MARKER_SUBDIR / draft_name
+    draft_path = RAW_ROOT / uc_type / lang / subdir / draft_name
 
     if not draft_path.exists():
         raise HTTPException(404, f"Draft not found: {draft_path.relative_to(PROJECT_ROOT)}")
@@ -160,8 +164,9 @@ def load_draft(
         "uc_type": uc_type,
         "lang": lang,
         "split": split,
+        "model": model,
         "draft": draft_data,
-        "existing_gt": existing_gt,  # unified GT (has both full_text + tables)
+        "existing_gt": existing_gt,
         "pdf_url": pdf_url,
         "gt_saved": gt_path.exists(),
     }
@@ -207,39 +212,33 @@ def save_gt(req: SaveGTRequest):
 @router.get("/md/{uc_type}/{lang}/{doc_id}")
 def get_markdown(uc_type: str, lang: str, doc_id: str, model: str = "marker"):
     """Serve raw Markdown output from OCR for display."""
-    md_path = RAW_ROOT / uc_type / lang / MARKER_SUBDIR / f"{doc_id}.md"
+    subdir = {"marker": "marker_output", "mistral": "mistral_output"}.get(model, "marker_output")
+    md_path = RAW_ROOT / uc_type / lang / subdir / f"{doc_id}.md"
     if not md_path.exists():
-        raise HTTPException(404, "Markdown file not found — run OCR first")
+        raise HTTPException(404, f"Markdown file not found for model={model} — run OCR first")
     content = md_path.read_text(encoding="utf-8")
-    return {"doc_id": doc_id, "markdown": content, "path": str(md_path.relative_to(PROJECT_ROOT))}
+    return {"doc_id": doc_id, "model": model, "markdown": content, "path": str(md_path.relative_to(PROJECT_ROOT))}
+
+
+@router.get("/bboxes")
 def get_bboxes(
     doc_id:  str = Query(...),
     uc_type: str = Query(...),
     lang:    str = Query(...),
+    model:   str = Query(default="marker"),
 ):
-    """
-    Return bbox annotations for all blocks in a document,
-    parsed from the Marker full_response.json.
-
-    Response shape:
-    {
-      "pages": {
-        "1": [
-          { "block_id": int, "type": str, "bbox": [x1,y1,x2,y2],  // normalised 0-1
-            "text": str }
-        ]
-      }
-    }
-    """
-    full_path = RAW_ROOT / uc_type / lang / MARKER_SUBDIR / f"{doc_id}_full_response.json"
+    """Return bbox annotations from OCR full_response.json (Marker only, Mistral returns empty)."""
+    subdir = {"marker": "marker_output", "mistral": "mistral_output"}.get(model, "marker_output")
+    full_path = RAW_ROOT / uc_type / lang / subdir / f"{doc_id}_full_response.json"
+    # Mistral doesn't have block-level bbox — return empty silently
     if not full_path.exists():
-        raise HTTPException(404, "full_response.json not found — run OCR first")
+        return {"pages": {}}
 
     with open(full_path, encoding="utf-8") as f:
         full = json.load(f)
 
     SKIP = {"Picture", "Figure", "Image", "Caption", "PageHeader", "PageFooter"}
-    TABLE_TYPES = {"Table", "Form"}   # cả 2 đều dùng HTML <table>
+    TABLE_TYPES = {"Table", "Form"}
 
     marker_json = full.get("json", {})
     page_nodes = marker_json.get("children") or []

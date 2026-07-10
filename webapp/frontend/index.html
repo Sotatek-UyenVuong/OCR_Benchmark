@@ -546,7 +546,7 @@ function goStep(n){
   });
   document.getElementById('btn-back').disabled = n<=1;
   document.getElementById('btn-next').disabled = n>=4 || !canAdvance(n);
-  document.getElementById('btn-save-eval').disabled = n!==3 || !S.selected?.ocr_done?.marker;
+  document.getElementById('btn-save-eval').disabled = n!==3 || !S.selected?.ocr_done?.[S.model];
   document.getElementById('btn-copy-draft').disabled = n!==3;
   const delBtn = document.getElementById('btn-delete-gt');
   if(delBtn){
@@ -561,7 +561,7 @@ function nextStep(){ goStep(S.step+1); }
 function prevStep(){ goStep(S.step-1); }
 function canAdvance(step){
   if(step===1) return !!S.selected;
-  if(step===2) return S.selected?.ocr_done?.marker;
+  if(step===2) return S.selected?.ocr_done?.[S.model];
   if(step===3) return true;
   return false;
 }
@@ -711,7 +711,7 @@ function renderFileGrid(pdfs){
 function buildStep2(){
   const f=S.selected;
   const body=document.getElementById('step2-body');
-  const ocrDone=f.ocr_done?.marker;
+  const ocrDone=f.ocr_done?.[S.model] || false;
   body.innerHTML=`
     <div style="font-size:15px;font-weight:700;color:var(--text)">
       ${f.doc_id} <span style="font-size:12px;font-weight:400;color:var(--muted)">[${f.uc_type}/${f.lang}]</span>
@@ -789,7 +789,7 @@ async function runOCR(force=false){
       statusBox.innerHTML='✅ OCR already done — skipped (use Force re-run to redo)';
       btn.disabled=false; btn.textContent='Re-run OCR';
       toast('OCR already done');
-      S.selected.ocr_done={marker:true};
+      S.selected.ocr_done={...S.selected.ocr_done, [S.model]:true};
       buildStep2();
       return;
     }
@@ -819,7 +819,7 @@ function pollJob(force=false){
       clearInterval(S.pollTimer);
       statusBox.className='ocr-status done';
       statusBox.innerHTML='✅ OCR complete! Prediction files saved.';
-      S.selected.ocr_done={marker:true};
+      S.selected.ocr_done={...S.selected.ocr_done, [S.model]:true};
       toast('✅ OCR complete');
       // Nếu là force re-run, xóa GT cũ để editor load draft mới
       if(force && S.selected.gt_saved){
@@ -858,15 +858,15 @@ async function renderReview(){
     ?`<iframe src="${f.pdf_url}" title="PDF"></iframe>`
     :'<div class="empty"><p>PDF not available</p></div>';
 
-  // Load cả text lẫn table draft (song song)
+  // Load cả text lẫn table draft (song song) — dùng model của S.selectedOcrSource (nếu có) hoặc S.model
+  const srcModel = S.selectedOcrSource || S.model || 'marker';
+  const textDone  = f.has_text_pred_by_model?.[srcModel] || f.has_text_pred;
+  const tableDone = f.has_table_pred_by_model?.[srcModel] || f.has_table_pred;
+
   const loads = [];
-  if(f.has_text_pred || !f.has_table_pred){
-    loads.push(loadDraft(f,'text'));
-  }
-  if(f.has_table_pred){
-    loads.push(loadDraft(f,'table'));
-  }
-  if(!loads.length) loads.push(loadDraft(f,'unified'));
+  if(textDone || !tableDone) loads.push(loadDraft(f,'text', srcModel));
+  if(tableDone) loads.push(loadDraft(f,'table', srcModel));
+  if(!loads.length) loads.push(loadDraft(f,'unified', srcModel));
 
   const results = await Promise.all(loads);
 
@@ -887,9 +887,9 @@ async function renderReview(){
        hasGT ? 'status-ok' : '');
 }
 
-async function loadDraft(f, split){
+async function loadDraft(f, split, model='marker'){
   const actualSplit = split==='unified' ? 'unified' : split;
-  const p=new URLSearchParams({doc_id:f.doc_id,uc_type:f.uc_type,lang:f.lang,split:actualSplit});
+  const p=new URLSearchParams({doc_id:f.doc_id,uc_type:f.uc_type,lang:f.lang,split:actualSplit,model});
   try{
     const res=await fetch(`/api/gt/load?${p}`);
     if(!res.ok) return null;
@@ -1456,21 +1456,57 @@ async function renderMdView(){
   const body = document.getElementById('editor-body');
   body.style.padding='12px'; body.style.overflow='auto';
   body.classList.remove('table-mode');
-  body.innerHTML='<div style="color:var(--muted);font-size:12px">Loading Markdown…</div>';
 
+  // Check which models have MD available
+  const mdAvail = [];
+  for(const m of MODELS){
+    if(!m.available) continue;
+    try{
+      const r = await fetch(`/api/gt/md/${f.uc_type}/${f.lang}/${f.doc_id}?model=${m.id}`);
+      if(r.ok) mdAvail.push(m.id);
+    }catch(e){}
+  }
+
+  // Default to current model if available, else first available
+  const mdModel = mdAvail.includes(S.model) ? S.model : (mdAvail[0] || null);
+
+  if(!mdModel){
+    body.innerHTML='<div class="empty" style="height:200px"><p>No Markdown available</p><span style="font-size:12px;color:var(--muted)">Run OCR first to generate .md file</span></div>';
+    return;
+  }
+
+  // Model picker tabs
+  const pickerTabs = mdAvail.map(mid=>
+    `<button class="tab ${mid===mdModel?'active':''}" onclick="renderMdForModel('${mid}')" id="md-model-tab-${mid}">${mid}</button>`
+  ).join('');
+
+  body.innerHTML=`
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
+      <span class="field-lbl" style="margin:0">Raw Markdown</span>
+      <div style="display:flex;gap:4px">${pickerTabs}</div>
+    </div>
+    <textarea id="md-content-area" class="text-area" readonly
+      style="min-height:calc(100vh - 320px);color:var(--cyan);font-size:11px">Loading…</textarea>`;
+
+  renderMdForModel(mdModel);
+}
+
+async function renderMdForModel(modelId){
+  const f = S.selected;
+  // Update tab active state
+  document.querySelectorAll('[id^="md-model-tab-"]').forEach(b=>{
+    b.classList.toggle('active', b.id === `md-model-tab-${modelId}`);
+  });
+  const ta = document.getElementById('md-content-area');
+  if(!ta) return;
+  ta.value = 'Loading…';
   try{
-    const res = await fetch(`/api/gt/md/${f.uc_type}/${f.lang}/${f.doc_id}`);
-    if(!res.ok) throw new Error('MD not found');
+    const res = await fetch(`/api/gt/md/${f.uc_type}/${f.lang}/${f.doc_id}?model=${modelId}`);
+    if(!res.ok) throw new Error('Not found');
     const data = await res.json();
-    const md = data.markdown || '';
-    body.innerHTML=`
-      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
-        <span class="field-lbl" style="margin:0">Raw Markdown (read-only)</span>
-        <span style="font-size:11px;color:var(--muted)">${md.length.toLocaleString()} chars</span>
-      </div>
-      <textarea class="text-area" readonly style="min-height:calc(100vh - 300px);color:var(--cyan);font-size:11px">${esc(md)}</textarea>`;
+    ta.value = data.markdown || '';
   }catch(e){
-    body.innerHTML=`<div class="empty" style="height:200px"><p>No Markdown available</p><span style="font-size:12px;color:var(--muted)">Run OCR first to generate .md file</span></div>`;
+    ta.value = `No Markdown for ${modelId}`;
   }
 }
 
