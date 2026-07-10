@@ -1190,7 +1190,8 @@ function _flushAllHotInstances(){
       const pageNum = +parts[parts.length-2];
       if(!S.editorData[pageNum]?.tables?.[ti]) continue;
       const merges = S.editorData[pageNum].tables[ti]._parsedMerges || [];
-      const newHtml = _hotToHtml(hot, merges);
+      const hRows  = S.editorData[pageNum].tables[ti]._headerRows;
+      const newHtml = _hotToHtml(hot, merges, hRows);
       if(newHtml && newHtml.length > 20){  // > "<table></table>"
         S.editorData[pageNum].tables[ti].html  = newHtml;
         S.editorData[pageNum].tables[ti].cells = parseCells(newHtml);
@@ -1216,12 +1217,15 @@ function _htmlToHotData(html){
   if(!maxCols) maxCols=1;
 
   const data=[], merges=[];
+  // Track which rows contain <th> cells (header rows)
+  const headerRows = new Set();
   // occupied: track cells taken by rowspan across rows
   const rowspanOccupied = {};  // `${row},${col}` → true
 
   rows.forEach((row,ri)=>{
     const rowData=new Array(maxCols).fill('');
     let ci=0;
+    let rowHasTh = false;
 
     row.querySelectorAll('td,th').forEach(cell=>{
       // Skip cells occupied by rowspan from above
@@ -1230,8 +1234,12 @@ function _htmlToHotData(html){
 
       const cs=+(cell.getAttribute('colspan')||1);
       const rs=+(cell.getAttribute('rowspan')||1);
-      const text=cell.textContent.trim();
+      // Replace <br> with space before extracting text to preserve line break content
+      const tempDiv = document.createElement('div');
+      tempDiv.innerHTML = cell.innerHTML.replace(/<br\s*\/?>/gi, ' ');
+      const text = tempDiv.textContent.trim().replace(/\s+/g, ' ');
       rowData[ci]=text;
+      if(cell.tagName.toLowerCase()==='th') rowHasTh = true;
 
       if(cs>1||rs>1){
         merges.push({row:ri,col:ci,rowspan:rs,colspan:cs});
@@ -1246,17 +1254,20 @@ function _htmlToHotData(html){
       }
       ci+=cs;
     });
+    if(rowHasTh) headerRows.add(ri);
     data.push(rowData);
   });
 
   // Ensure all rows have same length
   data.forEach(r=>{ while(r.length<maxCols) r.push(''); });
-  return {data, merges, maxCols};
+  return {data, merges, maxCols, headerRows};
 }
 
-function _hotToHtml(hot, mergesConfig){
+function _hotToHtml(hot, mergesConfig, headerRows){
   const data=hot.getData();
   const nRows=data.length, nCols=(data[0]||[]).length;
+  // headerRows: Set of row indices that use <th> — preserved from original HTML
+  const _headerRows = headerRows instanceof Set ? headerRows : new Set(headerRows || [0]);
 
   // Lấy live merges từ HOT
   const mergeLookup={};
@@ -1290,7 +1301,7 @@ function _hotToHtml(hot, mergesConfig){
       const rs=m?m.rowspan:1;
       const cs=m?m.colspan:1;
       const attrs=[rs>1?`rowspan="${rs}"`:'', cs>1?`colspan="${cs}"`:''].filter(Boolean).join(' ');
-      const tag=r===0?'th':'td';
+      const tag = _headerRows.has(r) ? 'th' : 'td';
       // Lấy giá trị từ getData() - đây là source of truth
       const val=String(data[r][c]??'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
       html+=`<${tag}${attrs?' '+attrs:''}>${val}</${tag}>`;
@@ -1327,14 +1338,70 @@ function _buildJss(pageNum, ti, html){
   container.style.height = hotH + 'px';
   container.style.overflow = 'hidden';
 
+  const _htmlUndoStack = [];  // HTML snapshots for this table instance
+  const _htmlRedoStack = [];
+  const MAX_HTML_UNDO = 30;
+
+  // Push current HTML to undo stack before structural changes
+  const _pushHtmlUndo = () => {
+    const cur = S.editorData[pageNum]?.tables?.[ti]?.html;
+    if(cur) {
+      _htmlUndoStack.push(cur);
+      if(_htmlUndoStack.length > MAX_HTML_UNDO) _htmlUndoStack.shift();
+      _htmlRedoStack.length = 0;  // clear redo on new action
+    }
+  };
+
   const onChange=(_change, source)=>{
     if(source==='loadData') return;
     const hot=_jssInstances[key]; if(!hot) return;
-    const newHtml=_hotToHtml(hot, parsed.merges);
+    const merges = S.editorData[pageNum]?.tables?.[ti]?._parsedMerges || [];
+    const hRows  = S.editorData[pageNum]?.tables?.[ti]?._headerRows;
+    const newHtml = _hotToHtml(hot, merges, hRows);
     S.editorData[pageNum].tables[ti].html=newHtml;
     S.editorData[pageNum].tables[ti].cells=parseCells(newHtml);
     const ta=document.getElementById(`th-${pageNum}-${ti}`); if(ta) ta.value=newHtml;
     const cc=document.getElementById(`cell-count-${pageNum}-${ti}`); if(cc) cc.textContent=`${S.editorData[pageNum].tables[ti].cells.length} cells`;
+    _scheduleAutoSave();
+  };
+
+  // Structural change handler — push undo before applying
+  const onStructural = (_change, source) => {
+    if(source==='loadData' || source==='undo' || source==='redo') return;
+    _pushHtmlUndo();
+    onChange(_change, source);
+  };
+
+  // Undo handler — restore from HTML stack
+  const onUndo = () => {
+    const hot = _jssInstances[key]; if(!hot) return;
+    const prev = _htmlUndoStack.pop();
+    if(!prev) return;
+    // Push current to redo
+    const cur = S.editorData[pageNum]?.tables?.[ti]?.html;
+    if(cur) _htmlRedoStack.push(cur);
+
+    // Restore: re-init HOT from previous HTML
+    const hRows = S.editorData[pageNum]?.tables?.[ti]?._headerRows;
+    S.editorData[pageNum].tables[ti].html  = prev;
+    S.editorData[pageNum].tables[ti].cells = parseCells(prev);
+    const ta = document.getElementById(`th-${pageNum}-${ti}`);
+    if(ta) ta.value = prev;
+    // Rebuild HOT from restored HTML
+    setTimeout(() => _buildJss(pageNum, ti, prev), 0);
+    _scheduleAutoSave();
+  };
+
+  const onRedo = () => {
+    const next = _htmlRedoStack.pop();
+    if(!next) return;
+    const cur = S.editorData[pageNum]?.tables?.[ti]?.html;
+    if(cur) _htmlUndoStack.push(cur);
+    S.editorData[pageNum].tables[ti].html  = next;
+    S.editorData[pageNum].tables[ti].cells = parseCells(next);
+    const ta = document.getElementById(`th-${pageNum}-${ti}`);
+    if(ta) ta.value = next;
+    setTimeout(() => _buildJss(pageNum, ti, next), 0);
     _scheduleAutoSave();
   };
 
@@ -1361,25 +1428,32 @@ function _buildJss(pageNum, ti, html){
       autoWrapRow: true,
       licenseKey: 'non-commercial-and-evaluation',
       afterChange: onChange,
+      beforeCreateRow: _pushHtmlUndo,
+      beforeRemoveRow: _pushHtmlUndo,
+      beforeCreateCol: _pushHtmlUndo,
+      beforeRemoveCol: _pushHtmlUndo,
       afterCreateRow: onChange,
       afterRemoveRow: onChange,
       afterCreateCol: onChange,
       afterRemoveCol: onChange,
-      afterMergeCells: onChange,
-      afterUnmergeCells: onChange,
-      afterUndo: onChange,
-      afterRedo: onChange,
+      afterMergeCells: onStructural,
+      afterUnmergeCells: onStructural,
+      afterUndo: onUndo,
+      afterRedo: onRedo,
     });
     _jssInstances[key]=hot;
-    // Lưu merges config để dùng khi flush
+    // Lưu merges config và headerRows để dùng khi flush
     hot._parsedMerges = parsed.merges;
-    if(S.editorData[pageNum]?.tables?.[ti])
+    hot._headerRows   = parsed.headerRows || new Set([0]);
+    if(S.editorData[pageNum]?.tables?.[ti]){
       S.editorData[pageNum].tables[ti]._parsedMerges = parsed.merges;
+      S.editorData[pageNum].tables[ti]._headerRows   = parsed.headerRows || new Set([0]);
+    }
 
     // Sync ngay lần đầu — đảm bảo editorData luôn có HTML đúng ngay cả khi không edit
     requestAnimationFrame(()=>{
       try{
-        const initHtml = _hotToHtml(hot, parsed.merges);
+        const initHtml = _hotToHtml(hot, parsed.merges, parsed.headerRows);
         if(initHtml && initHtml.length > 20 && S.editorData[pageNum]?.tables?.[ti]){
           // Chỉ update nếu vẫn là file này
           if(S.selected?.doc_id === docId){
@@ -1433,7 +1507,7 @@ function toggleRawHtml(pageNum,ti){
     const hot=_jssInstances[key];
     if(hot){
       try{
-        const freshHtml=_hotToHtml(hot, S.editorData[pageNum].tables[ti]._parsedMerges||[]);
+        const freshHtml=_hotToHtml(hot, S.editorData[pageNum].tables[ti]._parsedMerges||[], S.editorData[pageNum].tables[ti]._headerRows);
         if(freshHtml && freshHtml.length>20){
           S.editorData[pageNum].tables[ti].html=freshHtml;
           S.editorData[pageNum].tables[ti].cells=parseCells(freshHtml);
@@ -1983,13 +2057,13 @@ async function renderScoresPanel(){
   // If we just saved/evaled, S.scores has the latest — cache it
   if(S.scores) S.scoresMap[S.scores.model] = S.scores;
 
-  // Load saved results from disk for all models
+  // Load saved results from disk for all models — always re-fetch to get latest
   await Promise.all(MODELS.map(async m => {
-    if(S.scoresMap[m.id]) return;  // already loaded
     try{
       const r = await fetch(`/api/ocr/result?doc_id=${f.doc_id}&uc_type=${f.uc_type}&lang=${f.lang}&model=${m.id}`);
       if(r.ok) S.scoresMap[m.id] = await r.json();
-    }catch(e){}
+      else delete S.scoresMap[m.id];
+    }catch(e){ delete S.scoresMap[m.id]; }
   }));
 
   const availModels = MODELS.filter(m => S.scoresMap[m.id]);

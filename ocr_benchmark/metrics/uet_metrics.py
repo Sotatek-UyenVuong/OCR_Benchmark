@@ -343,7 +343,10 @@ def soup_node_to_tree(node) -> Optional[TreeNode]:
 
 
 def html_table_to_tree(html_table: str) -> TreeNode:
-    soup = BeautifulSoup(html_table, 'lxml')
+    import re as _re
+    # Strip whitespace between tags to avoid spurious text nodes from formatting
+    html_clean = _re.sub(r'>\s+<', '><', html_table.strip())
+    soup = BeautifulSoup(html_clean, 'lxml')
     table = soup.find('table')
     if table is None:
         return TreeNode('table', [])
