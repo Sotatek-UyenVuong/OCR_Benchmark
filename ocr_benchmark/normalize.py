@@ -175,6 +175,9 @@ def normalize_ocr_text(
     s = re.sub(r"[\uff0f\uff3c]", "/", s)
     # Bullet chars that survived above (•·∙) → space
     s = re.sub(r"[\u2022\u00b7\u2219\u22c5\u2027]", " ", s)
+    # Common OCR symbol confusions in text context
+    s = s.replace("\u00d7", "x")   # × (multiplication) → x in text context
+    s = s.replace("\u0445", "x")   # х Cyrillic → Latin x
 
     # 10. Number-aware punctuation
     s = re.sub(r"(?<=\d),\s+(?=\d)", ",", s)
@@ -244,6 +247,12 @@ def normalize_cell(s: str) -> str:
     s = re.sub(r"<[^>]+>", " ", s)
     s = re.sub(r"\*\*|__|\*|_|`", "", s)
     s = re.sub(r"\\([|])", r"\1", s)
+    # Normalize common OCR symbol confusions
+    s = s.replace("×", "X")   # multiplication sign → Latin X (common OCR confusion)
+    s = s.replace("✓", "X")   # checkmark → X (some tables use ✓ as tick mark)
+    s = s.replace("✗", "X")   # cross mark → X
+    s = s.replace("✘", "X")   # heavy ballot X → X
+    s = s.replace("х", "x")   # Cyrillic х → Latin x
     return normalize_ws(s)
 
 

@@ -196,7 +196,7 @@ async def run_ocr(req: RunOCRRequest, background_tasks: BackgroundTasks):
 async def _run_ocr_job(job_id: str, req: RunOCRRequest, pdf_path: Path):
     """Background task: run Marker OCR and save prediction files."""
     try:
-        _jobs[job_id]["message"] = "Uploading to Marker API…"
+        _jobs[job_id]["message"] = f"Uploading to {req.model} API…"
         _jobs[job_id]["progress"] = 10
 
         # Import here to avoid circular at module load

@@ -50,29 +50,54 @@ def _encode_pdf(pdf_path: Path) -> str:
 
 def _extract_markdown(result: dict) -> list[dict]:
     """
-    Extract per-page markdown from Mistral response.
-    Returns: [{"page_num": int, "markdown": str}]
+    Extract per-page markdown + tables from Mistral response.
+
+    With extract_header=True / extract_footer=True, Mistral puts headers/footers
+    into separate fields (page.header, page.footer) and removes them from markdown.
+    We use only page.markdown (body content) and page.tables.
+
+    Returns: [{"page_num": int, "markdown": str, "tables": [{"id": str, "html": str}]}]
     """
     pages = result.get("pages") or []
     out = []
     for page in sorted(pages, key=lambda p: int(p.get("index", 0))):
+        # Collect tables from the dedicated tables array
+        tables = []
+        for tbl in (page.get("tables") or []):
+            html = tbl.get("content") or ""
+            if html.strip().lower().startswith("<table"):
+                tables.append({"id": tbl.get("id", ""), "html": html})
+
+        # Use only body markdown — header/footer are already separated
+        # (extract_header=True, extract_footer=True in request)
+        markdown = str(page.get("markdown") or "")
+
         out.append({
             "page_num": int(page.get("index", 0)) + 1,  # 0-indexed → 1-indexed
-            "markdown": str(page.get("markdown") or ""),
+            "markdown": markdown,
+            "tables": tables,
+            "header": page.get("header"),   # keep for build_scan_prediction
+            "footer": page.get("footer"),   # keep for build_scan_prediction
         })
     return out
 
 
 def _strip_html_tables(md: str) -> str:
-    """Remove HTML table blocks from markdown, return plain text only."""
-    # Remove <table>...</table> blocks (possibly multiline)
+    """Remove tables, image references, and placeholder links from markdown text."""
+    # Remove <table>...</table> blocks
     clean = re.sub(r"<table[\s\S]*?</table>", " ", md, flags=re.IGNORECASE)
+    # Remove Mistral table placeholder links: [tbl-0.html](tbl-0.html)
+    clean = re.sub(r"\[[^\]]*\.html\]\([^\)]*\.html\)", " ", clean)
+    # Remove markdown image syntax: ![alt](url)
+    clean = re.sub(r"!\[[^\]]*\]\([^\)]*\)", " ", clean)
+    # Remove HTML img tags
+    clean = re.sub(r"<img\b[^>]*/?>", " ", clean, flags=re.IGNORECASE)
     clean = re.sub(r"\s+", " ", clean).strip()
     return clean
 
 
 def _extract_html_table_strings(md: str) -> list[str]:
-    """Extract all <table>...</table> strings from markdown."""
+    """Extract all <table>...</table> strings from markdown (fallback for old format)."""
     tables = re.findall(r"<table[\s\S]*?</table>", md, flags=re.IGNORECASE)
     return tables
 
@@ -138,8 +163,10 @@ def convert(
             "type": "document_url",
             "document_url": _encode_pdf(file_path),
         },
-        "table_format": "html",   # tables as HTML inline
-        "include_image_base64": False,
+        "table_format": "html",       # tables as HTML (in pages[].tables[].content)
+        "include_image_base64": False, # no image blobs — saves bandwidth
+        "extract_header": True,        # separate header from body markdown
+        "extract_footer": True,        # separate footer from body markdown
     }
 
     headers = {
@@ -211,36 +238,66 @@ def convert(
 # ── Prediction builders ───────────────────────────────────────
 
 def build_scan_prediction(page_data: list[dict], doc_id: str = "") -> dict:
-    """Build text prediction from Mistral page data."""
+    """Build text prediction from Mistral page data.
+    Combines header + body markdown + footer to match Marker convention
+    (Marker includes all text regions: headers, footers, body).
+    Table placeholders and image refs stripped.
+    """
     pages = []
     for p in page_data:
-        # Strip HTML tables from text (they go to table prediction)
-        text = _strip_html_tables(p["markdown"])
+        parts = []
+        if p.get("header"):
+            parts.append(str(p["header"]).strip())
+        parts.append(p["markdown"].strip())
+        if p.get("footer"):
+            parts.append(str(p["footer"]).strip())
+        combined = "\n".join(filter(None, parts))
+        text = _strip_html_tables(combined)
         pages.append({"page_num": p["page_num"], "full_text": text})
     return {"doc_id": doc_id, "pages": pages}
 
 
 def build_table_prediction(page_data: list[dict], doc_id: str = "") -> dict:
-    """Build table prediction from Mistral page data (HTML tables inline in MD)."""
+    """
+    Build table prediction from Mistral page data.
+
+    Tables come from pages[].tables (set by _extract_markdown),
+    NOT from scanning the markdown text (which only has placeholder links).
+    """
     pages = []
     for p in page_data:
-        html_tables = _extract_html_table_strings(p["markdown"])
+        # Primary source: dedicated tables list from Mistral response
+        html_tables = p.get("tables") or []
+
+        # Fallback: scan markdown for inline <table> (old API behaviour)
+        if not html_tables:
+            for html in _extract_html_table_strings(p["markdown"]):
+                html_tables.append({"id": "", "html": html})
+
         if not html_tables:
             continue
+
         table_list = []
-        for ti, html in enumerate(html_tables, start=1):
+        for ti, tbl in enumerate(html_tables, start=1):
+            html = tbl["html"]
             cells = _html_table_to_cells(html)
             table_list.append({"table_id": ti, "html": html, "cells": cells})
+
         if table_list:
             pages.append({"page_num": p["page_num"], "tables": table_list})
+
     return {"doc_id": doc_id, "pages": pages}
 
 
 def build_text_layer_prediction(page_data: list[dict], doc_id: str = "") -> dict:
-    """Build text_layer prediction (same as scan for Mistral)."""
+    """Build text_layer prediction — header + body + footer, matching Marker convention."""
     pages = []
     for p in page_data:
-        text = _strip_html_tables(p["markdown"])
+        parts = []
+        if p.get("header"): parts.append(str(p["header"]).strip())
+        parts.append(p["markdown"].strip())
+        if p.get("footer"): parts.append(str(p["footer"]).strip())
+        text = _strip_html_tables("\n".join(filter(None, parts)))
         pages.append({
             "page_num": p["page_num"],
             "full_text": text,

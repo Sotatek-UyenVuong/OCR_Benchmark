@@ -220,6 +220,22 @@ def get_markdown(uc_type: str, lang: str, doc_id: str, model: str = "marker"):
     return {"doc_id": doc_id, "model": model, "markdown": content, "path": str(md_path.relative_to(PROJECT_ROOT))}
 
 
+@router.get("/full_response")
+def get_full_response(
+    doc_id:  str = Query(...),
+    uc_type: str = Query(...),
+    lang:    str = Query(...),
+    model:   str = Query(default="marker"),
+):
+    """Serve full OCR response JSON — used by frontend to get authoritative tbl-N.html IDs."""
+    subdir = {"marker": "marker_output", "mistral": "mistral_output"}.get(model, "marker_output")
+    full_path = RAW_ROOT / uc_type / lang / subdir / f"{doc_id}_full_response.json"
+    if not full_path.exists():
+        raise HTTPException(404, f"full_response not found for model={model}")
+    with open(full_path, encoding="utf-8") as f:
+        return json.load(f)
+
+
 @router.get("/bboxes")
 def get_bboxes(
     doc_id:  str = Query(...),
@@ -237,7 +253,9 @@ def get_bboxes(
     with open(full_path, encoding="utf-8") as f:
         full = json.load(f)
 
-    SKIP = {"Picture", "Figure", "Image", "Caption", "PageHeader", "PageFooter"}
+    SKIP = {"Picture", "Figure", "Image", "FigureGroup", "PictureGroup",
+            "Document", "Page", "Line", "Span"}
+    # Caption, PageHeader, PageFooter → real OCR text → show bbox
     TABLE_TYPES = {"Table", "Form"}
 
     marker_json = full.get("json", {})

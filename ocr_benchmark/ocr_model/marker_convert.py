@@ -57,6 +57,52 @@ UC_TYPE: dict[str, str] = {
 # Helpers
 # ──────────────────────────────────────────────────────────────────────────────
 
+def _extract_md_from_json(marker_json: dict) -> str:
+    """
+    Extract readable Markdown from Marker JSON output (output_format=json).
+    Marker returns block tree: json.children = pages, page.children = blocks.
+    Each block has html field; tables keep HTML, text blocks get tags stripped.
+    """
+    import re as _re
+
+    def _strip_tags(html: str) -> str:
+        """Strip HTML tags, decode basic entities."""
+        text = _re.sub(r"<br\s*/?>", "\n", html, flags=_re.I)
+        text = _re.sub(r"<[^>]+>", "", text)
+        text = text.replace("&amp;", "&").replace("&lt;", "<").replace("&gt;", ">").replace("&nbsp;", " ")
+        return _re.sub(r"\n{3,}", "\n\n", text).strip()
+
+    TABLE_TYPES = {"Table", "Form", "TableGroup"}
+    # Skip visual/structural blocks — no extractable OCR text
+    SKIP_TYPES  = {
+        "Picture", "Figure", "FigureGroup", "PictureGroup",  # images only
+        "Document", "Page", "Line", "Span",                   # structural containers
+        # Caption, PageHeader, PageFooter → real OCR text, keep them
+    }
+
+    pages_md: list[str] = []
+    for page in marker_json.get("children") or []:
+        parts: list[str] = []
+        for blk in page.get("children") or []:
+            bt = blk.get("block_type", "Text")
+            if bt in SKIP_TYPES:
+                continue
+            html = blk.get("html") or ""
+            if not html:
+                continue
+            if bt in TABLE_TYPES:
+                # Keep raw HTML table for preview rendering
+                parts.append(html.strip())
+            else:
+                text = _strip_tags(html)
+                if text:
+                    parts.append(text)
+        if parts:
+            pages_md.append("\n\n".join(parts))
+
+    return "\n\n---\n\n".join(pages_md)
+
+
 def _is_url(value: str) -> bool:
     return value.startswith("http://") or value.startswith("https://")
 
@@ -128,13 +174,28 @@ def _extract_blocks_from_marker(marker_json: dict) -> list[dict]:
         "metadata": {...}
       }
     """
-    # Block types to skip — no useful text content for OCR evaluation
+    # Block types to skip — visual/structural elements with no extractable OCR text
     SKIP_BLOCK_TYPES = {
-        "Picture", "Figure", "Image",   # image blocks
-        "Caption",                       # image captions
-        "PageHeader",                    # usually just a logo/watermark
-        "PageFooter",                    # page numbers, running headers
+        # ── Pure image blocks ──────────────────────────────────────────────
+        "Picture",          # raster image, logo, photo — no text
+        "Figure",           # figure (chart, diagram) — no text
+        "FigureGroup",      # group of figures
+
+        # ── Structural container nodes ─────────────────────────────────────
+        "PictureGroup",     # wrapper around Picture blocks
+        "TableGroup",       # wrapper around Table blocks
+        "Document",         # root document node
+        "Page",             # page node
+        "Line",             # sub-block of Text
+        "Span",             # character/word level
+
+        # Note: Caption is NOT skipped — it contains real OCR'd text
+        # (figure numbers, table titles like "FIGURE 7.4.B Cargo Aircraft Only")
+        # Note: PageHeader/PageFooter NOT skipped — real content when keep_pageheader/footer=True
     }
+
+    # Table-type blocks — handled separately in build_table_prediction
+    TABLE_TYPES = {"Table", "Form", "TableGroup"}
 
     all_blocks: list[dict] = []
 
@@ -476,15 +537,14 @@ def build_split_prediction(
     # ── Text prediction (exclude Table blocks) ────────────────────────────────
     blocks = _extract_blocks_from_marker(marker_json)
 
-    TEXT_BLOCK_TYPES = {
-        "Text", "SectionHeader", "ListGroup",
-        "PageHeader", "PageFooter", "Caption",
-    }
-    # Re-use skip logic but keep everything that isn't a Table
+    # All block types that carry OCR text (everything except images/tables/containers)
+    # Table/Form → table prediction; images/containers already filtered by _extract_blocks
+    TABLE_BLOCK_TYPES_LOCAL = {"Table", "Form", "TableGroup"}
+
+    # Re-use skip logic: keep everything that isn't a Table
     pages_text: dict[int, list[str]] = {}
     for blk in blocks:
-        # block_type Table/Form → goes to table prediction only
-        if blk["block_type"] in TABLE_BLOCK_TYPES:
+        if blk["block_type"] in TABLE_BLOCK_TYPES_LOCAL:
             continue
         pn = blk["page_num"]
         pages_text.setdefault(pn, [])
@@ -636,6 +696,11 @@ def convert(
         "paginate": str(paginate).lower(),
         "skip_cache": "false",
         "disable_image_extraction": "true",
+        # Keep page header/footer blocks in output so we can extract their text
+        "additional_config": json.dumps({
+            "keep_pageheader_in_output": True,
+            "keep_pagefooter_in_output": True,
+        }),
     }
 
     # Language hint (optional, helps OCR accuracy)
@@ -708,12 +773,16 @@ def convert(
     outputs: dict[str, Path] = {}
 
     # Convert API trả markdown/html/json tùy output_format
+    md_content = final.get("markdown") or ""
+    if md_content == "None":
+        md_content = ""
+
     if save_md:
-        md_content = final.get("markdown", "")
         if not md_content and output_format != "markdown":
-            # Nếu request format là json, markdown không có — skip
-            pass
-        elif md_content:
+            # output_format=json → markdown field is empty/None
+            # Extract text from JSON children (html blocks → strip tags)
+            md_content = _extract_md_from_json(final.get("json") or {})
+        if md_content:
             path = output_dir / f"{stem}.md"
             path.write_text(md_content, encoding="utf-8")
             outputs["markdown"] = path

@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>OCR Benchmark</title>
-<script src="https://cdn.jsdelivr.net/npm/pdfjs-dist@4.4.168/build/pdf.min.mjs" type="module" id="pdfjs-script"></script>
+<!-- PDF.js bundled locally (no CDN dependency) -->
 <!-- Handsontable CE v14: Excel-like grid editor (bundled locally for offline/server use) -->
 <link rel="stylesheet" href="/vendor/handsontable.full.min.css">
 <script src="/vendor/handsontable.full.min.js"></script>
@@ -160,6 +160,12 @@ body { font-family: -apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
 .handsontable .rowHeader { background:var(--surface2)!important; color:var(--muted)!important; }
 .htContextMenu table tbody tr td { color:var(--text)!important; background:var(--surface)!important; }
 .htContextMenu table tbody tr td.current,.htContextMenu table tbody tr td:hover { background:var(--border)!important; }
+
+/* ── rendered MD preview ── */
+#md-preview-area table { border-collapse:collapse; width:100%; margin:8px 0; font-size:12px; }
+#md-preview-area td, #md-preview-area th { border:1px solid var(--border); padding:4px 8px; }
+#md-preview-area th { background:var(--surface2); color:var(--accent); }
+#md-preview-area tr:nth-child(even) td { background:rgba(255,255,255,.02); }
 
 /* ── legacy .tbl-edit still used for Raw preview ── */
 .tbl-edit { border-collapse:collapse; width:100%; font-size:12px; }
@@ -554,7 +560,7 @@ function goStep(n){
     delBtn.style.display = (n===3 && S.selected?.gt_saved) ? '' : 'none';
   }
   if(n===3) renderReview();
-  if(n===4 && S.scores) renderScores(S.scores);
+  if(n===4) renderScoresPanel();
   updateStepInfo();
 }
 function nextStep(){ goStep(S.step+1); }
@@ -570,7 +576,7 @@ function updateStepInfo(){
     1: S.selected ? `Selected: ${S.selected.doc_id}` : 'Select a PDF to continue',
     2: 'Choose model and run OCR',
     3: 'Review and edit Ground Truth, then save & evaluate',
-    4: S.scores ? 'Evaluation complete' : 'No scores yet',
+    4: Object.keys(S.scoresMap||{}).length ? `Scores: ${Object.keys(S.scoresMap).join(', ')}` : 'No scores yet — save GT to evaluate',
   };
   info(msgs[S.step] || '');
 }
@@ -582,7 +588,17 @@ async function refreshAll(){
   const res = await fetch('/api/ocr/pdfs');
   S.pdfs = await res.json();
 
-  const total   = S.pdfs.length;
+  // Sync S.selected with fresh data so has_table_pred_by_model etc. are up to date
+  if(S.selected){
+    const fresh = S.pdfs.find(p =>
+      p.doc_id===S.selected.doc_id &&
+      p.uc_type===S.selected.uc_type &&
+      p.lang===S.selected.lang
+    );
+    if(fresh) S.selected = fresh;
+  }
+
+  const total    = S.pdfs.length;
   const evalDone = S.pdfs.filter(p=>p.eval_done?.marker).length;
   const pending  = total - evalDone;
   document.getElementById('stat-total').textContent   = `${total} files`;
@@ -617,6 +633,7 @@ function selectFile(pdf){
   S.textData   = {};
   S.tableData  = {};
   S.scores     = null;
+  S.scoresMap  = {};
   S._lastGTStatus = '';
 
   S.selected = pdf;
@@ -735,19 +752,27 @@ function buildStep2(){
     </div>
 
     <div class="card-block">
-      <div class="card-block-title">OCR Status</div>
+      <div class="card-block-title">OCR Status — <span style="color:var(--accent)">${S.model}</span></div>
       <div class="card-block-body" style="display:flex;flex-direction:column;gap:10px">
+        ${MODELS.map(m => {
+          const done = f.ocr_done?.[m.id] || false;
+          const isSelected = S.model === m.id;
+          return `<div style="display:flex;align-items:center;gap:10px;padding:8px 10px;border-radius:6px;border:1px solid ${isSelected?'var(--accent)':'var(--border)'};background:${isSelected?'rgba(124,131,255,.06)':''}">
+            <span style="font-size:12px;font-weight:600;color:${isSelected?'var(--accent)':'var(--muted)'};min-width:70px">${m.name}</span>
+            <span class="chip ${done?'chip-green':'chip-orange'}" style="font-size:11px">${done?'✅ done':'⏳ not run'}</span>
+          </div>`;
+        }).join('')}
         <div id="ocr-status-box" class="ocr-status ${ocrDone?'done':''}">
           ${ocrDone
-            ? '✅ OCR already done — prediction files ready'
-            : '⏳ Not yet run for this file'}
+            ? `✅ ${S.model} OCR ready — prediction files saved`
+            : `⏳ ${S.model} not yet run for this file`}
           <div class="progress-wrap" id="progress-wrap" style="${ocrDone?'display:none':''}">
             <div class="progress-fill" id="progress-fill" style="width:0%"></div>
           </div>
         </div>
         <div style="display:flex;gap:8px">
           <button class="btn btn-primary" id="btn-run-ocr" onclick="runOCR(false)"
-            ${ocrDone?'':''}>${ocrDone?'Re-run OCR':'▶ Run OCR'}</button>
+            >${ocrDone?`Re-run ${S.model}`:`▶ Run ${S.model}`}</button>
           ${ocrDone?`<button class="btn btn-ghost" onclick="runOCR(true)">Force re-run</button>`:''}
         </div>
       </div>
@@ -765,6 +790,8 @@ function selectModel(id){
   document.querySelectorAll('.model-opt').forEach(el=>{
     el.classList.toggle('selected', el.querySelector('input').value===id);
   });
+  // Rebuild step2 so OCR status reflects the newly selected model
+  buildStep2();
 }
 
 async function runOCR(force=false){
@@ -774,7 +801,8 @@ async function runOCR(force=false){
 
   const statusBox=document.getElementById('ocr-status-box');
   statusBox.className='ocr-status running';
-  statusBox.innerHTML='⏳ Submitting to Marker API…<div class="progress-wrap"><div class="progress-fill" id="progress-fill" style="width:5%"></div></div>';
+  const modelLabel = MODELS.find(m=>m.id===S.model)?.name || S.model;
+  statusBox.innerHTML=`⏳ Submitting to ${modelLabel} API…<div class="progress-wrap"><div class="progress-fill" id="progress-fill" style="width:5%"></div></div>`;
 
   try {
     const res=await fetch('/api/ocr/run',{
@@ -982,8 +1010,7 @@ function buildEditorChrome(){
   if(allPages.length) renderPage(allPages[0].page_num);
 }
 
-function setEditorMode(mode){
-  S.editorSplit = mode;
+async function setEditorMode(mode){  S.editorSplit = mode;
   // Update button styles
   ['text','table','md'].forEach(m=>{
     const btn = document.getElementById(`mode-${m}`);
@@ -993,7 +1020,7 @@ function setEditorMode(mode){
   });
 
   if(mode === 'md'){
-    renderMdView();
+    await renderMdView();
     return;
   }
 
@@ -1457,57 +1484,230 @@ async function renderMdView(){
   body.style.padding='12px'; body.style.overflow='auto';
   body.classList.remove('table-mode');
 
-  // Check which models have MD available
-  const mdAvail = [];
-  for(const m of MODELS){
-    if(!m.available) continue;
-    try{
-      const r = await fetch(`/api/gt/md/${f.uc_type}/${f.lang}/${f.doc_id}?model=${m.id}`);
-      if(r.ok) mdAvail.push(m.id);
-    }catch(e){}
+  // _md_models may not be set yet if renderReview is still loading — fetch now if needed
+  if(!f._md_models){
+    body.innerHTML='<div style="padding:16px;color:var(--muted)">Checking available Markdown…</div>';
+    const checks = await Promise.all(
+      MODELS.map(m => fetch(`/api/gt/md/${f.uc_type}/${f.lang}/${f.doc_id}?model=${m.id}`)
+        .then(r=>r.ok ? m.id : null).catch(()=>null))
+    );
+    f._md_models = checks.filter(Boolean);
+    f.has_md = f._md_models.length > 0;
   }
 
-  // Default to current model if available, else first available
-  const mdModel = mdAvail.includes(S.model) ? S.model : (mdAvail[0] || null);
+  const mdAvail = f._md_models;
+  // Default to S.model if it has MD, else first available, else null
+  const mdModel = mdAvail.includes(S.model) ? S.model
+                : mdAvail.length > 0 ? mdAvail[0]
+                : null;
 
   if(!mdModel){
     body.innerHTML='<div class="empty" style="height:200px"><p>No Markdown available</p><span style="font-size:12px;color:var(--muted)">Run OCR first to generate .md file</span></div>';
     return;
   }
 
-  // Model picker tabs
-  const pickerTabs = mdAvail.map(mid=>
-    `<button class="tab ${mid===mdModel?'active':''}" onclick="renderMdForModel('${mid}')" id="md-model-tab-${mid}">${mid}</button>`
-  ).join('');
+  // Show ALL models as tabs — disabled if no .md file yet
+  const pickerTabs = MODELS.map(mid => {
+    const hasFile = mdAvail.includes(mid.id);
+    const isActive = mid.id === mdModel;
+    return `<button
+      class="tab ${isActive ? 'active' : ''}"
+      id="md-model-tab-${mid.id}"
+      onclick="${hasFile ? `renderMdForModel('${mid.id}',currentMdRaw)` : ''}"
+      style="${!hasFile ? 'opacity:.4;cursor:not-allowed' : ''}"
+      ${!hasFile ? 'disabled title="Run OCR first to generate .md"' : ''}>
+      ${mid.id}${!hasFile ? ' <span style="font-size:9px;color:var(--orange)">—</span>' : ''}
+    </button>`;
+  }).join('');
 
   body.innerHTML=`
-    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
-      <span class="field-lbl" style="margin:0">Raw Markdown</span>
-      <div style="display:flex;gap:4px">${pickerTabs}</div>
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;gap:8px;flex-wrap:wrap">
+      <span class="field-lbl" style="margin:0">Markdown Preview</span>
+      <div style="display:flex;gap:4px;align-items:center">
+        <div style="display:flex;gap:4px">${pickerTabs}</div>
+        <button id="md-raw-toggle" class="btn btn-ghost" style="padding:3px 9px;font-size:11px" onclick="toggleMdRaw()">‹/› Raw</button>
+      </div>
     </div>
+    <!-- Rendered HTML preview -->
+    <div id="md-preview-area" style="
+      background:var(--surface2);border:1px solid var(--border);border-radius:6px;
+      padding:16px 20px;min-height:calc(100vh - 340px);overflow-y:auto;
+      font-size:13px;line-height:1.7;color:var(--text)">
+      Loading…
+    </div>
+    <!-- Raw textarea (hidden by default) -->
     <textarea id="md-content-area" class="text-area" readonly
-      style="min-height:calc(100vh - 320px);color:var(--cyan);font-size:11px">Loading…</textarea>`;
+      style="display:none;margin-top:8px;min-height:calc(100vh - 340px);color:var(--cyan);font-size:11px"></textarea>`;
 
-  renderMdForModel(mdModel);
+  window.currentMdRaw = false;
+  await renderMdForModel(mdModel, false);
 }
 
-async function renderMdForModel(modelId){
+// Track raw/preview state globally for tab switching
+window.currentMdRaw = false;
+
+function toggleMdRaw(){
+  window.currentMdRaw = !window.currentMdRaw;
+  const preview = document.getElementById('md-preview-area');
+  const raw = document.getElementById('md-content-area');
+  const btn = document.getElementById('md-raw-toggle');
+  if(!preview || !raw) return;
+  if(window.currentMdRaw){
+    preview.style.display='none'; raw.style.display='block';
+    if(btn){ btn.style.background='var(--accent)'; btn.style.color='#fff'; }
+  } else {
+    preview.style.display='block'; raw.style.display='none';
+    if(btn){ btn.style.background=''; btn.style.color=''; }
+  }
+}
+
+async function renderMdForModel(modelId, showRaw){
   const f = S.selected;
   // Update tab active state
   document.querySelectorAll('[id^="md-model-tab-"]').forEach(b=>{
     b.classList.toggle('active', b.id === `md-model-tab-${modelId}`);
   });
-  const ta = document.getElementById('md-content-area');
-  if(!ta) return;
-  ta.value = 'Loading…';
+  const preview = document.getElementById('md-preview-area');
+  const raw = document.getElementById('md-content-area');
+  if(!preview && !raw) return;
+  if(preview) preview.innerHTML='<span style="color:var(--muted)">Loading…</span>';
+  if(raw) raw.value = 'Loading…';
   try{
-    const res = await fetch(`/api/gt/md/${f.uc_type}/${f.lang}/${f.doc_id}?model=${modelId}`);
-    if(!res.ok) throw new Error('Not found');
-    const data = await res.json();
-    ta.value = data.markdown || '';
+    // Fetch MD + full_response in parallel
+    // full_response has the authoritative tbl-N.html → HTML mapping
+    const subdir = modelId === 'mistral' ? 'mistral_output' : 'marker_output';
+    const [mdRes, fullRes] = await Promise.all([
+      fetch(`/api/gt/md/${f.uc_type}/${f.lang}/${f.doc_id}?model=${modelId}`),
+      fetch(`/api/gt/pdf/${f.uc_type}/${f.lang}/${f.doc_id}.pdf`)  // just a ping
+        .then(()=>null).catch(()=>null),  // ignore — use a different endpoint
+    ]);
+    if(!mdRes.ok) throw new Error('Not found');
+    const data = await mdRes.json();
+    const md = data.markdown || '';
+
+    // Build tblMap from full_response (has original tbl-N.html IDs from Mistral)
+    // Fall back to table_prediction if full_response not available
+    const tblMap = await _buildTblMap(f, modelId);
+
+    if(raw) raw.value = md;
+    if(preview) preview.innerHTML = _renderMdToHtml(md, tblMap);
   }catch(e){
-    ta.value = `No Markdown for ${modelId}`;
+    if(preview) preview.innerHTML=`<span style="color:var(--muted)">No Markdown for ${modelId}: ${e.message}</span>`;
+    if(raw) raw.value = `No Markdown for ${modelId}`;
   }
+}
+
+/** Build tbl-N.html → HTML map from full_response (authoritative) or fallback to prediction */
+async function _buildTblMap(f, modelId){
+  const tblMap = {};
+
+  if(modelId === 'mistral'){
+    // Mistral full_response has exact tbl-N.html IDs — use it
+    try{
+      const res = await fetch(
+        `/api/gt/full_response?doc_id=${f.doc_id}&uc_type=${f.uc_type}&lang=${f.lang}&model=mistral`
+      );
+      if(res.ok){
+        const full = await res.json();
+        for(const page of (full.pages || [])){
+          for(const tbl of (page.tables || [])){
+            const key = tbl.id || '';   // "tbl-0.html", "tbl-1.html", etc.
+            const html = tbl.content || '';
+            if(key && html.trim().toLowerCase().startsWith('<table'))
+              tblMap[key] = html;
+          }
+        }
+        if(Object.keys(tblMap).length > 0) return tblMap;
+      }
+    }catch(e){}
+  }
+
+  // Fallback (Marker or if full_response unavailable):
+  // table_prediction — table_id is 1-based PER page, use global running index
+  try{
+    const res = await fetch(
+      `/api/gt/load?doc_id=${f.doc_id}&uc_type=${f.uc_type}&lang=${f.lang}&split=table&model=${modelId}`
+    );
+    if(res.ok){
+      const d = await res.json();
+      let globalIdx = 0;
+      for(const page of (d.draft?.pages || [])){
+        for(const tbl of (page.tables || [])){
+          tblMap[`tbl-${globalIdx}.html`] = tbl.html || '';
+          globalIdx++;
+        }
+      }
+    }
+  }catch(e){}
+
+  return tblMap;
+}
+
+/** Simple Markdown → HTML renderer (tables, headings, bold, inline code, paragraphs) */
+function _renderMdToHtml(md, tblMap={}){
+  if(!md) return '<span style="color:var(--muted)">Empty</span>';
+
+  // Step 1: replace table placeholders BEFORE escaping HTML
+  // Mistral placeholder format: [tbl-0.html](tbl-0.html)
+  md = md.replace(/\[([^\]]*\.html)\]\([^\)]*\.html\)/g, (_, id) => {
+    const html = tblMap[id];
+    if(html) return `\x00TABLE\x00${html}\x00ENDTABLE\x00`;  // sentinel — won't be escaped
+    return `<span style="color:var(--orange);font-size:11px">[table: ${id} — not found]</span>`;
+  });
+
+  // Step 2: split on TABLE sentinels to process text and tables separately
+  const parts = md.split(/\x00TABLE\x00([\s\S]*?)\x00ENDTABLE\x00/);
+  const rendered = parts.map((part, i) => {
+    if(i % 2 === 1){
+      // Odd index = table HTML — pass through with styling
+      return `<div style="overflow-x:auto;margin:10px 0">${_styleTableHtml(part)}</div>`;
+    }
+    // Even index = normal markdown text — escape and render
+    return _renderMdText(part);
+  });
+
+  return rendered.join('');
+}
+
+function _styleTableHtml(html){
+  return html
+    .replace(/<table\b[^>]*>/gi,
+      '<table class="tbl-edit" style="border-collapse:collapse;font-size:12px;width:max-content;min-width:100%">')
+    .replace(/<th\b([^>]*)>/gi, '<th$1 style="background:var(--surface2);color:var(--accent);padding:5px 8px;border:1px solid var(--border);font-weight:700;white-space:nowrap">')
+    .replace(/<td\b([^>]*)>/gi, '<td$1 style="padding:4px 8px;border:1px solid var(--border);vertical-align:top">');
+}
+
+function _renderMdText(md){
+  if(!md.trim()) return '';
+  let html = md
+    .replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')
+    // HTML tables inline (Marker style) — unescape
+    .replace(/&lt;table[\s\S]*?&lt;\/table&gt;/gi, m =>
+      `<div style="overflow-x:auto;margin:10px 0">${_styleTableHtml(m.replace(/&lt;/g,'<').replace(/&gt;/g,'>').replace(/&amp;/g,'&'))}</div>`)
+    // Headings
+    .replace(/^#{6}\s+(.*)$/gm, '<h6 style="color:var(--accent);margin:10px 0 4px">$1</h6>')
+    .replace(/^#{5}\s+(.*)$/gm, '<h5 style="color:var(--accent);margin:10px 0 4px">$1</h5>')
+    .replace(/^#{4}\s+(.*)$/gm, '<h4 style="color:var(--accent);margin:10px 0 4px">$1</h4>')
+    .replace(/^#{3}\s+(.*)$/gm, '<h3 style="color:var(--accent);margin:12px 0 5px;font-size:14px">$1</h3>')
+    .replace(/^#{2}\s+(.*)$/gm, '<h2 style="color:var(--accent);margin:14px 0 6px;font-size:15px">$1</h2>')
+    .replace(/^#{1}\s+(.*)$/gm, '<h1 style="color:var(--accent);margin:16px 0 8px;font-size:16px">$1</h1>')
+    // Bold & italic
+    .replace(/\*\*\*(.+?)\*\*\*/g,'<strong><em>$1</em></strong>')
+    .replace(/\*\*(.+?)\*\*/g,'<strong>$1</strong>')
+    .replace(/\*(.+?)\*/g,'<em>$1</em>')
+    // Inline code
+    .replace(/`([^`]+)`/g,'<code style="background:rgba(255,255,255,.07);padding:1px 5px;border-radius:3px;font-size:11px;color:var(--cyan)">$1</code>')
+    // Horizontal rule
+    .replace(/^---+$/gm,'<hr style="border:none;border-top:1px solid var(--border);margin:12px 0">')
+    // Paragraphs
+    .split(/\n{2,}/)
+    .map(block => {
+      if(/^<[hH][1-6]|^<hr|^<div|^<ul|^<ol|^<li/.test(block.trim())) return block;
+      const inner = block.replace(/\n/g,'<br>').trim();
+      return inner ? `<p style="margin:0 0 8px">${inner}</p>` : '';
+    })
+    .join('\n');
+  return html;
 }
 
 async function copyDraft(){
@@ -1520,12 +1720,13 @@ async function copyDraft(){
   if(!confirm(`Load fresh OCR output from ${modelChoice}? Current edits will be lost.`)) return;
 
   const f=S.selected;
-  // TODO: khi có Mistral, loadDraft sẽ truyền thêm model param
-  // Hiện tại chỉ có Marker
   const loads=[];
-  if(f.has_text_pred||!f.has_table_pred) loads.push(loadDraft(f,'text'));
-  if(f.has_table_pred) loads.push(loadDraft(f,'table'));
-  if(!loads.length) loads.push(loadDraft(f,'unified'));
+  const srcModel = modelChoice;
+  const textDone  = f.has_text_pred_by_model?.[srcModel] || false;
+  const tableDone = f.has_table_pred_by_model?.[srcModel] || false;
+  if(textDone || !tableDone) loads.push(loadDraft(f,'text', srcModel));
+  if(tableDone) loads.push(loadDraft(f,'table', srcModel));
+  if(!loads.length) loads.push(loadDraft(f,'unified', srcModel));
   const results=await Promise.all(loads);
   S.textData={}; S.tableData={};
   for(const d of results) applyLoadResult(d, S.textData, S.tableData, false); // false = bỏ GT, dùng draft
@@ -1652,20 +1853,8 @@ async function confirmSave(){
     });
   const gtData = {doc_id: f.doc_id, pages};
 
-  // Debug log — xem data trước khi POST
-  for(const p of pages){
-    if(p.tables?.length){
-      p.tables.forEach((t,i)=>{
-        const hasHi = t.html?.includes('Hi');
-        console.log(`[save-pre-post] page=${p.page_num} table=${i} html.len=${t.html?.length} hasHi=${hasHi}`);
-        if(hasHi) console.log('[save-pre-post] HI FOUND in table', i, 'snippet:', t.html?.slice(0,200));
-      });
-    }
-  }
-
   try {
     // 1. Save GT
-    console.log('[confirmSave] posting gtData pages:', pages.map(p=>({pn:p.page_num,tables:p.tables?.length||0})));
     const saveRes = await fetch('/api/gt/save', {
       method: 'POST',
       headers: {'Content-Type': 'application/json'},
@@ -1676,33 +1865,61 @@ async function confirmSave(){
     });
     if(!saveRes.ok) throw new Error((await saveRes.json()).detail || 'Save failed');
     const saveData = await saveRes.json();
-    console.log('[confirmSave] server response:', saveData);
 
     const statusIcon = status === 'done' ? '🟢' : '🟠';
     toast(`✅ Saved ${statusIcon} ${status}${reviewer ? ' · ' + reviewer : ''}`);
     S._lastGTStatus = status;
 
-    // 2. Evaluate
+    // 2. Re-evaluate ALL models that have predictions (GT changed → all scores invalidated)
     btn.textContent = '⏳ Evaluating…';
-    info('Running evaluation…', 'status-info');
+    info('Running evaluation for all models with predictions…', 'status-info');
 
-    const hasBoth = f.has_text_pred && f.has_table_pred;
-    const split   = hasBoth ? 'both' : (f.has_table_pred ? 'table' : 'text');
+    const hasTablesInGT = Object.values(S.editorData).some(p=>(p.tables||[]).length > 0);
+    if(!S.scoresMap) S.scoresMap = {};
 
-    const evalRes = await fetch('/api/ocr/eval', {
-      method: 'POST',
-      headers: {'Content-Type': 'application/json'},
-      body: JSON.stringify({doc_id: f.doc_id, uc_type: f.uc_type, lang: f.lang, model: S.model, split})
-    });
-    if(!evalRes.ok) throw new Error((await evalRes.json()).detail || 'Eval failed');
-    S.scores = await evalRes.json();
+    // Collect models that have OCR done
+    const modelsToEval = MODELS.filter(m =>
+      f.has_text_pred_by_model?.[m.id] || f.has_table_pred_by_model?.[m.id]
+    );
 
-    toast('✅ Evaluation complete!');
+    // Run evals in parallel
+    const evalResults = await Promise.allSettled(modelsToEval.map(async m => {
+      const hasText  = f.has_text_pred_by_model?.[m.id]  || false;
+      const hasTable = f.has_table_pred_by_model?.[m.id] || false;
+      const split = (hasText && (hasTable || hasTablesInGT)) ? 'both'
+                  : (hasTable || hasTablesInGT) ? 'table'
+                  : 'text';
+
+      const res = await fetch('/api/ocr/eval', {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({doc_id: f.doc_id, uc_type: f.uc_type, lang: f.lang, model: m.id, split})
+      });
+      if(!res.ok) throw new Error(`${m.id}: ${(await res.json()).detail || 'Eval failed'}`);
+      const result = await res.json();
+      S.scoresMap[m.id] = result;
+      return result;
+    }));
+
+    // Check for errors
+    const failed = evalResults.filter(r => r.status === 'rejected');
+    if(failed.length) {
+      failed.forEach(r => console.warn('Eval failed:', r.reason));
+      toast(`⚠️ ${failed.length} model(s) eval failed — see console`, true);
+    }
+
+    // Use current model's result as S.scores for backward compat
+    const curResult = S.scoresMap[S.model] || Object.values(S.scoresMap)[0];
+    S.scores = curResult || null;
+
+    const evalCount = evalResults.filter(r => r.status === 'fulfilled').length;
+    toast(`✅ Evaluation complete (${evalCount} model${evalCount>1?'s':''})`);
     info('Done! Showing scores…', 'status-ok');
     btn.textContent = '💾 Save GT & Evaluate';
     btn.disabled = false;
 
     await refreshAll();
+    // refreshAll() already syncs S.selected with fresh data
     renderScores(S.scores);
     goStep(4);
   } catch(e) {
@@ -1714,37 +1931,172 @@ async function confirmSave(){
 }
 
 // ═══════════════════════════════════════════════════════════════
-// Step 4: render scores
+// Step 4: Scores panel — multi-model tabs
 // ═══════════════════════════════════════════════════════════════
-function renderScores(data){
-  const body=document.getElementById('scores-body');
-  body.innerHTML='';
 
-  const f=S.selected;
-  const hdr=document.createElement('div');
-  hdr.style.cssText='font-size:15px;font-weight:700;margin-bottom:4px';
-  hdr.innerHTML=`${data.doc_id} <span style="font-size:12px;font-weight:400;color:var(--muted)">[${f?.uc_type}/${f?.lang}] · ${data.model}</span>`;
+// S.scoresMap: { modelId: scoresData } — loaded results per model
+// S.scores: last eval result (legacy, kept for compat)
+
+async function renderScoresPanel(){
+  const f = S.selected;
+  const body = document.getElementById('scores-body');
+  if(!f){ body.innerHTML='<div class="empty" style="height:200px"><p>Select a file first</p></div>'; return; }
+
+  body.innerHTML='<div style="padding:16px;color:var(--muted)">Loading scores…</div>';
+
+  // Load existing eval results for all models in parallel
+  if(!S.scoresMap) S.scoresMap = {};
+
+  // If we just saved/evaled, S.scores has the latest — cache it
+  if(S.scores) S.scoresMap[S.scores.model] = S.scores;
+
+  // Load saved results from disk for all models
+  await Promise.all(MODELS.map(async m => {
+    if(S.scoresMap[m.id]) return;  // already loaded
+    try{
+      const r = await fetch(`/api/ocr/result?doc_id=${f.doc_id}&uc_type=${f.uc_type}&lang=${f.lang}&model=${m.id}`);
+      if(r.ok) S.scoresMap[m.id] = await r.json();
+    }catch(e){}
+  }));
+
+  const availModels = MODELS.filter(m => S.scoresMap[m.id]);
+  const activeModel = S.scores?.model || availModels[0]?.id || S.model || 'marker';
+
+  renderScoresTabs(availModels, activeModel, f);
+}
+
+function renderScoresTabs(availModels, activeModel, f){
+  const body = document.getElementById('scores-body');
+  body.innerHTML = '';
+
+  // Header
+  const hdr = document.createElement('div');
+  hdr.style.cssText = 'display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;flex-wrap:wrap;gap:8px';
+  hdr.innerHTML = `
+    <div style="font-size:15px;font-weight:700">
+      ${f.doc_id}
+      <span style="font-size:12px;font-weight:400;color:var(--muted)">[${f.uc_type}/${f.lang}]</span>
+    </div>
+    <div style="display:flex;gap:6px;align-items:center" id="scores-model-tabs">
+      ${MODELS.map(m => {
+        const hasResult = !!S.scoresMap?.[m.id];
+        const isActive  = m.id === activeModel;
+        return `<button
+          class="btn ${isActive ? 'btn-primary' : 'btn-ghost'}"
+          style="padding:5px 14px;font-size:12px;${!hasResult ? 'opacity:.5' : ''}"
+          onclick="switchScoresModel('${m.id}')"
+          id="scores-tab-${m.id}">
+          ${m.id === 'marker' ? '🔬' : '✨'} ${m.name}
+          ${hasResult ? '' : '<span style="font-size:10px;color:var(--orange)"> no eval</span>'}
+        </button>`;
+      }).join('')}
+    </div>`;
   body.appendChild(hdr);
+
+  // Eval button for models without results
+  const noEval = MODELS.filter(m => !S.scoresMap?.[m.id] && (f.ocr_done?.[m.id]));
+  if(noEval.length){
+    const evalBar = document.createElement('div');
+    evalBar.style.cssText = 'display:flex;gap:8px;margin-bottom:12px;flex-wrap:wrap';
+    for(const m of noEval){
+      const btn = document.createElement('button');
+      btn.className = 'btn btn-ghost';
+      btn.style.cssText = 'font-size:12px;padding:5px 12px;border:1px solid var(--orange);color:var(--orange)';
+      btn.textContent = `▶ Eval ${m.name}`;
+      btn.onclick = () => runEvalForModel(m.id);
+      evalBar.appendChild(btn);
+    }
+    body.appendChild(evalBar);
+  }
+
+  // Scores content area
+  const content = document.createElement('div');
+  content.id = 'scores-content';
+  body.appendChild(content);
+
+  // Show active model scores
+  renderScoresForModel(activeModel, content);
+}
+
+function switchScoresModel(modelId){
+  // Update tab highlight
+  document.querySelectorAll('[id^="scores-tab-"]').forEach(b=>{
+    const mid = b.id.replace('scores-tab-','');
+    b.className = `btn ${mid===modelId ? 'btn-primary' : 'btn-ghost'}`;
+    b.style.padding = '5px 14px'; b.style.fontSize = '12px';
+    if(!S.scoresMap?.[mid]) b.style.opacity = '.5';
+    else b.style.opacity = '1';
+  });
+  const content = document.getElementById('scores-content');
+  if(content) renderScoresForModel(modelId, content);
+}
+
+function renderScoresForModel(modelId, container){
+  container.innerHTML = '';
+  const data = S.scoresMap?.[modelId];
+  if(!data){
+    container.innerHTML = `<div class="empty" style="height:200px">
+      <p>No evaluation for ${modelId}</p>
+      <span style="font-size:12px;color:var(--muted)">Run OCR first then Save GT & Evaluate</span>
+    </div>`;
+    return;
+  }
+  renderScores(data, container);
+}
+
+async function runEvalForModel(modelId){
+  const f = S.selected;
+  if(!f) return;
+  const btn = document.querySelector(`button[onclick="runEvalForModel('${modelId}')"]`);
+  if(btn){ btn.disabled=true; btn.textContent=`⏳ Evaluating ${modelId}…`; }
+
+  try{
+    const curModel = modelId;
+    const hasTextPred  = f.has_text_pred_by_model?.[curModel] || false;
+    const hasTablePred = f.has_table_pred_by_model?.[curModel] || false;
+    const hasTablesInGT = Object.values(S.editorData||{}).some(p=>(p.tables||[]).length > 0);
+    const split = (hasTextPred && (hasTablePred || hasTablesInGT)) ? 'both'
+                : (hasTablePred || hasTablesInGT) ? 'table'
+                : 'text';
+
+    const res = await fetch('/api/ocr/eval', {
+      method:'POST', headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({doc_id:f.doc_id, uc_type:f.uc_type, lang:f.lang, model:modelId, split})
+    });
+    if(!res.ok) throw new Error((await res.json()).detail || 'Eval failed');
+    const result = await res.json();
+    if(!S.scoresMap) S.scoresMap = {};
+    S.scoresMap[modelId] = result;
+    toast(`✅ ${modelId} eval complete`);
+    renderScoresTabs(MODELS.filter(m=>S.scoresMap[m.id]), modelId, f);
+  }catch(e){
+    toast(e.message, true);
+    if(btn){ btn.disabled=false; btn.textContent=`▶ Eval ${modelId}`; }
+  }
+}
+
+function renderScores(data, container){
+  const el = container || document.getElementById('scores-body');
 
   // Text scores
   if(data.text){
     const s=data.text.summary;
-    body.appendChild(buildScoreCard('📝 Text Evaluation', [
-      {label:'CER',         val:s.avg_cer,                      lower:true},
-      {label:'WER',         val:s.avg_wer,                      lower:true},
-      {label:'nWER',        val:s.avg_nwer,                     lower:true},
-      {label:'Char F1',     val:s.avg_char_f1,                  lower:false},
-      {label:'Word F1',     val:s.avg_word_f1,                  lower:false},
-      {label:'Edit Sim',    val:s.avg_normalized_edit_similarity, lower:false},
+    el.appendChild(buildScoreCard('📝 Text Evaluation', [
+      {label:'CER',         val:s.avg_cer,                         lower:true},
+      {label:'WER',         val:s.avg_wer,                         lower:true},
+      {label:'nWER',        val:s.avg_nwer,                        lower:true},
+      {label:'Char F1',     val:s.avg_char_f1,                     lower:false},
+      {label:'Word F1',     val:s.avg_word_f1,                     lower:false},
+      {label:'Edit Sim',    val:s.avg_normalized_edit_similarity,   lower:false},
       ...(s.avg_mean_iou!==undefined?[{label:'IoU',val:s.avg_mean_iou,lower:false}]:[]),
-      {label:'Pages',       val:s.n_pages,                      raw:true},
+      {label:'Pages',       val:s.n_pages,                         raw:true},
     ]));
-    body.appendChild(buildPageTable(data.text.pages, 'text'));
+    el.appendChild(buildPageTable(data.text.pages, 'text'));
   }
 
   if(data.table){
     const s=data.table.summary;
-    body.appendChild(buildScoreCard('📊 Table Evaluation', [
+    el.appendChild(buildScoreCard('📊 Table Evaluation', [
       {label:'Avg TEDS',       val:s.avg_teds,                lower:false},
       {label:'Cell Exact F1',  val:s.avg_cell_exact_f1,       lower:false},
       {label:'Cell Text Sim',  val:s.avg_cell_text_similarity, lower:false},
@@ -1753,11 +2105,11 @@ function renderScores(data){
       {label:'Table Count F1', val:s.table_count_f1,           lower:false},
       {label:'Pages',          val:s.n_pages,                  raw:true},
     ]));
-    body.appendChild(buildPageTable(data.table.pages, 'table'));
+    el.appendChild(buildPageTable(data.table.pages, 'table'));
   }
 
   if(!data.text && !data.table){
-    body.innerHTML='<div class="empty" style="height:200px"><p>No scores available</p></div>';
+    el.innerHTML += '<div class="empty" style="height:200px"><p>No scores available</p></div>';
   }
 }
 
@@ -2092,9 +2444,8 @@ refreshAll();
      PDF.js viewer + bbox highlight (ES module)
      ═══════════════════════════════════════════════════════════ -->
 <script type="module">
-import * as pdfjsLib from 'https://cdn.jsdelivr.net/npm/pdfjs-dist@4.4.168/build/pdf.min.mjs';
-pdfjsLib.GlobalWorkerOptions.workerSrc =
-  'https://cdn.jsdelivr.net/npm/pdfjs-dist@4.4.168/build/pdf.worker.min.mjs';
+import * as pdfjsLib from '/vendor/pdf.min.mjs';
+pdfjsLib.GlobalWorkerOptions.workerSrc = '/vendor/pdf.worker.min.mjs';
 
 // State shared with main scripts via window.PDF
 window.PDF = {
@@ -2117,7 +2468,7 @@ window.PDF.renderDocument = async function(url) {
   try {
     const doc = await pdfjsLib.getDocument({
       url,
-      cMapUrl: 'https://cdn.jsdelivr.net/npm/pdfjs-dist@4.4.168/cmaps/',
+      cMapUrl: '/vendor/cmaps/',
       cMapPacked: true,
     }).promise;
     window.PDF.doc = doc;
@@ -2314,49 +2665,139 @@ const _patchedRenderReview = async function() {
   const f = S.selected;
   if(!f) return;
 
-  // Load PDF.js document
-  if(f.pdf_url) {
-    await window.PDF.renderDocument(f.pdf_url);
+  // ── Start PDF render immediately (non-blocking) ──────────────
+  const pdfPromise = f.pdf_url ? window.PDF.renderDocument(f.pdf_url) : Promise.resolve();
+
+  // ── Determine source model for draft ─────────────────────────
+  const gtCheck = await fetch(
+    `/api/gt/load?doc_id=${f.doc_id}&uc_type=${f.uc_type}&lang=${f.lang}&split=text&model=marker`
+  ).then(r=>r.ok?r.json():null).catch(()=>null);
+  const hasExistingGT = !!gtCheck?.existing_gt;
+
+  let srcModel = S.model || 'marker';
+
+  if(!hasExistingGT){
+    const availModels = MODELS.filter(m =>
+      f.has_text_pred_by_model?.[m.id] || f.has_table_pred_by_model?.[m.id]
+    );
+    if(availModels.length === 0){
+      srcModel = S.model || 'marker';
+    } else if(availModels.length === 1){
+      srcModel = availModels[0].id;
+    } else {
+      const picked = await _pickOcrSourceForGT(availModels, f);
+      srcModel = picked || availModels[0].id;
+    }
+    S.model = srcModel;
   }
 
-  // Load bboxes
-  const bRes = await fetch(`/api/gt/bboxes?doc_id=${f.doc_id}&uc_type=${f.uc_type}&lang=${f.lang}`);
-  if(bRes.ok) {
-    window.PDF.bboxes = (await bRes.json()).pages || {};
-    window.PDF.drawAllBboxes();
-  }
+  const textDone  = f.has_text_pred_by_model?.[srcModel] || false;
+  const tableDone = f.has_table_pred_by_model?.[srcModel] || false;
 
-  // Load text+table data
-  // Logic: nếu đã có GT → dùng GT, KHÔNG load draft OCR
-  //        nếu chưa có GT → load draft từ OCR đã chọn (S.selectedOcrModel)
   const loads = [];
-  if(f.has_text_pred || !f.has_table_pred) loads.push(loadDraft(f,'text'));
-  if(f.has_table_pred) loads.push(loadDraft(f,'table'));
-  if(!loads.length) loads.push(loadDraft(f,'unified'));
+  if(textDone || !tableDone) loads.push(loadDraft(f,'text', srcModel));
+  if(tableDone) loads.push(loadDraft(f,'table', srcModel));
+  if(!loads.length) loads.push(loadDraft(f,'unified', srcModel));
 
-  const results = await Promise.all(loads);
+  // ── Load data + check MD in parallel (while PDF may still render) ──
+  const [results, mdChecks] = await Promise.all([
+    Promise.all(loads),
+    Promise.all(
+      MODELS.map(m => fetch(`/api/gt/md/${f.uc_type}/${f.lang}/${f.doc_id}?model=${m.id}`)
+        .then(r=>r.ok ? m.id : null).catch(()=>null))
+    ),
+  ]);
+
   const hasGT = results.some(d=>d?.gt_saved);
   S.textData = {}; S.tableData = {};
-
-  // Nếu đã có GT: dùng GT hoàn toàn (useGT=true)
-  // Nếu chưa có GT: load draft từ OCR (useGT=false)
   for(const d of results) applyLoadResult(d, S.textData, S.tableData, hasGT);
   S.editorData = mergeEditorPages(S.textData, S.tableData);
   S.editorSplit = 'text';
 
-  // Check MD file exists
-  const mdCheck = await fetch(`/api/gt/md/${f.uc_type}/${f.lang}/${f.doc_id}`);
-  f.has_md = mdCheck.ok;
+  f.has_md = mdChecks.some(Boolean);
+  f._md_models = mdChecks.filter(Boolean);
 
+  // ── Build editor immediately — don't wait for PDF ─────────────
   buildEditorChrome();
 
   const firstGT = results.find(d=>d?.existing_gt);
   S._lastGTStatus = firstGT?.existing_gt?.status || 'in_progress';
 
-  info(hasGT ? '✓ GT saved — editing will update it'
-             : 'Click a block on PDF to jump to it • Edit text/table • Save & Evaluate',
-       hasGT ? 'status-ok' : '');
+  // Source label
+  const editorHdr = document.querySelector('#editor-panel .panel-hdr');
+  if(editorHdr){
+    const existing = editorHdr.querySelector('#editor-src-label');
+    if(existing) existing.remove();
+    const lbl = document.createElement('span');
+    lbl.id = 'editor-src-label';
+    lbl.style.cssText = 'font-weight:400;font-size:10px;text-transform:none;letter-spacing:0;margin-left:8px';
+    if(hasGT){ lbl.style.color='var(--green)'; lbl.textContent='✓ from GT'; }
+    else      { lbl.style.color='var(--orange)'; lbl.textContent=`draft: ${srcModel}`; }
+    const modeLbl = editorHdr.querySelector('#editor-mode-lbl');
+    if(modeLbl) editorHdr.insertBefore(lbl, modeLbl);
+    else editorHdr.appendChild(lbl);
+  }
+
+  info(hasGT ? `✓ GT saved — editing will update it`
+             : `Draft loaded from ${srcModel} • Edit then Save & Evaluate`,
+       hasGT ? 'status-ok' : 'status-info');
+
+  // ── Load bboxes after PDF done (non-blocking for editor) ──────
+  pdfPromise.then(async () => {
+    const bRes = await fetch(
+      `/api/gt/bboxes?doc_id=${f.doc_id}&uc_type=${f.uc_type}&lang=${f.lang}&model=marker`
+    );
+    if(bRes.ok){
+      window.PDF.bboxes = (await bRes.json()).pages || {};
+      window.PDF.drawAllBboxes();
+    }
+  }).catch(()=>{});
 };
+
+/** Show a small non-blocking picker: which OCR model to load as GT draft? */
+function _pickOcrSourceForGT(availModels, f){
+  return new Promise(resolve => {
+    const overlay = document.createElement('div');
+    overlay.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:2000;display:flex;align-items:center;justify-content:center';
+
+    const btns = availModels.map(m => `
+      <button class="btn btn-ghost" data-model="${m.id}"
+        style="justify-content:flex-start;gap:10px;padding:10px 14px;text-align:left">
+        ${m.id==='marker'?'🔬':'✨'}
+        <div>
+          <div style="font-weight:600;font-size:13px">${m.name}</div>
+          <div style="font-size:11px;color:var(--muted)">${m.tier}</div>
+        </div>
+      </button>`).join('');
+
+    overlay.innerHTML = `
+      <div style="background:var(--surface);border:1px solid var(--border);border-radius:12px;
+                  padding:20px;width:320px;display:flex;flex-direction:column;gap:12px;
+                  box-shadow:0 8px 40px rgba(0,0,0,.5)">
+        <div>
+          <div style="font-size:14px;font-weight:700;margin-bottom:4px">Load OCR draft as GT base</div>
+          <div style="font-size:11px;color:var(--muted)">No GT yet for <strong>${f.doc_id}</strong>. Which OCR output to start from?</div>
+        </div>
+        <div style="display:flex;flex-direction:column;gap:6px" id="_gt-src-picker">${btns}</div>
+        <div style="display:flex;justify-content:flex-end">
+          <button class="btn btn-ghost" id="_gt-src-cancel" style="font-size:12px;padding:5px 12px">Cancel</button>
+        </div>
+      </div>`;
+
+    overlay.querySelector('#_gt-src-picker').addEventListener('click', e => {
+      const btn = e.target.closest('button[data-model]');
+      if(!btn) return;
+      document.body.removeChild(overlay);
+      resolve(btn.dataset.model);
+    });
+    overlay.querySelector('#_gt-src-cancel').onclick = () => {
+      document.body.removeChild(overlay);
+      resolve(null);
+    };
+    overlay.onclick = e => { if(e.target === overlay){ document.body.removeChild(overlay); resolve(null); } };
+    document.body.appendChild(overlay);
+  });
+}
 
 // Replace renderReview globally
 window.renderReview = _patchedRenderReview;
