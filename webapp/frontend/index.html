@@ -954,8 +954,9 @@ function buildEditorChrome(){
   const f=S.selected;
   const hasText  = Object.values(S.editorData).some(p=>(p.full_text||'').trim().length>0);
   const hasTable = Object.values(S.editorData).some(p=>(p.tables||[]).length>0);
+  const hasMd    = f?.has_md;  // set when md file exists
 
-  // Mode lbl → replace with toggle buttons
+  // Mode toggle buttons
   const modeLbl = document.getElementById('editor-mode-lbl');
   modeLbl.innerHTML = `
     <span style="display:inline-flex;gap:4px;margin-left:8px">
@@ -967,9 +968,13 @@ function buildEditorChrome(){
         class="btn btn-ghost" style="padding:3px 10px;font-size:11px;
         ${S.editorSplit==='table'?'background:var(--accent);color:#fff':''}">
         📊 Table</button>`:''}
+      ${hasMd   ?`<button id="mode-md"    onclick="setEditorMode('md')"
+        class="btn btn-ghost" style="padding:3px 10px;font-size:11px;
+        ${S.editorSplit==='md'?'background:var(--border);color:var(--cyan)':''}">
+        📄 MD</button>`:''}
     </span>`;
 
-  // Page tabs
+  // Page tabs (not shown in MD mode)
   const allPages = Object.values(S.editorData).sort((a,b)=>a.page_num-b.page_num);
   renderTabs(allPages);
   if(allPages.length) renderPage(allPages[0].page_num);
@@ -978,10 +983,18 @@ function buildEditorChrome(){
 function setEditorMode(mode){
   S.editorSplit = mode;
   // Update button styles
-  const tb = document.getElementById('mode-text');
-  const tb2= document.getElementById('mode-table');
-  if(tb)  tb.style.cssText  = tb.style.cssText.replace(/background:[^;]+;color:[^;]+/,'') + (mode==='text' ?';background:var(--accent);color:#fff':'');
-  if(tb2) tb2.style.cssText = tb2.style.cssText.replace(/background:[^;]+;color:[^;]+/,'') + (mode==='table'?';background:var(--accent);color:#fff':'');
+  ['text','table','md'].forEach(m=>{
+    const btn = document.getElementById(`mode-${m}`);
+    if(!btn) return;
+    if(m===mode){ btn.style.background=m==='md'?'var(--border)':'var(--accent)'; btn.style.color=m==='md'?'var(--cyan)':'#fff'; }
+    else{ btn.style.background=''; btn.style.color=''; }
+  });
+
+  if(mode === 'md'){
+    renderMdView();
+    return;
+  }
+
   // Re-render current page
   const activeTab=document.querySelector('.tab.active');
   const pn=activeTab?+activeTab.id.replace('tab-',''):1;
@@ -1436,21 +1449,104 @@ function parseCells(html){
   return cells;
 }
 
+async function renderMdView(){
+  const f = S.selected;
+  const body = document.getElementById('editor-body');
+  body.style.padding='12px'; body.style.overflow='auto';
+  body.classList.remove('table-mode');
+  body.innerHTML='<div style="color:var(--muted);font-size:12px">Loading Markdown…</div>';
+
+  try{
+    const res = await fetch(`/api/gt/md/${f.uc_type}/${f.lang}/${f.doc_id}`);
+    if(!res.ok) throw new Error('MD not found');
+    const data = await res.json();
+    const md = data.markdown || '';
+    body.innerHTML=`
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
+        <span class="field-lbl" style="margin:0">Raw Markdown (read-only)</span>
+        <span style="font-size:11px;color:var(--muted)">${md.length.toLocaleString()} chars</span>
+      </div>
+      <textarea class="text-area" readonly style="min-height:calc(100vh - 300px);color:var(--cyan);font-size:11px">${esc(md)}</textarea>`;
+  }catch(e){
+    body.innerHTML=`<div class="empty" style="height:200px"><p>No Markdown available</p><span style="font-size:12px;color:var(--muted)">Run OCR first to generate .md file</span></div>`;
+  }
+}
+
 async function copyDraft(){
-  if(!S.selected||!confirm('Load fresh OCR output? Current edits will be lost.')) return;
-  // Reload editor từ draft (bỏ qua GT)
+  if(!S.selected) return;
+
+  // Dialog chọn OCR model để load draft từ
+  const modelChoice = await showOcrSourcePicker();
+  if(!modelChoice) return;  // user cancelled
+
+  if(!confirm(`Load fresh OCR output from ${modelChoice}? Current edits will be lost.`)) return;
+
   const f=S.selected;
+  // TODO: khi có Mistral, loadDraft sẽ truyền thêm model param
+  // Hiện tại chỉ có Marker
   const loads=[];
   if(f.has_text_pred||!f.has_table_pred) loads.push(loadDraft(f,'text'));
   if(f.has_table_pred) loads.push(loadDraft(f,'table'));
   if(!loads.length) loads.push(loadDraft(f,'unified'));
   const results=await Promise.all(loads);
   S.textData={}; S.tableData={};
-  for(const d of results) applyLoadResult(d, S.textData, S.tableData, false); // false = dùng draft
+  for(const d of results) applyLoadResult(d, S.textData, S.tableData, false); // false = bỏ GT, dùng draft
   S.editorData=mergeEditorPages(S.textData, S.tableData);
   S.editorSplit='text';
   buildEditorChrome();
-  toast('↺ Loaded fresh OCR output');
+  toast(`↺ Loaded OCR output from ${modelChoice}`);
+}
+
+function showOcrSourcePicker(){
+  return new Promise(resolve=>{
+    // Tạo simple picker modal
+    const overlay = document.createElement('div');
+    overlay.style.cssText='position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:2000;display:flex;align-items:center;justify-content:center';
+    overlay.innerHTML=`
+      <div style="background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:20px;min-width:280px;display:flex;flex-direction:column;gap:12px">
+        <div style="font-size:14px;font-weight:700">Load OCR Draft From</div>
+        <div style="display:flex;flex-direction:column;gap:6px" id="ocr-source-list">
+          <button class="btn btn-ghost" style="justify-content:flex-start" onclick="this.closest('[data-picker]').dataset.choice='marker'">
+            🔬 Marker OCR (datalab.to)
+          </button>
+          <button class="btn btn-ghost" style="justify-content:flex-start;opacity:.4" disabled title="Coming soon">
+            ✨ Mistral OCR (coming soon)
+          </button>
+        </div>
+        <div style="display:flex;justify-content:flex-end;gap:8px">
+          <button class="btn btn-ghost" onclick="this.closest('[data-picker]').dataset.choice='cancel'">Cancel</button>
+        </div>
+      </div>`;
+    overlay.setAttribute('data-picker','');
+    overlay.addEventListener('click', e=>{
+      if(e.target===overlay) { document.body.removeChild(overlay); resolve(null); }
+    });
+
+    // Watch for choice
+    const observer = new MutationObserver(()=>{
+      const choice = overlay.dataset.choice;
+      if(choice){
+        observer.disconnect();
+        document.body.removeChild(overlay);
+        resolve(choice === 'cancel' ? null : choice);
+      }
+    });
+    observer.observe(overlay, {attributes:true, attributeFilter:['data-choice']});
+
+    // Also handle button clicks
+    overlay.querySelectorAll('#ocr-source-list button:not([disabled])').forEach(btn=>{
+      btn.onclick = ()=>{ overlay.dataset.choice = btn.onclick.toString().match(/'(\w+)'/)?.[1] || 'marker'; };
+    });
+
+    // Simpler: use event delegation
+    overlay.querySelector('#ocr-source-list').onclick = e=>{
+      const btn = e.target.closest('button:not([disabled])');
+      if(btn) overlay.dataset.choice = btn.textContent.includes('Marker') ? 'marker' : 'cancel';
+    };
+    overlay.querySelector('.btn-ghost:last-child').onclick = ()=>{ overlay.dataset.choice='cancel'; };
+
+    document.body.appendChild(overlay);
+  });
 }
 
 async function deleteGT(){
@@ -2211,22 +2307,30 @@ const _patchedRenderReview = async function() {
     window.PDF.drawAllBboxes();
   }
 
-  // Load text+table data (existing renderReview logic)
+  // Load text+table data
+  // Logic: nếu đã có GT → dùng GT, KHÔNG load draft OCR
+  //        nếu chưa có GT → load draft từ OCR đã chọn (S.selectedOcrModel)
   const loads = [];
   if(f.has_text_pred || !f.has_table_pred) loads.push(loadDraft(f,'text'));
   if(f.has_table_pred) loads.push(loadDraft(f,'table'));
   if(!loads.length) loads.push(loadDraft(f,'unified'));
 
   const results = await Promise.all(loads);
+  const hasGT = results.some(d=>d?.gt_saved);
   S.textData = {}; S.tableData = {};
 
-  for(const d of results) applyLoadResult(d, S.textData, S.tableData);
+  // Nếu đã có GT: dùng GT hoàn toàn (useGT=true)
+  // Nếu chưa có GT: load draft từ OCR (useGT=false)
+  for(const d of results) applyLoadResult(d, S.textData, S.tableData, hasGT);
   S.editorData = mergeEditorPages(S.textData, S.tableData);
   S.editorSplit = 'text';
+
+  // Check MD file exists
+  const mdCheck = await fetch(`/api/gt/md/${f.uc_type}/${f.lang}/${f.doc_id}`);
+  f.has_md = mdCheck.ok;
+
   buildEditorChrome();
 
-  const hasGT = results.some(d=>d?.gt_saved);
-  // Lưu status hiện tại để modal pre-fill đúng
   const firstGT = results.find(d=>d?.existing_gt);
   S._lastGTStatus = firstGT?.existing_gt?.status || 'in_progress';
 

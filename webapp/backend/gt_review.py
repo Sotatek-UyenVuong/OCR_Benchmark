@@ -204,7 +204,14 @@ def save_gt(req: SaveGTRequest):
     }
 
 
-@router.get("/bboxes")
+@router.get("/md/{uc_type}/{lang}/{doc_id}")
+def get_markdown(uc_type: str, lang: str, doc_id: str, model: str = "marker"):
+    """Serve raw Markdown output from OCR for display."""
+    md_path = RAW_ROOT / uc_type / lang / MARKER_SUBDIR / f"{doc_id}.md"
+    if not md_path.exists():
+        raise HTTPException(404, "Markdown file not found — run OCR first")
+    content = md_path.read_text(encoding="utf-8")
+    return {"doc_id": doc_id, "markdown": content, "path": str(md_path.relative_to(PROJECT_ROOT))}
 def get_bboxes(
     doc_id:  str = Query(...),
     uc_type: str = Query(...),
