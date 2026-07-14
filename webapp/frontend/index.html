@@ -1796,7 +1796,73 @@ function _renderMdText(md){
   return html;
 }
 
-/** Refresh bbox overlay on PDF for the given model (non-blocking) */
+/** Render PDF pages as server-side PNG images via pdftoppm */
+async function _renderAllPagesPng(f) {
+  const frame = document.getElementById('pdf-frame');
+  frame.innerHTML = '<div style="padding:16px;color:var(--muted)">Loading pages…</div>';
+  window.PDF.overlays = {};
+  window.PDF.canvases = {};
+
+  // Get page count
+  let pageCount = 0;
+  try {
+    const infoRes = await fetch(`/api/gt/pdf_info/${f.uc_type}/${f.lang}/${f.doc_id}`);
+    if(infoRes.ok) pageCount = (await infoRes.json()).page_count || 0;
+  } catch(e){}
+
+  if(!pageCount){
+    // Probe by loading until 404
+    for(let pn = 1; pn <= 50; pn++){
+      const r = await fetch(`/api/gt/pdf_page/${f.uc_type}/${f.lang}/${f.doc_id}/${pn}?dpi=1`,{method:'HEAD'}).catch(()=>({status:404}));
+      if(r.status===404){ pageCount=pn-1; break; }
+    }
+  }
+
+  if(!pageCount){
+    frame.innerHTML='<div class="empty"><p>PDF not available</p></div>';
+    return;
+  }
+
+  frame.innerHTML='';
+  document.getElementById('pdf-page-info').textContent=`${pageCount} pages`;
+  window.PDF._pageCount=pageCount;
+
+  const dpr=Math.min(window.devicePixelRatio||1,2);
+  const baseDpi=Math.round(96 * window.PDF.SCALE);
+
+  for(let pn=1; pn<=pageCount; pn++){
+    const wrap=document.createElement('div');
+    wrap.className='pdf-page-wrap';
+    wrap.id=`pdf-page-${pn}`;
+    wrap.style.cssText='margin:8px auto;display:block;position:relative;background:#fff';
+
+    const img=document.createElement('img');
+    img.src=`/api/gt/pdf_page/${f.uc_type}/${f.lang}/${f.doc_id}/${pn}?dpi=${baseDpi}`;
+    img.style.cssText='display:block;width:100%;box-shadow:0 2px 12px rgba(0,0,0,.5)';
+    img.alt=`Page ${pn}`;
+    img.onerror=()=>{ wrap.style.display='none'; };
+
+    const svg=document.createElementNS('http://www.w3.org/2000/svg','svg');
+    svg.setAttribute('class','pdf-overlay');
+    svg.style.cssText='position:absolute;top:0;left:0;width:100%;height:100%;pointer-events:none';
+    window.PDF.overlays[pn]=svg;
+
+    img.onload=()=>{
+      const w=img.naturalWidth/dpr;
+      const h=img.naturalHeight/dpr;
+      svg.setAttribute('viewBox',`0 0 ${w} ${h}`);
+      svg.setAttribute('width',w);
+      svg.setAttribute('height',h);
+      wrap.style.width=w+'px';
+      window.PDF.drawPageBboxes(pn, window.PDF.bboxes[String(pn)]||[]);
+    };
+
+    wrap.appendChild(img);
+    wrap.appendChild(svg);
+    frame.appendChild(wrap);
+  }
+}
+
 async function _refreshBboxOverlay(modelId){
   const f = S.selected;
   if(!f) return;
@@ -2515,47 +2581,21 @@ function _updateZoomLabel(){
 }
 
 async function _rerender(){
-  if(!window.PDF.doc || !window.PDF._lastUrl) return;
-  const frame   = document.getElementById('pdf-frame');
+  if(!window.PDF._lastUrl && !window.PDF._pageCount) return;
+  // PNG mode: reload images at new DPI
+  const f = S.selected;
+  if(!f) return;
+  const dpr = Math.min(window.devicePixelRatio||1, 2);
+  const baseDpi = Math.round(120 * window.PDF.SCALE * dpr);
+  const frame = document.getElementById('pdf-frame');
   const scrollY = frame.scrollTop;
-
-  // Re-render song song 3 trang cùng lúc
-  const doc   = window.PDF.doc;
-  const dpr   = window.PDF.DPR;
-  const queue = Array.from({length: doc.numPages}, (_, i) => i + 1);
-  const worker = async () => {
-    while(queue.length) {
-      const pn = queue.shift();
-      const canvas  = window.PDF.canvases[pn];
-      const svg     = window.PDF.overlays[pn];
-      const wrap    = document.getElementById(`pdf-page-${pn}`);
-      if(!canvas) continue;
-
-      const page     = await doc.getPage(pn);
-      const viewport = page.getViewport({ scale: window.PDF.SCALE * dpr });
-      const cssW = viewport.width  / dpr;
-      const cssH = viewport.height / dpr;
-
-      canvas.width  = viewport.width;
-      canvas.height = viewport.height;
-      canvas.style.width  = cssW + 'px';
-      canvas.style.height = cssH + 'px';
-      if(svg){
-        svg.setAttribute('viewBox', `0 0 ${cssW} ${cssH}`);
-        svg.setAttribute('width',  cssW);
-        svg.setAttribute('height', cssH);
-      }
-      if(wrap) wrap.style.width = cssW + 'px';
-
-      const ctx2 = canvas.getContext('2d');
-      ctx2.fillStyle = '#ffffff';
-      ctx2.fillRect(0, 0, canvas.width, canvas.height);
-      await page.render({ canvasContext: ctx2, viewport }).promise;
-    }
-  };
-  await Promise.all(Array.from({length: 3}, worker));
-
-  window.PDF.drawAllBboxes();
+  const pageCount = window.PDF._pageCount || 0;
+  for(let pn=1; pn<=pageCount; pn++){
+    const wrap = document.getElementById(`pdf-page-${pn}`);
+    if(!wrap) continue;
+    const img = wrap.querySelector('img');
+    if(img) img.src = `/api/gt/pdf_page/${f.uc_type}/${f.lang}/${f.doc_id}/${pn}?dpi=${baseDpi}`;
+  }
   frame.scrollTop = scrollY;
 }
 
@@ -2842,8 +2882,8 @@ const _patchedRenderReview = async function() {
   const f = S.selected;
   if(!f) return;
 
-  // ── Start PDF render immediately (non-blocking) ──────────────
-  const pdfPromise = f.pdf_url ? window.PDF.renderDocument(f.pdf_url) : Promise.resolve();
+  // ── Render PDF as server-side PNG images (reliable, no codec issues) ──
+  const pdfPromise = f.pdf_url ? _renderAllPagesPng(f) : Promise.resolve();
 
   // ── Determine source model for draft ─────────────────────────
   const gtCheck = await fetch(
