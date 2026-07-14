@@ -2876,7 +2876,7 @@ const _patchedRenderReview = async function() {
   // ── Load bboxes after PDF done (non-blocking for editor) ──────
   pdfPromise.then(async () => {
     const bRes = await fetch(
-      `/api/gt/bboxes?doc_id=${f.doc_id}&uc_type=${f.uc_type}&lang=${f.lang}&model=marker`
+      `/api/gt/bboxes?doc_id=${f.doc_id}&uc_type=${f.uc_type}&lang=${f.lang}&model=${srcModel}`
     );
     if(bRes.ok){
       window.PDF.bboxes = (await bRes.json()).pages || {};

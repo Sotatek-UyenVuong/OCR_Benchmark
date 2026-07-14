@@ -243,20 +243,56 @@ def get_bboxes(
     lang:    str = Query(...),
     model:   str = Query(default="marker"),
 ):
-    """Return bbox annotations from OCR full_response.json (Marker only, Mistral returns empty)."""
+    """Return bbox annotations from OCR full_response.json (Marker and Mistral)."""
     subdir = {"marker": "marker_output", "mistral": "mistral_output"}.get(model, "marker_output")
     full_path = RAW_ROOT / uc_type / lang / subdir / f"{doc_id}_full_response.json"
-    # Mistral doesn't have block-level bbox — return empty silently
     if not full_path.exists():
         return {"pages": {}}
 
     with open(full_path, encoding="utf-8") as f:
         full = json.load(f)
 
+    import re as _re
+
+    # ── Mistral format ────────────────────────────────────────────────────────
+    if model == "mistral":
+        SKIP_MISTRAL = {"image", "figure"}
+        pages_out: dict[str, list] = {}
+        for page in (full.get("pages") or []):
+            page_num = int(page.get("index", 0)) + 1
+            dims = page.get("dimensions") or {}
+            pw = dims.get("width") or 1
+            ph = dims.get("height") or 1
+            blocks = []
+            for i, blk in enumerate(page.get("blocks") or []):
+                bt = blk.get("type", "text")
+                if bt.lower() in SKIP_MISTRAL:
+                    continue
+                x1 = blk.get("top_left_x", 0)
+                y1 = blk.get("top_left_y", 0)
+                x2 = blk.get("bottom_right_x", 0)
+                y2 = blk.get("bottom_right_y", 0)
+                bbox_norm = [
+                    round(x1 / pw, 4), round(y1 / ph, 4),
+                    round(x2 / pw, 4), round(y2 / ph, 4),
+                ]
+                content = blk.get("content", "")
+                # Strip HTML tags for text preview
+                text = _re.sub(r"<[^>]+>", " ", content)
+                text = _re.sub(r"\s+", " ", text).strip()[:120]
+                blocks.append({
+                    "block_id": i,
+                    "type": bt,
+                    "bbox": bbox_norm,
+                    "text": text,
+                })
+            if blocks:
+                pages_out[str(page_num)] = blocks
+        return {"pages": pages_out}
+
+    # ── Marker format ─────────────────────────────────────────────────────────
     SKIP = {"Picture", "Figure", "Image", "FigureGroup", "PictureGroup",
             "Document", "Page", "Line", "Span"}
-    # Caption, PageHeader, PageFooter → real OCR text → show bbox
-    TABLE_TYPES = {"Table", "Form"}
 
     marker_json = full.get("json", {})
     page_nodes = marker_json.get("children") or []
@@ -279,9 +315,7 @@ def get_bboxes(
                 round(bbox_abs[2] / pw, 4),
                 round(bbox_abs[3] / ph, 4),
             ]
-            # Extract plain text
             html = blk.get("html", "")
-            import re as _re
             text = _re.sub(r"<img\b[^>]*>", "", html, flags=_re.I)
             text = _re.sub(r"<[^>]+>", " ", text)
             text = _re.sub(r"\s+", " ", text).strip()[:120]

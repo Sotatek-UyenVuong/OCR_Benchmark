@@ -83,17 +83,27 @@ def _extract_markdown(result: dict) -> list[dict]:
 
 
 def _strip_html_tables(md: str) -> str:
-    """Remove tables, image references, and placeholder links from markdown text."""
+    """Remove tables, image references, placeholder links from markdown text.
+    Also strips heading markers (#) at start of lines — these are OCR formatting
+    artifacts (Mistral adds them), not actual document content.
+    Preserves newlines for readable multi-line full_text.
+    """
     # Remove <table>...</table> blocks
-    clean = re.sub(r"<table[\s\S]*?</table>", " ", md, flags=re.IGNORECASE)
+    clean = re.sub(r"<table[\s\S]*?</table>", "\n", md, flags=re.IGNORECASE)
     # Remove Mistral table placeholder links: [tbl-0.html](tbl-0.html)
-    clean = re.sub(r"\[[^\]]*\.html\]\([^\)]*\.html\)", " ", clean)
+    clean = re.sub(r"\[[^\]]*\.html\]\([^\)]*\.html\)", "", clean)
     # Remove markdown image syntax: ![alt](url)
-    clean = re.sub(r"!\[[^\]]*\]\([^\)]*\)", " ", clean)
+    clean = re.sub(r"!\[[^\]]*\]\([^\)]*\)", "", clean)
     # Remove HTML img tags
-    clean = re.sub(r"<img\b[^>]*/?>", " ", clean, flags=re.IGNORECASE)
-    clean = re.sub(r"\s+", " ", clean).strip()
-    return clean
+    clean = re.sub(r"<img\b[^>]*/?>", "", clean, flags=re.IGNORECASE)
+    # Strip markdown heading markers at start of line (# ## ### etc)
+    # These are OCR formatting artifacts, not document content
+    clean = re.sub(r"(?m)^[ \t]*#{1,6}[ \t]+", "", clean)
+    # Collapse multiple spaces/tabs on same line (not newlines)
+    clean = re.sub(r"[ \t]+", " ", clean)
+    # Collapse 3+ consecutive newlines → 2
+    clean = re.sub(r"\n{3,}", "\n\n", clean)
+    return clean.strip()
 
 
 def _extract_html_table_strings(md: str) -> list[str]:
