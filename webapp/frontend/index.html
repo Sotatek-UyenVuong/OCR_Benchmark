@@ -845,15 +845,31 @@ function pollJob(force=false){
     if(!S.jobId) return;
     const res=await fetch(`/api/ocr/job/${S.jobId}`);
 
-    // Job not found (server restarted) — stop polling
+    // Job not found (server restarted) — check if OCR already finished
     if(res.status === 404){
       clearInterval(S.pollTimer);
+      // Refresh file list to check if prediction files exist
+      await refreshAll();
+      const f = S.selected;
+      const ocrDone = f?.ocr_done?.[S.model] || false;
       const statusBox=document.getElementById('ocr-status-box');
-      if(statusBox){ statusBox.className='ocr-status error';
-        statusBox.innerHTML='❌ Job not found (server may have restarted). Please re-run OCR.'; }
       const btn=document.getElementById('btn-run-ocr');
-      if(btn){ btn.disabled=false; btn.textContent='▶ Run OCR'; }
+      if(ocrDone){
+        // OCR completed before server restarted
+        if(statusBox){ statusBox.className='ocr-status done';
+          statusBox.innerHTML=`✅ ${S.model} OCR ready — prediction files saved`; }
+        if(btn){ btn.disabled=false; btn.textContent=`Re-run ${S.model}`; }
+        S.selected.ocr_done={...S.selected.ocr_done, [S.model]:true};
+        buildStep2();
+        toast('✅ OCR was already complete');
+      } else {
+        if(statusBox){ statusBox.className='ocr-status error';
+          statusBox.innerHTML='❌ Server restarted during OCR. Please re-run.'; }
+        if(btn){ btn.disabled=false; btn.textContent=`▶ Run ${S.model}`; }
+        toast('Server restarted — please re-run OCR', true);
+      }
       return;
+    }      return;
     }
 
     const job=await res.json();

@@ -256,10 +256,35 @@ async def _run_ocr_job(job_id: str, req: RunOCRRequest, pdf_path: Path):
 
 @router.get("/job/{job_id}")
 def get_job_status(job_id: str):
-    """Poll OCR job status."""
-    if job_id not in _jobs:
-        raise HTTPException(404, "Job not found")
-    return _jobs[job_id]
+    """Poll OCR job status. If job not in memory (server restarted), check prediction files."""
+    if job_id in _jobs:
+        return _jobs[job_id]
+
+    # Server restarted — try to recover status from prediction files
+    # job_id format: {doc_id}_{model}_{timestamp}
+    parts = job_id.rsplit("_", 2)
+    if len(parts) == 3:
+        doc_id_model, model, _ts = parts
+        # Try to extract doc_id and model from job_id
+        for m_name in MODEL_SUBDIR:
+            if f"_{m_name}_" in job_id:
+                model = m_name
+                doc_id = job_id[:job_id.rfind(f"_{m_name}_")]
+                subdir = _model_subdir(model)
+                # Check all uc_type/lang combos
+                for pred_file in RAW_ROOT.rglob(f"{subdir}/{doc_id}_*_prediction.json"):
+                    return {
+                        "status": "done",
+                        "message": "OCR complete (recovered after server restart)",
+                        "progress": 100,
+                    }
+                return {
+                    "status": "error",
+                    "message": "Server restarted during OCR — please re-run",
+                    "progress": 0,
+                }
+
+    raise HTTPException(404, "Job not found")
 
 
 class EvalRequest(BaseModel):
