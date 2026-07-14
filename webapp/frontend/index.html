@@ -380,7 +380,7 @@ body { font-family: -apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
               <button onclick="zoomFit()" title="Fit width" style="width:auto;padding:0 8px;font-size:11px;font-weight:600">Fit</button>
             </div>
             <!-- PDF.js viewer -->
-            <div id="pdf-frame" style="flex:1;overflow-y:auto;overflow-x:hidden;background:#525659;position:relative;">
+            <div id="pdf-frame" style="flex:1;overflow-y:auto;overflow-x:auto;background:#525659;position:relative;">
               <div class="empty"><p>No PDF loaded</p></div>
             </div>
           </div>
@@ -2489,6 +2489,7 @@ async function _rerender(){
 
   // Re-render song song 3 trang cùng lúc
   const doc   = window.PDF.doc;
+  const dpr   = window.PDF.DPR;
   const queue = Array.from({length: doc.numPages}, (_, i) => i + 1);
   const worker = async () => {
     while(queue.length) {
@@ -2499,16 +2500,20 @@ async function _rerender(){
       if(!canvas) continue;
 
       const page     = await doc.getPage(pn);
-      const viewport = page.getViewport({ scale: window.PDF.SCALE });
+      const viewport = page.getViewport({ scale: window.PDF.SCALE * dpr });
+      const cssW = viewport.width  / dpr;
+      const cssH = viewport.height / dpr;
 
       canvas.width  = viewport.width;
       canvas.height = viewport.height;
+      canvas.style.width  = cssW + 'px';
+      canvas.style.height = cssH + 'px';
       if(svg){
-        svg.setAttribute('viewBox', `0 0 ${viewport.width} ${viewport.height}`);
-        svg.setAttribute('width',  viewport.width);
-        svg.setAttribute('height', viewport.height);
+        svg.setAttribute('viewBox', `0 0 ${cssW} ${cssH}`);
+        svg.setAttribute('width',  cssW);
+        svg.setAttribute('height', cssH);
       }
-      if(wrap) wrap.style.width = viewport.width + 'px';
+      if(wrap) wrap.style.width = cssW + 'px';
 
       await page.render({ canvasContext: canvas.getContext('2d'), viewport }).promise;
     }
@@ -2530,7 +2535,6 @@ function zoomOut(){
 }
 
 function zoomFit(){
-  // Fit width: tính scale sao cho canvas width = panel width - 16px padding
   const panelW = document.getElementById('pdf-frame').offsetWidth - 16;
   if(!window.PDF.doc) return;
   window.PDF.doc.getPage(1).then(page => {
@@ -2562,7 +2566,8 @@ window.PDF = {
   activeBlock: null,  // { pageNum, blockId }
   canvases: {},   // pageNum → canvas element
   overlays: {},   // pageNum → svg element
-  SCALE: 1.2,
+  SCALE: 1.5,     // base display scale (higher = sharper at normal zoom)
+  DPR: Math.min(window.devicePixelRatio || 1, 2),  // cap at 2x for performance
 };
 
 // ── render all pages ──────────────────────────────────────────
@@ -2588,25 +2593,33 @@ window.PDF.renderDocument = async function(url) {
     // Tạo placeholder cho tất cả trang trước (không render canvas ngay)
     for(let pn = 1; pn <= doc.numPages; pn++) {
       const page     = await doc.getPage(pn);
+      const dpr      = window.PDF.DPR;
       const viewport = page.getViewport({ scale: window.PDF.SCALE });
+
+      // CSS size (display) — what user sees
+      const cssW = viewport.width;
+      const cssH = viewport.height;
 
       const wrap = document.createElement('div');
       wrap.className = 'pdf-page-wrap';
       wrap.id = `pdf-page-${pn}`;
-      wrap.style.width  = viewport.width  + 'px';
-      wrap.style.height = viewport.height + 'px';
-      wrap.style.background = '#3a3a3a';  // placeholder màu
+      wrap.style.width  = cssW + 'px';
+      wrap.style.height = cssH + 'px';
+      wrap.style.background = '#3a3a3a';
 
+      // Canvas physical size = CSS * DPR for sharp rendering
       const canvas = document.createElement('canvas');
-      canvas.width  = viewport.width;
-      canvas.height = viewport.height;
+      canvas.width  = Math.round(cssW * dpr);
+      canvas.height = Math.round(cssH * dpr);
+      canvas.style.width  = cssW + 'px';
+      canvas.style.height = cssH + 'px';
       window.PDF.canvases[pn] = canvas;
 
       const svg = document.createElementNS('http://www.w3.org/2000/svg','svg');
       svg.setAttribute('class','pdf-overlay');
-      svg.setAttribute('viewBox',`0 0 ${viewport.width} ${viewport.height}`);
-      svg.setAttribute('width',  viewport.width);
-      svg.setAttribute('height', viewport.height);
+      svg.setAttribute('viewBox',`0 0 ${cssW} ${cssH}`);
+      svg.setAttribute('width',  cssW);
+      svg.setAttribute('height', cssH);
       window.PDF.overlays[pn] = svg;
 
       wrap.appendChild(canvas);
@@ -2637,17 +2650,26 @@ window.PDF._renderPage = async function(pn) {
   const canvas = window.PDF.canvases[pn];
   if(!doc || !canvas) return;
 
+  const dpr      = window.PDF.DPR;
   const page     = await doc.getPage(pn);
-  const viewport = page.getViewport({ scale: window.PDF.SCALE });
-  canvas.width   = viewport.width;
-  canvas.height  = viewport.height;
+  // Render at DPR * SCALE for sharp output
+  const viewport = page.getViewport({ scale: window.PDF.SCALE * dpr });
+
+  canvas.width  = viewport.width;
+  canvas.height = viewport.height;
+  // CSS size = physical / DPR
+  canvas.style.width  = (viewport.width  / dpr) + 'px';
+  canvas.style.height = (viewport.height / dpr) + 'px';
 
   const ctx = canvas.getContext('2d');
   await page.render({ canvasContext: ctx, viewport }).promise;
 
-  // Update wrap height (placeholder → real)
+  // Update wrap to CSS size
   const wrap = document.getElementById(`pdf-page-${pn}`);
-  if(wrap) wrap.style.height = '';
+  if(wrap){
+    wrap.style.width  = (viewport.width  / dpr) + 'px';
+    wrap.style.height = '';
+  }
 };
 
 // ── draw all bboxes on all pages ──────────────────────────────
@@ -2664,7 +2686,9 @@ window.PDF.drawPageBboxes = function(pn, blocks) {
   if(!svg || !canvas) return;
 
   svg.innerHTML = '';
-  const W = canvas.width, H = canvas.height;
+  // Use CSS size (display size) not physical canvas size
+  const W = parseFloat(canvas.style.width)  || canvas.width;
+  const H = parseFloat(canvas.style.height) || canvas.height;
 
   for(const blk of blocks) {
     const [x1,y1,x2,y2] = blk.bbox;
