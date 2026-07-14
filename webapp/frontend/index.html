@@ -836,6 +836,18 @@ function pollJob(force=false){
   S.pollTimer=setInterval(async()=>{
     if(!S.jobId) return;
     const res=await fetch(`/api/ocr/job/${S.jobId}`);
+
+    // Job not found (server restarted) — stop polling
+    if(res.status === 404){
+      clearInterval(S.pollTimer);
+      const statusBox=document.getElementById('ocr-status-box');
+      if(statusBox){ statusBox.className='ocr-status error';
+        statusBox.innerHTML='❌ Job not found (server may have restarted). Please re-run OCR.'; }
+      const btn=document.getElementById('btn-run-ocr');
+      if(btn){ btn.disabled=false; btn.textContent='▶ Run OCR'; }
+      return;
+    }
+
     const job=await res.json();
 
     const statusBox=document.getElementById('ocr-status-box');
