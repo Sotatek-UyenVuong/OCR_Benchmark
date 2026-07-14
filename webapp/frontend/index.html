@@ -1803,20 +1803,15 @@ async function _renderAllPagesPng(f) {
   window.PDF.overlays = {};
   window.PDF.canvases = {};
 
-  // Get page count
+  const dpr = Math.min(window.devicePixelRatio||1, 2);
+  const baseDpi = Math.round(96 * window.PDF.SCALE);
+
+  // pdf_info pre-renders ALL pages at once (one pdftoppm call) — much faster
   let pageCount = 0;
   try {
-    const infoRes = await fetch(`/api/gt/pdf_info/${f.uc_type}/${f.lang}/${f.doc_id}`);
+    const infoRes = await fetch(`/api/gt/pdf_info/${f.uc_type}/${f.lang}/${f.doc_id}?dpi=${baseDpi}`);
     if(infoRes.ok) pageCount = (await infoRes.json()).page_count || 0;
   } catch(e){}
-
-  if(!pageCount){
-    // Probe by loading until 404
-    for(let pn = 1; pn <= 50; pn++){
-      const r = await fetch(`/api/gt/pdf_page/${f.uc_type}/${f.lang}/${f.doc_id}/${pn}?dpi=1`,{method:'HEAD'}).catch(()=>({status:404}));
-      if(r.status===404){ pageCount=pn-1; break; }
-    }
-  }
 
   if(!pageCount){
     frame.innerHTML='<div class="empty"><p>PDF not available</p></div>';
@@ -1826,9 +1821,8 @@ async function _renderAllPagesPng(f) {
   frame.innerHTML='';
   document.getElementById('pdf-page-info').textContent=`${pageCount} pages`;
   window.PDF._pageCount=pageCount;
-
-  const dpr=Math.min(window.devicePixelRatio||1,2);
-  const baseDpi=Math.round(96 * window.PDF.SCALE);
+  window.PDF._pdfFile=f;
+  window.PDF._baseDpi=baseDpi;
 
   for(let pn=1; pn<=pageCount; pn++){
     const wrap=document.createElement('div');
@@ -1837,10 +1831,11 @@ async function _renderAllPagesPng(f) {
     wrap.style.cssText='margin:8px auto;display:block;position:relative;background:#fff';
 
     const img=document.createElement('img');
+    // Pages are already cached by pdf_info call above — instant load
     img.src=`/api/gt/pdf_page/${f.uc_type}/${f.lang}/${f.doc_id}/${pn}?dpi=${baseDpi}`;
     img.style.cssText='display:block;width:100%;box-shadow:0 2px 12px rgba(0,0,0,.5)';
     img.alt=`Page ${pn}`;
-    img.onerror=()=>{ wrap.style.display='none'; };
+    img.onerror=()=>{ wrap.innerHTML=`<div style="padding:10px;color:var(--red);font-size:11px">Page ${pn} failed</div>`; };
 
     const svg=document.createElementNS('http://www.w3.org/2000/svg','svg');
     svg.setAttribute('class','pdf-overlay');
@@ -1848,13 +1843,16 @@ async function _renderAllPagesPng(f) {
     window.PDF.overlays[pn]=svg;
 
     img.onload=()=>{
+      // Set viewBox to image's natural CSS size (natural/dpr)
       const w=img.naturalWidth/dpr;
       const h=img.naturalHeight/dpr;
       svg.setAttribute('viewBox',`0 0 ${w} ${h}`);
       svg.setAttribute('width',w);
       svg.setAttribute('height',h);
       wrap.style.width=w+'px';
-      window.PDF.drawPageBboxes(pn, window.PDF.bboxes[String(pn)]||[]);
+      // Draw bbox if already loaded
+      const blocks = window.PDF.bboxes[String(pn)];
+      if(blocks) window.PDF.drawPageBboxes(pn, blocks);
     };
 
     wrap.appendChild(img);
@@ -2581,16 +2579,14 @@ function _updateZoomLabel(){
 }
 
 async function _rerender(){
-  if(!window.PDF._lastUrl && !window.PDF._pageCount) return;
-  // PNG mode: reload images at new DPI
-  const f = S.selected;
-  if(!f) return;
-  const dpr = Math.min(window.devicePixelRatio||1, 2);
-  const baseDpi = Math.round(120 * window.PDF.SCALE * dpr);
+  const f = window.PDF._pdfFile || S.selected;
+  if(!f || !window.PDF._pageCount) return;
+  const baseDpi = Math.round(96 * window.PDF.SCALE);
   const frame = document.getElementById('pdf-frame');
   const scrollY = frame.scrollTop;
-  const pageCount = window.PDF._pageCount || 0;
-  for(let pn=1; pn<=pageCount; pn++){
+  // Pre-render all at new DPI
+  try{ await fetch(`/api/gt/pdf_info/${f.uc_type}/${f.lang}/${f.doc_id}?dpi=${baseDpi}`); }catch(e){}
+  for(let pn=1; pn<=window.PDF._pageCount; pn++){
     const wrap = document.getElementById(`pdf-page-${pn}`);
     if(!wrap) continue;
     const img = wrap.querySelector('img');
@@ -2768,13 +2764,26 @@ window.PDF.drawAllBboxes = function() {
 
 window.PDF.drawPageBboxes = function(pn, blocks) {
   const svg = window.PDF.overlays[pn];
-  const canvas = window.PDF.canvases[pn];
-  if(!svg || !canvas) return;
+  if(!svg) return;
 
   svg.innerHTML = '';
-  // Use CSS size (display size) not physical canvas size
-  const W = parseFloat(canvas.style.width)  || canvas.width;
-  const H = parseFloat(canvas.style.height) || canvas.height;
+
+  // Get dimensions from SVG viewBox (set by img.onload in PNG mode)
+  const vb = svg.getAttribute('viewBox');
+  let W = 1, H = 1;
+  if(vb) {
+    const parts = vb.split(/\s+/);
+    W = parseFloat(parts[2]) || 1;
+    H = parseFloat(parts[3]) || 1;
+  } else {
+    // Fallback: canvas mode
+    const canvas = window.PDF.canvases[pn];
+    if(canvas) {
+      W = parseFloat(canvas.style.width)  || canvas.width  || 1;
+      H = parseFloat(canvas.style.height) || canvas.height || 1;
+    }
+  }
+  if(!blocks || !blocks.length) return;
 
   for(const blk of blocks) {
     const [x1,y1,x2,y2] = blk.bbox;

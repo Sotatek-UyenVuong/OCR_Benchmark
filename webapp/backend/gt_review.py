@@ -174,11 +174,43 @@ def load_draft(
 
 import subprocess
 import tempfile
-import hashlib
+import glob as _glob
 from fastapi.responses import Response
 
-# Cache directory for PDF page images
-_IMG_CACHE: dict[str, bytes] = {}  # key: "uc_type/lang/doc_id/page_N" → PNG bytes
+# Cache: doc_key → {page_num: PNG bytes}
+_PAGE_CACHE: dict[str, dict[int, bytes]] = {}
+
+
+def _get_page_cache_key(uc_type: str, lang: str, doc_id: str, dpi: int) -> str:
+    return f"{uc_type}/{lang}/{doc_id}/dpi{dpi}"
+
+
+def _render_pdf_pages(pdf_path, dpi: int, cache_key: str) -> dict[int, bytes]:
+    """Render all pages of a PDF to PNG using pdftoppm, cache in memory."""
+    if cache_key in _PAGE_CACHE:
+        return _PAGE_CACHE[cache_key]
+
+    with tempfile.TemporaryDirectory() as tmpdir:
+        out_prefix = f"{tmpdir}/page"
+        result = subprocess.run(
+            ["pdftoppm", "-r", str(dpi), "-png", str(pdf_path), out_prefix],
+            capture_output=True,
+            timeout=60,
+        )
+        if result.returncode != 0:
+            raise RuntimeError(f"pdftoppm failed: {result.stderr.decode()[:200]}")
+
+        pages: dict[int, bytes] = {}
+        for fpath in sorted(_glob.glob(f"{tmpdir}/page*.png")):
+            # pdftoppm names: page-1.png, page-2.png or page-01.png etc
+            import re as _re
+            m = _re.search(r'page-?(\d+)\.png$', fpath)
+            pn = int(m.group(1)) if m else len(pages) + 1
+            with open(fpath, "rb") as f:
+                pages[pn] = f.read()
+
+    _PAGE_CACHE[cache_key] = pages
+    return pages
 
 
 @router.get("/pdf/{uc_type}/{lang}/{filename}")
@@ -193,76 +225,36 @@ def serve_pdf(uc_type: str, lang: str, filename: str):
 @router.get("/pdf_page/{uc_type}/{lang}/{doc_id}/{page_num}")
 def get_pdf_page_image(
     uc_type: str, lang: str, doc_id: str, page_num: int,
-    dpi: int = 150,
+    dpi: int = 144,
 ):
-    """
-    Convert a single PDF page to PNG using pdftoppm and return the image.
-    Cached in memory per session. Used as fallback when PDF.js fails.
-    """
-    cache_key = f"{uc_type}/{lang}/{doc_id}/p{page_num}_dpi{dpi}"
-    if cache_key in _IMG_CACHE:
-        return Response(content=_IMG_CACHE[cache_key], media_type="image/png")
-
+    """Convert a PDF page to PNG and return it. All pages rendered at once and cached."""
     pdf_path = RAW_ROOT / uc_type / lang / f"{doc_id}.pdf"
     if not pdf_path.exists():
         raise HTTPException(404, "PDF not found")
 
+    cache_key = _get_page_cache_key(uc_type, lang, doc_id, dpi)
     try:
-        with tempfile.TemporaryDirectory() as tmpdir:
-            out_prefix = f"{tmpdir}/page"
-            result = subprocess.run(
-                [
-                    "pdftoppm",
-                    "-r", str(dpi),
-                    "-f", str(page_num),
-                    "-l", str(page_num),
-                    "-png",
-                    str(pdf_path),
-                    out_prefix,
-                ],
-                capture_output=True,
-                timeout=30,
-            )
-            if result.returncode != 0:
-                raise HTTPException(500, f"pdftoppm failed: {result.stderr.decode()}")
-
-            # Find output file
-            import glob as _glob
-            files = sorted(_glob.glob(f"{tmpdir}/page*.png"))
-            if not files:
-                raise HTTPException(500, "No PNG output from pdftoppm")
-
-            with open(files[0], "rb") as f:
-                img_bytes = f.read()
-
-        _IMG_CACHE[cache_key] = img_bytes
-        return Response(content=img_bytes, media_type="image/png")
-
-    except subprocess.TimeoutExpired:
-        raise HTTPException(500, "PDF conversion timeout")
+        pages = _render_pdf_pages(pdf_path, dpi, cache_key)
     except Exception as e:
         raise HTTPException(500, str(e))
 
+    if page_num not in pages:
+        raise HTTPException(404, f"Page {page_num} not found (total: {len(pages)})")
+
+    return Response(content=pages[page_num], media_type="image/png")
+
 
 @router.get("/pdf_info/{uc_type}/{lang}/{doc_id}")
-def get_pdf_info(uc_type: str, lang: str, doc_id: str):
-    """Return PDF page count using pdftoppm."""
+def get_pdf_info(uc_type: str, lang: str, doc_id: str, dpi: int = 144):
+    """Return page count by rendering all pages (cached)."""
     pdf_path = RAW_ROOT / uc_type / lang / f"{doc_id}.pdf"
     if not pdf_path.exists():
         raise HTTPException(404, "PDF not found")
+
+    cache_key = _get_page_cache_key(uc_type, lang, doc_id, dpi)
     try:
-        result = subprocess.run(
-            ["pdftoppm", "-r", "1", "-f", "1", "-l", "1", str(pdf_path), "/dev/null"],
-            capture_output=True, timeout=10
-        )
-        # Get page count via pdfinfo if available
-        info = subprocess.run(["pdfinfo", str(pdf_path)], capture_output=True, timeout=10)
-        if info.returncode == 0:
-            for line in info.stdout.decode().splitlines():
-                if line.startswith("Pages:"):
-                    return {"page_count": int(line.split(":")[1].strip())}
-        # Fallback: count pages by running pdftoppm for a large range
-        return {"page_count": None}
+        pages = _render_pdf_pages(pdf_path, dpi, cache_key)
+        return {"page_count": len(pages)}
     except Exception as e:
         raise HTTPException(500, str(e))
 
