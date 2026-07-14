@@ -142,7 +142,8 @@ def convert(
     output_dir: Path,
     langs: str = "",
     mode: str = "balanced",
-    timeout: int = 120,
+    timeout: int = 300,   # increased: large PDFs take time to upload
+    max_retries: int = 3,
     save_md: bool = True,
     save_full: bool = True,
     uc_type: str | None = None,
@@ -186,16 +187,32 @@ def convert(
 
     print(f"⏳ Calling Mistral OCR…", end="", flush=True)
     t0 = time.time()
-    response = requests.post(
-        MISTRAL_OCR_URL,
-        headers=headers,
-        json=payload,
-        timeout=timeout,
-    )
+
+    last_error: Exception | None = None
+    response = None
+    for attempt in range(max_retries):
+        try:
+            response = requests.post(
+                MISTRAL_OCR_URL,
+                headers=headers,
+                json=payload,
+                timeout=timeout,
+            )
+            response.raise_for_status()
+            break
+        except (requests.exceptions.Timeout, requests.exceptions.ConnectionError) as e:
+            last_error = e
+            if attempt < max_retries - 1:
+                wait = 2 ** attempt
+                print(f"\n  ⚠️  Attempt {attempt + 1} failed ({e}), retry in {wait}s…", end="", flush=True)
+                time.sleep(wait)
+            else:
+                raise RuntimeError(
+                    f"Mistral OCR failed after {max_retries} attempts: {last_error}"
+                ) from last_error
+
     elapsed = round(time.time() - t0, 1)
     print(f" done ({elapsed}s)")
-
-    response.raise_for_status()
     result = response.json()
     result.setdefault("status", "complete")
     result.setdefault("success", True)

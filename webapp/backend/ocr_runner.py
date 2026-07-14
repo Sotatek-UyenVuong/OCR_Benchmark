@@ -224,6 +224,8 @@ async def _run_ocr_job(job_id: str, req: RunOCRRequest, pdf_path: Path):
                 doc_id=req.doc_id,
                 save_full=True,
                 save_md=True,
+                timeout=300,
+                max_retries=3,
             ))
         else:
             # Default: Marker
