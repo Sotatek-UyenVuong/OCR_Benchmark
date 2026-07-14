@@ -2535,7 +2535,10 @@ async function _rerender(){
       }
       if(wrap) wrap.style.width = cssW + 'px';
 
-      await page.render({ canvasContext: canvas.getContext('2d'), viewport }).promise;
+      const ctx2 = canvas.getContext('2d');
+      ctx2.fillStyle = '#ffffff';
+      ctx2.fillRect(0, 0, canvas.width, canvas.height);
+      await page.render({ canvasContext: ctx2, viewport }).promise;
     }
   };
   await Promise.all(Array.from({length: 3}, worker));
@@ -2602,6 +2605,9 @@ window.PDF.renderDocument = async function(url) {
       url,
       cMapUrl: '/vendor/cmaps/',
       cMapPacked: true,
+      standardFontDataUrl: '/vendor/standard_fonts/',
+      // WASM modules for JBig2, OpenJPEG, QCMS image codecs
+      wasmUrl: '/vendor/wasm/',
     }).promise;
     window.PDF.doc = doc;
     window.PDF.canvases = {};
@@ -2625,7 +2631,7 @@ window.PDF.renderDocument = async function(url) {
       wrap.id = `pdf-page-${pn}`;
       wrap.style.width  = cssW + 'px';
       wrap.style.height = cssH + 'px';
-      wrap.style.background = '#3a3a3a';
+      wrap.style.background = '#ffffff';  // white — shows if canvas renders blank
 
       // Canvas physical size = CSS * DPR for sharp rendering
       const canvas = document.createElement('canvas');
@@ -2647,8 +2653,8 @@ window.PDF.renderDocument = async function(url) {
       frame.appendChild(wrap);
     }
 
-    // Render song song, tối đa 3 trang cùng lúc
-    const CONCURRENCY = 3;
+    // Render sequentially to avoid canvas context conflicts
+    const CONCURRENCY = 1;
     const queue = Array.from({length: doc.numPages}, (_, i) => i + 1);
     const worker = async () => {
       while(queue.length) {
@@ -2660,7 +2666,8 @@ window.PDF.renderDocument = async function(url) {
 
     window.PDF.drawAllBboxes();
   } catch(e) {
-    frame.innerHTML = `<div style="padding:20px;color:var(--red)">${e.message}</div>`;
+    frame.innerHTML = `<div style="padding:20px;color:var(--red)">PDF render error: ${e.message}</div>`;
+    console.error('PDF.js error:', e);
   }
 };
 
@@ -2670,25 +2677,32 @@ window.PDF._renderPage = async function(pn) {
   const canvas = window.PDF.canvases[pn];
   if(!doc || !canvas) return;
 
-  const dpr      = window.PDF.DPR;
-  const page     = await doc.getPage(pn);
-  // Render at DPR * SCALE for sharp output
-  const viewport = page.getViewport({ scale: window.PDF.SCALE * dpr });
+  try {
+    const dpr      = window.PDF.DPR;
+    const page     = await doc.getPage(pn);
+    const viewport = page.getViewport({ scale: window.PDF.SCALE * dpr });
 
-  canvas.width  = viewport.width;
-  canvas.height = viewport.height;
-  // CSS size = physical / DPR
-  canvas.style.width  = (viewport.width  / dpr) + 'px';
-  canvas.style.height = (viewport.height / dpr) + 'px';
+    canvas.width  = viewport.width;
+    canvas.height = viewport.height;
+    canvas.style.width  = (viewport.width  / dpr) + 'px';
+    canvas.style.height = (viewport.height / dpr) + 'px';
 
-  const ctx = canvas.getContext('2d');
-  await page.render({ canvasContext: ctx, viewport }).promise;
+    const ctx = canvas.getContext('2d');
+    ctx.fillStyle = '#ffffff';
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-  // Update wrap to CSS size
-  const wrap = document.getElementById(`pdf-page-${pn}`);
-  if(wrap){
-    wrap.style.width  = (viewport.width  / dpr) + 'px';
-    wrap.style.height = '';
+    await page.render({ canvasContext: ctx, viewport }).promise;
+
+    const wrap = document.getElementById(`pdf-page-${pn}`);
+    if(wrap){
+      wrap.style.width  = (viewport.width  / dpr) + 'px';
+      wrap.style.height = '';
+    }
+  } catch(e) {
+    console.error(`PDF page ${pn} render error:`, e);
+    // Show error indicator on failed page
+    const wrap = document.getElementById(`pdf-page-${pn}`);
+    if(wrap) wrap.innerHTML = `<div style="padding:20px;color:#ef4444;font-size:12px">Page ${pn} render failed: ${e.message}</div>`;
   }
 };
 
