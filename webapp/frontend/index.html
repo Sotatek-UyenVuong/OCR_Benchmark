@@ -1784,6 +1784,21 @@ function _renderMdText(md){
   return html;
 }
 
+/** Refresh bbox overlay on PDF for the given model (non-blocking) */
+async function _refreshBboxOverlay(modelId){
+  const f = S.selected;
+  if(!f) return;
+  try{
+    const r = await fetch(
+      `/api/gt/bboxes?doc_id=${f.doc_id}&uc_type=${f.uc_type}&lang=${f.lang}&model=${modelId}`
+    );
+    if(r.ok){
+      window.PDF.bboxes = (await r.json()).pages || {};
+      window.PDF.drawAllBboxes();
+    }
+  }catch(e){}
+}
+
 async function copyDraft(){
   if(!S.selected) return;
 
@@ -1814,6 +1829,10 @@ async function copyDraft(){
   S.editorData=mergeEditorPages(S.textData, S.tableData);
   S.editorSplit='text';
   buildEditorChrome();
+
+  // Update bbox overlay to match the newly loaded model
+  _refreshBboxOverlay(modelChoice);
+
   toast(`↺ Loaded fresh OCR from ${modelChoice}`);
 }
 
@@ -1886,6 +1905,7 @@ async function deleteGT(){
     S.editorData = mergeEditorPages(S.textData, S.tableData);
     S.editorSplit = 'text';
     buildEditorChrome();
+    _refreshBboxOverlay(srcModel);
 
     await refreshAll();
     const delBtn=document.getElementById('btn-delete-gt');
