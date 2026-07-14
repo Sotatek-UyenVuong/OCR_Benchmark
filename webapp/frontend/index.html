@@ -646,6 +646,14 @@ function selectFile(pdf){
 
   document.getElementById('btn-next').disabled = false;
   info(`Selected: ${pdf.doc_id}  [${pdf.uc_type}/${pdf.lang}]`);
+
+  // Pre-render PDF pages in background so step 3 loads instantly
+  if(pdf.pdf_url) {
+    const dpi = Math.round(96 * (window.PDF?.SCALE || 1.5));
+    fetch(`/api/gt/pdf_info/${pdf.uc_type}/${pdf.lang}/${pdf.doc_id}?dpi=${dpi}`)
+      .catch(()=>{});  // fire and forget — caches all pages
+  }
+
   // Go to step 2 immediately
   buildStep2();
   goStep(2);

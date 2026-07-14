@@ -66,10 +66,16 @@ def _extract_md_from_json(marker_json: dict) -> str:
     import re as _re
 
     def _strip_tags(html: str) -> str:
-        """Strip HTML tags, decode basic entities."""
+        """Strip HTML tags, decode basic entities, remove Marker image descriptions."""
         text = _re.sub(r"<br\s*/?>", "\n", html, flags=_re.I)
+        # Remove img-description divs (Marker auto-generated alt descriptions)
+        text = _re.sub(r"<div\b[^>]*class=[\"'][^\"']*img-(?:description|alt)[^\"']*[\"'][^>]*>.*?</div>",
+                       "", text, flags=_re.I | _re.S)
+        text = _re.sub(r"<img\b[^>]*>", "", text, flags=_re.I)
         text = _re.sub(r"<[^>]+>", "", text)
         text = text.replace("&amp;", "&").replace("&lt;", "<").replace("&gt;", ">").replace("&nbsp;", " ")
+        # Remove Marker auto-generated "Image: xxx" lines
+        text = _re.sub(r"\bImage:\s+[^\n]+", "", text)
         return _re.sub(r"\n{3,}", "\n\n", text).strip()
 
     TABLE_TYPES = {"Table", "Form", "TableGroup"}
@@ -271,6 +277,9 @@ def _block_text(blk: dict) -> str:
     if html:
         # Remove <img ...> tags entirely (logos, icons, figures)
         text = re.sub(r"<img\b[^>]*>", "", html, flags=re.I)
+        # Remove img-description divs (Marker auto-generated image descriptions)
+        text = re.sub(r"<div\b[^>]*class=[\"'][^\"']*img-(?:description|alt)[^\"']*[\"'][^>]*>.*?</div>",
+                      "", text, flags=re.I | re.S)
         # Remove all remaining HTML tags
         text = re.sub(r"<[^>]+>", " ", text)
         # Decode common HTML entities
@@ -281,6 +290,9 @@ def _block_text(blk: dict) -> str:
                 .replace("&nbsp;", " ")
                 .replace("&#39;", "'")
                 .replace("&quot;", '"'))
+        # Remove Marker auto-generated image description lines: "Image: xxx"
+        # These appear as "Image: [alt text]" followed by the actual footer text
+        text = re.sub(r"\bImage:\s+[^\n]+", "", text)
         text = re.sub(r"\s+", " ", text).strip()
         if text:
             return text
