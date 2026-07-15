@@ -27,3 +27,6 @@ benchmark_results/
 
 # uv
 uv.lock
+
+# PDF page cache (server-side PNG renders)
+.pdf_cache/

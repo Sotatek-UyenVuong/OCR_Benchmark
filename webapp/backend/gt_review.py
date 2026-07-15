@@ -175,42 +175,84 @@ def load_draft(
 import subprocess
 import tempfile
 import glob as _glob
+from pathlib import Path as _Path
 from fastapi.responses import Response
 
-# Cache: doc_key → {page_num: PNG bytes}
-_PAGE_CACHE: dict[str, dict[int, bytes]] = {}
+# ── PDF PNG Cache (disk-backed) ───────────────────────────────────────────────
+# Disk cache: RAW_ROOT/../.pdf_cache/<uc_type>/<lang>/<doc_id>/dpi<N>/page-NNN.png
+# Survives server restarts; only re-renders if PDF mtime changes.
 
-
-def _get_page_cache_key(uc_type: str, lang: str, doc_id: str, dpi: int) -> str:
-    return f"{uc_type}/{lang}/{doc_id}/dpi{dpi}"
-
+def _disk_cache_dir(uc_type: str, lang: str, doc_id: str, dpi: int) -> _Path:
+    cache_root = PROJECT_ROOT / ".pdf_cache" / uc_type / lang / doc_id / f"dpi{dpi}"
+    return cache_root
 
 def _render_pdf_pages(pdf_path, dpi: int, cache_key: str) -> dict[int, bytes]:
-    """Render all pages of a PDF to PNG using pdftoppm, cache in memory."""
-    if cache_key in _PAGE_CACHE:
-        return _PAGE_CACHE[cache_key]
+    """
+    Render all pages of a PDF to PNG using pdftoppm.
+    Disk-cached: writes PNGs to .pdf_cache/; survives server restarts.
+    Only re-renders when PDF mtime changes (stored in .mtime sentinel file).
+    """
+    uc_type, lang, doc_id = cache_key.split("/")[:3]   # "uc/lang/doc/dpi144"
+    cache_dir = _disk_cache_dir(uc_type, lang, doc_id, dpi)
 
-    with tempfile.TemporaryDirectory() as tmpdir:
-        out_prefix = f"{tmpdir}/page"
-        result = subprocess.run(
-            ["pdftoppm", "-r", str(dpi), "-png", str(pdf_path), out_prefix],
-            capture_output=True,
-            timeout=60,
-        )
-        if result.returncode != 0:
-            raise RuntimeError(f"pdftoppm failed: {result.stderr.decode()[:200]}")
+    # Check mtime sentinel — invalidate if PDF changed
+    mtime_file = cache_dir / ".mtime"
+    pdf_mtime  = str(pdf_path.stat().st_mtime) if pdf_path.exists() else ""
+    cache_valid = (
+        cache_dir.exists()
+        and mtime_file.exists()
+        and mtime_file.read_text().strip() == pdf_mtime
+    )
 
-        pages: dict[int, bytes] = {}
-        for fpath in sorted(_glob.glob(f"{tmpdir}/page*.png")):
-            # pdftoppm names: page-1.png, page-2.png or page-01.png etc
+    if not cache_valid:
+        # Re-render
+        cache_dir.mkdir(parents=True, exist_ok=True)
+        with tempfile.TemporaryDirectory() as tmpdir:
+            out_prefix = f"{tmpdir}/page"
+            result = subprocess.run(
+                ["pdftoppm", "-r", str(dpi), "-png", str(pdf_path), out_prefix],
+                capture_output=True,
+                timeout=60,
+            )
+            if result.returncode != 0:
+                raise RuntimeError(f"pdftoppm failed: {result.stderr.decode()[:200]}")
+
             import re as _re
-            m = _re.search(r'page-?(\d+)\.png$', fpath)
-            pn = int(m.group(1)) if m else len(pages) + 1
-            with open(fpath, "rb") as f:
-                pages[pn] = f.read()
+            for fpath in sorted(_glob.glob(f"{tmpdir}/page*.png")):
+                m = _re.search(r'page-?(\d+)\.png$', fpath)
+                pn = int(m.group(1)) if m else 0
+                dest = cache_dir / f"page-{pn:03d}.png"
+                import shutil as _shutil
+                _shutil.copy2(fpath, dest)
 
-    _PAGE_CACHE[cache_key] = pages
+        # Write mtime sentinel
+        mtime_file.write_text(pdf_mtime)
+
+    # Read from disk cache
+    pages: dict[int, bytes] = {}
+    import re as _re2
+    for fpath in sorted(cache_dir.glob("page-*.png")):
+        m = _re2.search(r'page-(\d+)\.png$', fpath.name)
+        if m:
+            pages[int(m.group(1))] = fpath.read_bytes()
     return pages
+
+
+def _get_page_count_fast(pdf_path) -> int:
+    """Get page count cheaply via pdfinfo (no rendering)."""
+    try:
+        r = subprocess.run(
+            ["pdfinfo", str(pdf_path)],
+            capture_output=True, timeout=10
+        )
+        if r.returncode == 0:
+            for line in r.stdout.decode().splitlines():
+                if line.startswith("Pages:"):
+                    return int(line.split(":")[1].strip())
+    except Exception:
+        pass
+    # Fallback: count cached pages if available
+    return 0
 
 
 @router.get("/pdf/{uc_type}/{lang}/{filename}")
@@ -227,12 +269,28 @@ def get_pdf_page_image(
     uc_type: str, lang: str, doc_id: str, page_num: int,
     dpi: int = 144,
 ):
-    """Convert a PDF page to PNG and return it. All pages rendered at once and cached."""
+    """Serve a PDF page as PNG. Disk-cached; fast after first render."""
     pdf_path = RAW_ROOT / uc_type / lang / f"{doc_id}.pdf"
     if not pdf_path.exists():
         raise HTTPException(404, "PDF not found")
 
-    cache_key = _get_page_cache_key(uc_type, lang, doc_id, dpi)
+    cache_key = f"{uc_type}/{lang}/{doc_id}/dpi{dpi}"
+
+    # Check disk cache first (no subprocess needed)
+    cache_dir = _disk_cache_dir(uc_type, lang, doc_id, dpi)
+    cached_file = cache_dir / f"page-{page_num:03d}.png"
+    mtime_file = cache_dir / ".mtime"
+    pdf_mtime = str(pdf_path.stat().st_mtime)
+    if (cached_file.exists()
+            and mtime_file.exists()
+            and mtime_file.read_text().strip() == pdf_mtime):
+        return Response(
+            content=cached_file.read_bytes(),
+            media_type="image/png",
+            headers={"Cache-Control": "max-age=86400", "ETag": f'"{pdf_mtime}-p{page_num}"'},
+        )
+
+    # Not cached — render all pages
     try:
         pages = _render_pdf_pages(pdf_path, dpi, cache_key)
     except Exception as e:
@@ -241,22 +299,51 @@ def get_pdf_page_image(
     if page_num not in pages:
         raise HTTPException(404, f"Page {page_num} not found (total: {len(pages)})")
 
-    return Response(content=pages[page_num], media_type="image/png")
+    return Response(
+        content=pages[page_num],
+        media_type="image/png",
+        headers={"Cache-Control": "max-age=86400", "ETag": f'"{pdf_mtime}-p{page_num}"'},
+    )
 
 
 @router.get("/pdf_info/{uc_type}/{lang}/{doc_id}")
 def get_pdf_info(uc_type: str, lang: str, doc_id: str, dpi: int = 144):
-    """Return page count by rendering all pages (cached)."""
+    """Return page count. Uses pdfinfo for fast count; triggers background render."""
     pdf_path = RAW_ROOT / uc_type / lang / f"{doc_id}.pdf"
     if not pdf_path.exists():
         raise HTTPException(404, "PDF not found")
 
-    cache_key = _get_page_cache_key(uc_type, lang, doc_id, dpi)
-    try:
-        pages = _render_pdf_pages(pdf_path, dpi, cache_key)
-        return {"page_count": len(pages)}
-    except Exception as e:
-        raise HTTPException(500, str(e))
+    # Fast path: pdfinfo (no rendering)
+    page_count = _get_page_count_fast(pdf_path)
+
+    # Also check disk cache count (if pdfinfo unavailable)
+    if not page_count:
+        cache_dir = _disk_cache_dir(uc_type, lang, doc_id, dpi)
+        if cache_dir.exists():
+            page_count = len(list(cache_dir.glob("page-*.png")))
+
+    # Trigger full render in background if not cached yet
+    if not page_count or not (_disk_cache_dir(uc_type, lang, doc_id, dpi) / ".mtime").exists():
+        import threading
+        cache_key = f"{uc_type}/{lang}/{doc_id}/dpi{dpi}"
+        def _bg_render():
+            try: _render_pdf_pages(pdf_path, dpi, cache_key)
+            except Exception: pass
+        threading.Thread(target=_bg_render, daemon=True).start()
+
+        # If we have page count from pdfinfo, return it immediately
+        if page_count:
+            return {"page_count": page_count, "rendering": True}
+
+        # No pdfinfo available — need to wait for render
+        cache_key = f"{uc_type}/{lang}/{doc_id}/dpi{dpi}"
+        try:
+            pages = _render_pdf_pages(pdf_path, dpi, cache_key)
+            return {"page_count": len(pages)}
+        except Exception as e:
+            raise HTTPException(500, str(e))
+
+    return {"page_count": page_count}
 
 
 @router.post("/save")

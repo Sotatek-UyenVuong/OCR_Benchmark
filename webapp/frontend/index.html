@@ -635,6 +635,8 @@ function selectFile(pdf){
   S.scores     = null;
   S.scoresMap  = {};
   S._lastGTStatus = '';
+  // Clear MD tblMap cache for previous file
+  Object.keys(_tblMapCache).forEach(k => delete _tblMapCache[k]);
 
   S.selected = pdf;
   // Update sidebar highlight
@@ -1672,7 +1674,6 @@ function toggleMdRaw(){
 
 async function renderMdForModel(modelId, showRaw){
   const f = S.selected;
-  // Update tab active state
   document.querySelectorAll('[id^="md-model-tab-"]').forEach(b=>{
     b.classList.toggle('active', b.id === `md-model-tab-${modelId}`);
   });
@@ -1682,21 +1683,14 @@ async function renderMdForModel(modelId, showRaw){
   if(preview) preview.innerHTML='<span style="color:var(--muted)">Loading…</span>';
   if(raw) raw.value = 'Loading…';
   try{
-    // Fetch MD + full_response in parallel
-    // full_response has the authoritative tbl-N.html → HTML mapping
-    const subdir = modelId === 'mistral' ? 'mistral_output' : 'marker_output';
-    const [mdRes, fullRes] = await Promise.all([
+    // Fetch MD and tblMap in parallel — don't wait for one before the other
+    const [mdRes, tblMap] = await Promise.all([
       fetch(`/api/gt/md/${f.uc_type}/${f.lang}/${f.doc_id}?model=${modelId}`),
-      fetch(`/api/gt/pdf/${f.uc_type}/${f.lang}/${f.doc_id}.pdf`)  // just a ping
-        .then(()=>null).catch(()=>null),  // ignore — use a different endpoint
+      _buildTblMap(f, modelId),
     ]);
     if(!mdRes.ok) throw new Error('Not found');
     const data = await mdRes.json();
     const md = data.markdown || '';
-
-    // Build tblMap from full_response (has original tbl-N.html IDs from Mistral)
-    // Fall back to table_prediction if full_response not available
-    const tblMap = await _buildTblMap(f, modelId);
 
     if(raw) raw.value = md;
     if(preview) preview.innerHTML = _renderMdToHtml(md, tblMap);
@@ -1707,7 +1701,13 @@ async function renderMdForModel(modelId, showRaw){
 }
 
 /** Build tbl-N.html → HTML map from full_response (authoritative) or fallback to prediction */
+// Cache per doc+model — avoids re-fetching full_response on tab switch
+const _tblMapCache = {};
+
 async function _buildTblMap(f, modelId){
+  const cacheKey = `${f.doc_id}|${modelId}`;
+  if(_tblMapCache[cacheKey]) return _tblMapCache[cacheKey];
+
   const tblMap = {};
 
   if(modelId === 'mistral'){
@@ -1749,6 +1749,7 @@ async function _buildTblMap(f, modelId){
     }
   }catch(e){}
 
+  _tblMapCache[cacheKey] = tblMap;
   return tblMap;
 }
 
@@ -1829,11 +1830,15 @@ async function _renderAllPagesPng(f) {
   const dpr = Math.min(window.devicePixelRatio||1, 2);
   const baseDpi = Math.round(96 * window.PDF.SCALE);
 
-  // pdf_info pre-renders ALL pages at once (one pdftoppm call) — much faster
+  // pdf_info: fast via pdfinfo; also triggers background render if not cached
   let pageCount = 0;
   try {
     const infoRes = await fetch(`/api/gt/pdf_info/${f.uc_type}/${f.lang}/${f.doc_id}?dpi=${baseDpi}`);
-    if(infoRes.ok) pageCount = (await infoRes.json()).page_count || 0;
+    if(infoRes.ok) {
+      const info = await infoRes.json();
+      pageCount = info.page_count || 0;
+      // If still rendering in background, images will load as they become available
+    }
   } catch(e){}
 
   if(!pageCount){
@@ -2918,10 +2923,8 @@ const _patchedRenderReview = async function() {
   const pdfPromise = f.pdf_url ? _renderAllPagesPng(f) : Promise.resolve();
 
   // ── Determine source model for draft ─────────────────────────
-  const gtCheck = await fetch(
-    `/api/gt/load?doc_id=${f.doc_id}&uc_type=${f.uc_type}&lang=${f.lang}&split=text&model=marker`
-  ).then(r=>r.ok?r.json():null).catch(()=>null);
-  const hasExistingGT = !!gtCheck?.existing_gt;
+  // Use f.gt_saved from file list (already fetched) — no extra round trip
+  const hasExistingGT = !!f.gt_saved;
 
   let srcModel = S.model || 'marker';
 
