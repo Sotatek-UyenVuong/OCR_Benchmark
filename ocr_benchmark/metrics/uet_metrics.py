@@ -52,6 +52,12 @@ try:
     _APTED_AVAILABLE = True
 except ImportError:
     _APTED_AVAILABLE = False
+    # Stub so TEDSConfig class definition doesn't fail at import time
+    class APTEDConfig:
+        pass
+    class APTED:
+        def __init__(self, *a, **kw): pass
+        def compute_edit_distance(self): return 0
 
 try:
     from scipy.optimize import linear_sum_assignment
