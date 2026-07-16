@@ -452,6 +452,13 @@ body { font-family: -apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
       </div>
     </div>
     <div class="db-table-wrap">
+      <!-- Model comparison summary -->
+      <div id="db-summary" style="padding:16px 20px;border-bottom:1px solid var(--border)">
+        <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.05em;color:var(--muted);margin-bottom:10px">
+          📈 Average Scores (evaluated files only)
+        </div>
+        <div id="db-summary-content" style="color:var(--muted);font-size:12px">Loading…</div>
+      </div>
       <table class="db-table">
         <thead>
           <tr>
@@ -2400,14 +2407,122 @@ function hideDashboard(){
   document.getElementById('dashboard-overlay').style.display = 'none';
 }
 
+function _renderDashboardSummary(summary){
+  const el = document.getElementById('db-summary-content');
+  if(!el) return;
+  if(!summary || !summary.models || Object.keys(summary.models).length === 0){
+    el.innerHTML = '<span style="color:var(--muted)">No eval results yet</span>';
+    return;
+  }
+
+  const pct = v => v == null ? '—' : (v * 100).toFixed(1) + '%';
+  const models = Object.keys(summary.models);
+  const UC_LABELS = { scan: '📄 Scan', table: '📊 Table', text_layer: '🔤 Text Layer' };
+
+  // Model comparison table
+  let html = `
+    <table style="width:100%;border-collapse:collapse;font-size:12px;margin-bottom:12px">
+      <thead>
+        <tr>
+          <th style="text-align:left;padding:5px 10px;border-bottom:1px solid var(--border);color:var(--muted);font-weight:700">Metric</th>
+          ${models.map(m=>`
+            <th style="text-align:right;padding:5px 10px;border-bottom:1px solid var(--border);color:var(--accent);font-weight:700">
+              ${m==='marker'?'🔬':'✨'} ${m} <span style="font-size:10px;color:var(--muted)">(${summary.models[m].docs} docs)</span>
+            </th>`).join('')}
+        </tr>
+      </thead>
+      <tbody>`;
+
+  const TEXT_METRICS = [
+    {key:'avg_char_f1',   label:'Char F1',   higher:true},
+    {key:'avg_word_f1',   label:'Word F1',   higher:true},
+    {key:'avg_cer',       label:'CER',       higher:false},
+  ];
+  const TABLE_METRICS = [
+    {key:'avg_teds',           label:'Avg TEDS',        higher:true},
+    {key:'avg_cell_exact_f1',  label:'Cell Exact F1',   higher:true},
+  ];
+
+  const allHaveText  = models.every(m => summary.models[m].avg_char_f1  != null);
+  const allHaveTable = models.every(m => summary.models[m].avg_teds      != null);
+
+  if(allHaveText){
+    html += `<tr><td colspan="${models.length+1}" style="padding:4px 10px;color:var(--muted);font-size:10px;font-weight:700;text-transform:uppercase">Text</td></tr>`;
+    for(const {key,label,higher} of TEXT_METRICS){
+      const vals = models.map(m => summary.models[m][key]);
+      const best = higher ? Math.max(...vals.filter(v=>v!=null)) : Math.min(...vals.filter(v=>v!=null));
+      html += `<tr style="border-bottom:1px solid #1e2132">
+        <td style="padding:5px 10px;color:var(--muted)">${label}</td>
+        ${models.map((m,i)=>{
+          const v = vals[i];
+          const isBest = v == best;
+          const color = v==null ? 'var(--muted)' : isBest ? 'var(--green)' : 'var(--text)';
+          return `<td style="text-align:right;padding:5px 10px;color:${color};font-weight:${isBest?700:400}">${pct(v)}</td>`;
+        }).join('')}
+      </tr>`;
+    }
+  }
+
+  if(allHaveTable){
+    html += `<tr><td colspan="${models.length+1}" style="padding:4px 10px;color:var(--muted);font-size:10px;font-weight:700;text-transform:uppercase">Table</td></tr>`;
+    for(const {key,label,higher} of TABLE_METRICS){
+      const vals = models.map(m => summary.models[m][key]);
+      const best = higher ? Math.max(...vals.filter(v=>v!=null)) : Math.min(...vals.filter(v=>v!=null));
+      html += `<tr style="border-bottom:1px solid #1e2132">
+        <td style="padding:5px 10px;color:var(--muted)">${label}</td>
+        ${models.map((m,i)=>{
+          const v = vals[i];
+          const isBest = v == best;
+          const color = v==null ? 'var(--muted)' : isBest ? 'var(--green)' : 'var(--text)';
+          return `<td style="text-align:right;padding:5px 10px;color:${color};font-weight:${isBest?700:400}">${pct(v)}</td>`;
+        }).join('')}
+      </tr>`;
+    }
+  }
+
+  html += '</tbody></table>';
+
+  // By UC type breakdown
+  const allUcs = new Set(models.flatMap(m => Object.keys(summary.models[m].by_uc || {})));
+  if(allUcs.size > 1){
+    html += `<div style="font-size:10px;font-weight:700;text-transform:uppercase;color:var(--muted);margin:8px 0 4px">By UC Type</div>`;
+    html += `<div style="display:flex;gap:8px;flex-wrap:wrap">`;
+    for(const uc of allUcs){
+      html += `<div style="background:var(--bg);border:1px solid var(--border);border-radius:6px;padding:8px 12px;min-width:180px">
+        <div style="font-size:11px;font-weight:700;color:var(--accent);margin-bottom:6px">${UC_LABELS[uc]||uc}</div>`;
+      for(const m of models){
+        const d = summary.models[m].by_uc?.[uc];
+        if(!d) continue;
+        const textScore = d.avg_char_f1 != null ? `Char F1: ${pct(d.avg_char_f1)}` : '';
+        const tableScore = d.avg_teds != null ? `TEDS: ${pct(d.avg_teds)}` : '';
+        const scores = [textScore, tableScore].filter(Boolean).join(' · ');
+        html += `<div style="font-size:11px;margin-bottom:2px">
+          <span style="color:var(--muted)">${m==='marker'?'🔬':'✨'} ${m}:</span>
+          <span style="color:var(--text);margin-left:4px">${scores || '—'}</span>
+          <span style="color:var(--muted);margin-left:4px">(${d.docs})</span>
+        </div>`;
+      }
+      html += `</div>`;
+    }
+    html += `</div>`;
+  }
+
+  el.innerHTML = html;
+}
+
 async function refreshDashboard(){
-  // Lấy danh sách PDF + trạng thái
-  const [pdfsRes, filesRes] = await Promise.all([
+  // Fetch all data in parallel including summary
+  const [pdfsRes, filesRes, summaryRes] = await Promise.all([
     fetch('/api/ocr/pdfs'),
     fetch('/api/gt/files'),
+    fetch('/api/ocr/summary'),
   ]);
-  const pdfs  = await pdfsRes.json();   // [{doc_id, uc_type, lang, ocr_done, eval_done, ...}]
-  const files = await filesRes.json();  // {files: [{doc_id, gt_saved, gt_status, gt_reviewer, ...}]}
+  const pdfs    = await pdfsRes.json();
+  const files   = await filesRes.json();
+  const summary = summaryRes.ok ? await summaryRes.json() : null;
+
+  // Render summary section
+  _renderDashboardSummary(summary);
 
   // Build lookup: doc_id → gt metadata
   const gtMap = {};
@@ -2415,9 +2530,6 @@ async function refreshDashboard(){
     const key = `${f.doc_id}|${f.uc_type}|${f.lang}`;
     if(!gtMap[key] || f.gt_saved) gtMap[key] = f;
   }
-
-  // Đọc thêm updated_at từ GT JSON nếu saved
-  // (đã có trong files API qua gt_status + gt_reviewer)
 
   let cntDone=0, cntProg=0, cntNew=0;
 
@@ -2450,7 +2562,6 @@ async function refreshDashboard(){
   const tbody = document.getElementById('db-tbody');
   tbody.innerHTML = '';
 
-  // Sort: done last, in_progress middle, not started first
   const order = {'': 0, 'in_progress': 1, 'done': 2, 'unknown': 1};
   rows.sort((a,b) => (order[a.status]||0) - (order[b.status]||0));
 
@@ -2471,7 +2582,6 @@ async function refreshDashboard(){
     const evalPill = evalDone
       ? `<span class="status-pill pill-done">✓ Eval</span>`
       : `<span class="status-pill pill-new">—</span>`;
-
     tr.innerHTML = `
       <td style="font-weight:600">${p.doc_id}</td>
       <td>${p.uc_type}</td>

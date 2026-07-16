@@ -425,3 +425,122 @@ def get_result(
         raise HTTPException(404, "No eval result found")
     with open(path, encoding="utf-8") as f:
         return json.load(f)
+
+
+@router.get("/summary")
+def get_eval_summary():
+    """
+    Aggregate all eval results into a dashboard summary.
+    Returns per-model, per-UC-type averages for key metrics.
+    """
+    from statistics import mean as _mean
+
+    # Collect all eval JSON files
+    # Structure: benchmark_results/<model>/<uc_type>/<lang>/<doc_id>_eval.json
+    all_results: list[dict] = []
+    for eval_file in RESULT_ROOT.rglob("*_eval.json"):
+        parts = eval_file.relative_to(RESULT_ROOT).parts
+        if len(parts) < 4:
+            continue
+        model_name = parts[0]   # marker / mistral
+        uc_type    = parts[1]   # scan / table / text_layer
+        lang       = parts[2]   # en / vi / ja
+        try:
+            with open(eval_file, encoding="utf-8") as f:
+                data = json.load(f)
+            all_results.append({
+                "model": model_name,
+                "uc_type": uc_type,
+                "lang": lang,
+                "doc_id": data.get("doc_id", ""),
+                "text": data.get("text", {}).get("summary", {}),
+                "table": data.get("table", {}).get("summary", {}),
+            })
+        except Exception:
+            continue
+
+    if not all_results:
+        return {"models": {}, "by_uc": {}, "total_docs": 0}
+
+    # Helper: safe mean ignoring None/missing
+    def smean(vals):
+        v = [x for x in vals if x is not None]
+        return round(_mean(v), 4) if v else None
+
+    # Group by model
+    models_data: dict[str, dict] = {}
+    for r in all_results:
+        m = r["model"]
+        if m not in models_data:
+            models_data[m] = {
+                "docs": 0,
+                "cer": [], "char_f1": [], "word_f1": [],
+                "teds": [], "cell_exact_f1": [],
+                "by_uc": {}
+            }
+        md = models_data[m]
+        md["docs"] += 1
+
+        uc = r["uc_type"]
+        if uc not in md["by_uc"]:
+            md["by_uc"][uc] = {
+                "docs": 0,
+                "cer": [], "char_f1": [], "word_f1": [],
+                "teds": [], "cell_exact_f1": []
+            }
+        uc_d = md["by_uc"][uc]
+        uc_d["docs"] += 1
+
+        # Text metrics
+        if r["text"]:
+            t = r["text"]
+            for key, lst in [
+                ("avg_cer",        md["cer"]),
+                ("avg_char_f1",    md["char_f1"]),
+                ("avg_word_f1",    md["word_f1"]),
+            ]:
+                if t.get(key) is not None:
+                    lst.append(t[key])
+            for key, lst in [
+                ("avg_cer",        uc_d["cer"]),
+                ("avg_char_f1",    uc_d["char_f1"]),
+                ("avg_word_f1",    uc_d["word_f1"]),
+            ]:
+                if t.get(key) is not None:
+                    lst.append(t[key])
+
+        # Table metrics
+        if r["table"]:
+            tb = r["table"]
+            for key, lst in [
+                ("avg_teds",             md["teds"]),
+                ("avg_cell_exact_f1",    md["cell_exact_f1"]),
+            ]:
+                if tb.get(key) is not None:
+                    lst.append(tb[key])
+            for key, lst in [
+                ("avg_teds",             uc_d["teds"]),
+                ("avg_cell_exact_f1",    uc_d["cell_exact_f1"]),
+            ]:
+                if tb.get(key) is not None:
+                    lst.append(tb[key])
+
+    # Build summary output
+    def _summarize(d: dict) -> dict:
+        return {
+            "docs":          d["docs"],
+            "avg_cer":       smean(d["cer"]),
+            "avg_char_f1":   smean(d["char_f1"]),
+            "avg_word_f1":   smean(d["word_f1"]),
+            "avg_teds":      smean(d["teds"]),
+            "avg_cell_exact_f1": smean(d["cell_exact_f1"]),
+        }
+
+    summary: dict = {"models": {}, "total_docs": len(all_results)}
+    for model_name, md in models_data.items():
+        summary["models"][model_name] = {
+            **_summarize(md),
+            "by_uc": {uc: _summarize(uc_d) for uc, uc_d in md["by_uc"].items()},
+        }
+
+    return summary
