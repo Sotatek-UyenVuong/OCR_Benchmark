@@ -3614,7 +3614,7 @@ function usRenderResults(data) {
 
   // Compare panel — left side (current model)
   document.getElementById('us-cmp-current-name').textContent = data.model;
-  document.getElementById('us-cmp-current-table').innerHTML = usCmpMetricRows(sum);
+  document.getElementById('us-cmp-current-table').innerHTML = usCmpMetricRows(sum, pages);
 
   // Compare panel — right side: populate model dropdown from known models + skip current
   usPopulateCmpModels(data.model);
@@ -3637,7 +3637,17 @@ function usRenderResults(data) {
 
 // ── Compare panel helpers ──────────────────────────────
 
-function usCmpMetricRows(sum) {
+function usCmpMetricRows(sum, pages) {
+  // Helper: get metric value from summary or compute average from pages as fallback
+  function getVal(sk) {
+    const v = sum[sk] ?? sum[`avg_${sk}`] ?? null;
+    if (v != null) return v;
+    if (pages && pages.length) {
+      const vals = pages.map(p => p[sk]).filter(x => x != null && typeof x === 'number');
+      if (vals.length) return vals.reduce((a,b)=>a+b,0)/vals.length;
+    }
+    return null;
+  }
   const CMP_METRICS = [
     { label:'CER',      key:'cer',                         lb:true },
     { label:'WER',      key:'wer',                         lb:true },
@@ -3648,8 +3658,7 @@ function usCmpMetricRows(sum) {
     { label:'Cell F1',  key:'table_cell_exact_f1_mean',    lb:false },
   ];
   return CMP_METRICS.map(m => {
-    // accept both raw (cer) and avg_ (avg_cer) keys
-    const v = sum[m.key] ?? sum[`avg_${m.key}`] ?? null;
+    const v = getVal(m.key);
     return `<tr>
       <td>${m.label}</td>
       <td style="text-align:right;${usScoreClass(v,m.lb)}">${usFmt(v)}</td>
@@ -3690,23 +3699,37 @@ async function usCmpLoad() {
     }
     const data = await res.json();
     const sum = (data.text || {}).summary || {};
+    const otherPages = (data.text || {}).pages || [];
     // Compare with current
     const curSum = US.currentResult?.results?.text?.summary || {};
+    const curPages = US.currentResult?.results?.text?.pages || [];
+
+    // Helper to resolve metric from summary or page average
+    function resolveMetric(s, pages, key) {
+      const v = s[key] ?? s[`avg_${key}`] ?? null;
+      if (v != null) return v;
+      if (pages && pages.length) {
+        const vals = pages.map(p => p[key]).filter(x => x != null && typeof x === 'number');
+        if (vals.length) return vals.reduce((a,b)=>a+b,0)/vals.length;
+      }
+      return null;
+    }
+
     const CMP_METRICS = [
-      { label:'CER',      key:'cer',                         alt:'avg_cer',                        lb:true },
-      { label:'WER',      key:'wer',                         alt:'avg_wer',                        lb:true },
-      { label:'Char F1',  key:'char_f1',                     alt:'avg_char_f1',                    lb:false },
-      { label:'Word F1',  key:'word_f1',                     alt:'avg_word_f1',                    lb:false },
-      { label:'Edit Sim', key:'normalized_edit_similarity',  alt:'avg_normalized_edit_similarity', lb:false },
-      { label:'TEDS',     key:'table_teds_doc',              alt:'avg_teds',                       lb:false },
-      { label:'Cell F1',  key:'table_cell_exact_f1_mean',    alt:'avg_cell_exact_f1',              lb:false },
+      { label:'CER',      key:'cer',                        lb:true },
+      { label:'WER',      key:'wer',                        lb:true },
+      { label:'Char F1',  key:'char_f1',                    lb:false },
+      { label:'Word F1',  key:'word_f1',                    lb:false },
+      { label:'Edit Sim', key:'normalized_edit_similarity', lb:false },
+      { label:'TEDS',     key:'table_teds_doc',             lb:false },
+      { label:'Cell F1',  key:'table_cell_exact_f1_mean',   lb:false },
     ];
     const rows = CMP_METRICS.map(m => {
-      const v = sum[m.key] ?? sum[m.alt] ?? null;
-      const cur = curSum[m.key] ?? curSum[`avg_${m.key}`] ?? null;
+      const v   = resolveMetric(sum, otherPages, m.key);
+      const cur = resolveMetric(curSum, curPages, m.key);
       let delta = '';
       if (v != null && cur != null) {
-        const diff = m.lb ? (cur - v) : (v - cur); // positive = other model better
+        const diff = m.lb ? (cur - v) : (v - cur);
         const sign = diff > 0 ? '▲' : diff < 0 ? '▼' : '';
         const col = diff > 0.005 ? 'var(--green)' : diff < -0.005 ? 'var(--red)' : 'var(--muted)';
         delta = `<span style="font-size:10px;color:${col};margin-left:4px">${sign}${Math.abs(diff*100).toFixed(1)}%</span>`;
