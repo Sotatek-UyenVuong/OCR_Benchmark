@@ -3383,6 +3383,11 @@ function usOnFilesChosen(input) {
   cnt.style.display = 'block';
   cnt.textContent = `${US.files.length} file(s) selected, ${md.length} .md`;
   document.querySelector('#upload-score-overlay .us-file-btn').textContent = `📁 ${US.files.length} file(s)`;
+  // Re-enable Score button so user can score the new folder
+  document.getElementById('us-btn-score').disabled = false;
+  // Hide previous results when a new folder is picked
+  document.getElementById('us-results').style.display = 'none';
+  document.getElementById('us-error').style.display = 'none';
 }
 
 function usScoreClass(v, lowerBetter=true) {
@@ -3428,9 +3433,9 @@ async function usSubmitScore() {
   } catch(e) {
     errEl.textContent = e.message || 'Scoring failed';
     errEl.style.display = 'block';
-    document.getElementById('us-btn-score').disabled = false;
   } finally {
     US.scoring = false;
+    document.getElementById('us-btn-score').disabled = false;  // always re-enable after scoring
     document.getElementById('us-spinner').style.display = 'none';
     document.getElementById('us-status').textContent = '';
   }
