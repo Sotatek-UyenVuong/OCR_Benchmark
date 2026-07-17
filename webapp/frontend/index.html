@@ -340,6 +340,37 @@ body { font-family: -apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
 .us-info-bar { padding:8px 14px; background:var(--surface2); border-top:1px solid var(--border); font-size:12px; color:var(--muted); display:flex; align-items:center; gap:8px; }
 .us-spinner { width:14px; height:14px; border:2px solid var(--border); border-top-color:var(--accent); border-radius:50%; animation:spin .7s linear infinite; }
 @keyframes spin { to { transform:rotate(360deg); } }
+
+/* ── Leaderboard overlay ── */
+.lb-overlay { position:fixed; inset:0; background:rgba(0,0,0,.65); z-index:910;
+              display:flex; align-items:flex-start; justify-content:center;
+              padding:24px 16px; overflow-y:auto; }
+.lb-box { background:var(--surface); border:1px solid var(--border); border-radius:12px;
+          width:100%; max-width:760px; box-shadow:0 8px 40px rgba(0,0,0,.5); }
+.lb-table { width:100%; border-collapse:collapse; font-size:13px; }
+.lb-table th { padding:8px 14px; background:var(--surface2); color:var(--muted); font-weight:700;
+               text-align:left; border-bottom:1px solid var(--border); font-size:11px;
+               text-transform:uppercase; letter-spacing:.05em; }
+.lb-table td { padding:9px 14px; border-bottom:1px solid #1e2132; vertical-align:middle; }
+.lb-table tr:hover td { background:#1e2132; }
+.lb-rank { font-weight:800; font-size:15px; width:32px; }
+.lb-crown { color:#f59e0b; }
+.lb-badge { display:inline-block; padding:2px 8px; border-radius:99px; font-size:10px; font-weight:700; }
+.lb-badge-upload { background:#1e2a1a; color:var(--green); }
+.lb-badge-pipeline { background:#1e2a4a; color:var(--accent); }
+
+/* ── Compare panel ── */
+.us-compare-row { display:grid; grid-template-columns:1fr 1fr; gap:0; border-top:1px solid var(--border); }
+.us-compare-col { padding:12px 16px; border-right:1px solid var(--border); }
+.us-compare-col:last-child { border-right:none; }
+.us-compare-hdr { font-size:11px; font-weight:700; color:var(--muted); text-transform:uppercase;
+                  letter-spacing:.05em; margin-bottom:8px; display:flex; align-items:center; gap:6px; }
+.us-cmp-select { background:var(--bg); border:1px solid var(--border); color:var(--text);
+                 padding:5px 8px; border-radius:6px; font-size:12px; outline:none; cursor:pointer; width:100%; margin-bottom:8px; }
+.us-cmp-table { width:100%; border-collapse:collapse; font-size:11px; }
+.us-cmp-table td { padding:4px 0; border-bottom:1px solid #1e2132; font-family:monospace; }
+.us-cmp-table td:first-child { color:var(--muted); font-family:inherit; padding-right:8px; }
+.us-cmp-loading { color:var(--muted); font-size:12px; padding:8px 0; }
 </style>
 </head>
 <body>
@@ -354,6 +385,8 @@ body { font-family: -apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
     <div style="flex:1"></div>
     <button class="btn btn-ghost" onclick="showDashboard()" id="btn-dashboard"
       style="padding:5px 12px;font-size:12px">📊 Dashboard</button>
+    <button class="btn btn-ghost" onclick="showLeaderboard()"
+      style="padding:5px 12px;font-size:12px">🏆 Leaderboard</button>
     <button class="btn btn-ghost" onclick="refreshAll()" style="padding:5px 12px;font-size:12px">↻ Refresh</button>
     <button class="btn btn-primary" onclick="showUploadScore()" id="btn-upload-score"
       style="padding:5px 12px;font-size:12px">⬆ Upload &amp; Score</button>
@@ -3295,8 +3328,25 @@ refreshAll();
       <div id="us-results-header" class="us-info-bar"></div>
       <!-- Summary grid -->
       <div id="us-summary-grid" class="us-summary-grid"></div>
+      <!-- Compare row: current model left | pick another model right -->
+      <div class="us-compare-row" id="us-compare-row">
+        <!-- Left: current result summary -->
+        <div class="us-compare-col">
+          <div class="us-compare-hdr">📊 <span id="us-cmp-current-name">Current model</span></div>
+          <table class="us-cmp-table" id="us-cmp-current-table"></table>
+        </div>
+        <!-- Right: compare another model -->
+        <div class="us-compare-col">
+          <div class="us-compare-hdr">🔍 Compare with</div>
+          <select class="us-cmp-select" id="us-cmp-model-select" onchange="usCmpLoad()"
+                  style="margin-bottom:6px">
+            <option value="">— Select a model —</option>
+          </select>
+          <div id="us-cmp-other-content" class="us-cmp-loading">Select a model to compare</div>
+        </div>
+      </div>
       <!-- Per-page table -->
-      <div style="overflow-x:auto;padding:0 0 16px 0">
+      <div style="overflow-x:auto;padding:0 0 16px 0;border-top:1px solid var(--border)">
         <table class="us-page-table" id="us-page-table">
           <thead>
             <tr>
@@ -3316,11 +3366,29 @@ refreshAll();
   </div>
 </div>
 
+<!-- ══════════════════════════════════════════════════════════
+     Leaderboard overlay
+══════════════════════════════════════════════════════════ -->
+<div id="leaderboard-overlay" class="lb-overlay" style="display:none"
+     onclick="if(event.target===this)hideLeaderboard()">
+  <div class="lb-box">
+    <div class="dashboard-header">
+      <h2>🏆 Model Leaderboard</h2>
+      <span style="font-size:11px;color:var(--muted)">Models with results on all 24 documents</span>
+      <button class="btn btn-ghost" style="padding:4px 10px;font-size:12px" onclick="refreshLeaderboard()">↻</button>
+      <button class="btn btn-ghost" style="padding:4px 10px;font-size:12px" onclick="hideLeaderboard()">✕</button>
+    </div>
+    <div id="lb-content" style="padding:16px 0">
+      <div style="padding:20px;color:var(--muted);font-size:13px">Loading…</div>
+    </div>
+  </div>
+</div>
+
 <script>
 // ═══════════════════════════════════════════════════════
 // Upload & Score logic
 // ═══════════════════════════════════════════════════════
-const US = { files: null, scoring: false };
+const US = { files: null, scoring: false, currentResult: null, currentDocId: null };
 
 function showUploadScore() {
   document.getElementById('upload-score-overlay').style.display = 'flex';
@@ -3446,6 +3514,10 @@ function usRenderResults(data) {
   const sum = data.results?.text?.summary || {};
   const pages = data.results?.text?.pages || [];
 
+  // Store for compare panel
+  US.currentResult = data;
+  US.currentDocId = data.doc_id;
+
   // Header
   document.getElementById('us-results-header').innerHTML =
     `✅ <strong>${esc(data.model)}</strong> → <strong>${esc(data.doc_id)}</strong>
@@ -3470,6 +3542,13 @@ function usRenderResults(data) {
     </div>`
   ).join('');
 
+  // Compare panel — left side (current model)
+  document.getElementById('us-cmp-current-name').textContent = data.model;
+  document.getElementById('us-cmp-current-table').innerHTML = usCmpMetricRows(sum);
+
+  // Compare panel — right side: populate model dropdown from known models + skip current
+  usPopulateCmpModels(data.model);
+
   // Per-page table
   document.getElementById('us-page-tbody').innerHTML = pages.map(p => `
     <tr>
@@ -3484,6 +3563,157 @@ function usRenderResults(data) {
   ).join('');
 
   resEl.style.display = 'block';
+}
+
+// ── Compare panel helpers ──────────────────────────────
+
+function usCmpMetricRows(sum) {
+  const CMP_METRICS = [
+    { label:'CER',      key:'cer',                         lb:true },
+    { label:'WER',      key:'wer',                         lb:true },
+    { label:'Char F1',  key:'char_f1',                     lb:false },
+    { label:'Word F1',  key:'word_f1',                     lb:false },
+    { label:'Edit Sim', key:'normalized_edit_similarity',  lb:false },
+    { label:'TEDS',     key:'table_teds_doc',              lb:false },
+    { label:'Cell F1',  key:'table_cell_exact_f1_mean',    lb:false },
+  ];
+  return CMP_METRICS.map(m => {
+    // accept both raw (cer) and avg_ (avg_cer) keys
+    const v = sum[m.key] ?? sum[`avg_${m.key}`] ?? null;
+    return `<tr>
+      <td>${m.label}</td>
+      <td style="text-align:right;${usScoreClass(v,m.lb)}">${usFmt(v)}</td>
+    </tr>`;
+  }).join('');
+}
+
+async function usPopulateCmpModels(currentModel) {
+  const sel = document.getElementById('us-cmp-model-select');
+  sel.innerHTML = '<option value="">— Select a model —</option>';
+  document.getElementById('us-cmp-other-content').innerHTML =
+    '<div class="us-cmp-loading">Select a model to compare</div>';
+  try {
+    // Use known_models + hardcoded built-in models
+    const [known] = await Promise.all([
+      fetch('/api/upload/known_models').then(r => r.json()),
+    ]);
+    const all = [...new Set(['marker', 'mistral', ...known])].filter(m => m !== currentModel);
+    all.forEach(m => {
+      const o = document.createElement('option');
+      o.value = m; o.textContent = m;
+      sel.appendChild(o);
+    });
+  } catch(e) {}
+}
+
+async function usCmpLoad() {
+  const model = document.getElementById('us-cmp-model-select').value;
+  const docId = US.currentDocId;
+  const contentEl = document.getElementById('us-cmp-other-content');
+
+  if (!model || !docId) {
+    contentEl.innerHTML = '<div class="us-cmp-loading">Select a model to compare</div>';
+    return;
+  }
+  contentEl.innerHTML = '<div class="us-cmp-loading">Loading…</div>';
+
+  try {
+    const res = await fetch(`/api/upload/doc_result?doc_id=${encodeURIComponent(docId)}&model=${encodeURIComponent(model)}`);
+    if (!res.ok) {
+      contentEl.innerHTML = `<div class="us-cmp-loading" style="color:var(--orange)">No results for ${esc(model)} on ${esc(docId)}</div>`;
+      return;
+    }
+    const data = await res.json();
+    const sum = (data.text || {}).summary || {};
+    // Compare with current
+    const curSum = US.currentResult?.results?.text?.summary || {};
+    const CMP_METRICS = [
+      { label:'CER',      key:'cer',                         alt:'avg_cer',                        lb:true },
+      { label:'WER',      key:'wer',                         alt:'avg_wer',                        lb:true },
+      { label:'Char F1',  key:'char_f1',                     alt:'avg_char_f1',                    lb:false },
+      { label:'Word F1',  key:'word_f1',                     alt:'avg_word_f1',                    lb:false },
+      { label:'Edit Sim', key:'normalized_edit_similarity',  alt:'avg_normalized_edit_similarity', lb:false },
+      { label:'TEDS',     key:'table_teds_doc',              alt:'avg_teds',                       lb:false },
+      { label:'Cell F1',  key:'table_cell_exact_f1_mean',    alt:'avg_cell_exact_f1',              lb:false },
+    ];
+    const rows = CMP_METRICS.map(m => {
+      const v = sum[m.key] ?? sum[m.alt] ?? null;
+      const cur = curSum[m.key] ?? curSum[`avg_${m.key}`] ?? null;
+      let delta = '';
+      if (v != null && cur != null) {
+        const diff = m.lb ? (cur - v) : (v - cur); // positive = other model better
+        const sign = diff > 0 ? '▲' : diff < 0 ? '▼' : '';
+        const col = diff > 0.005 ? 'var(--green)' : diff < -0.005 ? 'var(--red)' : 'var(--muted)';
+        delta = `<span style="font-size:10px;color:${col};margin-left:4px">${sign}${Math.abs(diff*100).toFixed(1)}%</span>`;
+      }
+      return `<tr>
+        <td>${m.label}</td>
+        <td style="text-align:right;${usScoreClass(v,m.lb)}">${usFmt(v)}${delta}</td>
+      </tr>`;
+    }).join('');
+    contentEl.innerHTML = `<table class="us-cmp-table">${rows}</table>`;
+  } catch(e) {
+    contentEl.innerHTML = `<div class="us-cmp-loading" style="color:var(--red)">Error loading result</div>`;
+  }
+}
+
+// ── Leaderboard ───────────────────────────────────────
+
+function showLeaderboard() {
+  document.getElementById('leaderboard-overlay').style.display = 'flex';
+  refreshLeaderboard();
+}
+function hideLeaderboard() {
+  document.getElementById('leaderboard-overlay').style.display = 'none';
+}
+
+async function refreshLeaderboard() {
+  const el = document.getElementById('lb-content');
+  el.innerHTML = '<div style="padding:20px;color:var(--muted);font-size:13px">Loading…</div>';
+  try {
+    const rows = await fetch('/api/upload/leaderboard').then(r => r.json());
+    if (!rows.length) {
+      el.innerHTML = '<div style="padding:20px;color:var(--muted);font-size:13px">No model has been evaluated on all 24 documents yet.</div>';
+      return;
+    }
+    const pct = v => v == null ? '—' : (v * 100).toFixed(1) + '%';
+    let html = `<table class="lb-table">
+      <thead>
+        <tr>
+          <th style="width:40px">#</th>
+          <th>Model</th>
+          <th style="text-align:right">Docs</th>
+          <th style="text-align:right">Char F1</th>
+          <th style="text-align:right">CER</th>
+          <th style="text-align:right">Avg TEDS</th>
+          <th style="text-align:right">Cell F1</th>
+          <th>Type</th>
+        </tr>
+      </thead>
+      <tbody>`;
+    for (const r of rows) {
+      const rankIcon = r.rank === 1 ? '<span class="lb-crown">👑</span>' :
+                       r.rank === 2 ? '🥈' : r.rank === 3 ? '🥉' : r.rank;
+      const badge = r.source === 'upload'
+        ? '<span class="lb-badge lb-badge-upload">Upload</span>'
+        : '<span class="lb-badge lb-badge-pipeline">Pipeline</span>';
+      const rowStyle = r.is_best ? 'background:#1e2a1a' : '';
+      html += `<tr style="${rowStyle}">
+        <td class="lb-rank">${rankIcon}</td>
+        <td style="font-weight:${r.is_best?700:400};color:${r.is_best?'var(--green)':'var(--text)'}">${esc(r.model)}</td>
+        <td style="text-align:right;color:var(--muted)">${r.docs}</td>
+        <td style="text-align:right;${r.is_best?'color:var(--green);font-weight:700':''}">${pct(r.avg_char_f1)}</td>
+        <td style="text-align:right">${pct(r.avg_cer)}</td>
+        <td style="text-align:right">${pct(r.avg_teds)}</td>
+        <td style="text-align:right">${pct(r.avg_cell_f1)}</td>
+        <td>${badge}</td>
+      </tr>`;
+    }
+    html += '</tbody></table>';
+    el.innerHTML = html;
+  } catch(e) {
+    el.innerHTML = `<div style="padding:20px;color:var(--red);font-size:13px">Failed to load leaderboard: ${e.message}</div>`;
+  }
 }
 </script>
 </body>
