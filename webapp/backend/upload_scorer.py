@@ -213,8 +213,27 @@ def _collect_model_stats() -> dict:
         tbl = (data.get("table") or {}).get("summary") or {}
         if tbl.get("avg_teds") is not None:
             s["teds"].append(tbl["avg_teds"])
+        elif txt.get("table_teds_doc") is not None:
+            # upload results: TEDS stored directly in text.summary
+            s["teds"].append(txt["table_teds_doc"])
+        else:
+            # upload results: compute average from pages
+            pages = (data.get("text") or {}).get("pages") or []
+            page_teds = [p["table_teds_doc"] for p in pages
+                         if isinstance(p.get("table_teds_doc"), (int, float))]
+            if page_teds:
+                s["teds"].append(sum(page_teds) / len(page_teds))
+
         if tbl.get("avg_cell_exact_f1") is not None:
             s["cell_f1"].append(tbl["avg_cell_exact_f1"])
+        elif txt.get("table_cell_exact_f1_mean") is not None:
+            s["cell_f1"].append(txt["table_cell_exact_f1_mean"])
+        else:
+            pages = (data.get("text") or {}).get("pages") or []
+            page_cell = [p["table_cell_exact_f1_mean"] for p in pages
+                         if isinstance(p.get("table_cell_exact_f1_mean"), (int, float))]
+            if page_cell:
+                s["cell_f1"].append(sum(page_cell) / len(page_cell))
 
     # compute averages in-place
     for s in model_stats.values():

@@ -123,9 +123,11 @@ def normalize_ocr_text(
 
     s = protect(r"https?://[^\s)>\]]+", s)
 
-    # 3. Remove images
+    # 3. Remove images (including any AI-generated caption text on the same line)
+    # Pattern: ![alt](url) followed by optional trailing text on the same line
+    # e.g. "![Diagram](img.webp)A diagram showing a box..." → removed entirely
     s = re.sub(r"<img\b[^>]*>", " ", s, flags=re.IGNORECASE)
-    s = re.sub(r"!\[[^\]]*\]\([^)]+\)", " ", s)
+    s = re.sub(r"!\[[^\]]*\]\([^)]+\)[^\n]*", " ", s)
 
     # 4. HTML to text
     s = re.sub(r"<\s*br\s*/?\s*>", " ", s, flags=re.IGNORECASE)
