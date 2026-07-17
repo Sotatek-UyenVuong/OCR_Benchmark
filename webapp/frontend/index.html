@@ -3256,7 +3256,9 @@ refreshAll();
         <div class="us-field">
           <label class="us-label">Model Name</label>
           <input id="us-model-name" class="us-input" type="text" maxlength="100"
-                 placeholder="e.g. PaddleOCR-v4, MyModel…">
+                 placeholder="e.g. PaddleOCR-v4, MyModel…"
+                 list="us-model-datalist" autocomplete="off">
+          <datalist id="us-model-datalist"></datalist>
         </div>
         <!-- Doc ID dropdown -->
         <div class="us-field">
@@ -3323,9 +3325,23 @@ const US = { files: null, scoring: false };
 function showUploadScore() {
   document.getElementById('upload-score-overlay').style.display = 'flex';
   usLoadDocs();
+  usLoadKnownModels();
 }
 function hideUploadScore() {
   document.getElementById('upload-score-overlay').style.display = 'none';
+}
+
+async function usLoadKnownModels() {
+  try {
+    const models = await fetch('/api/upload/known_models').then(r => r.json());
+    const list = document.getElementById('us-model-datalist');
+    list.innerHTML = '';
+    for (const m of models) {
+      const opt = document.createElement('option');
+      opt.value = m;
+      list.appendChild(opt);
+    }
+  } catch(e) { /* non-critical */ }
 }
 
 async function usLoadDocs() {
@@ -3408,6 +3424,7 @@ async function usSubmitScore() {
     const data = await res.json();
     if (!res.ok) throw new Error(data.detail || `HTTP ${res.status}`);
     usRenderResults(data);
+    usLoadKnownModels();  // refresh autocomplete with newly saved model name
   } catch(e) {
     errEl.textContent = e.message || 'Scoring failed';
     errEl.style.display = 'block';
@@ -3428,7 +3445,8 @@ function usRenderResults(data) {
   document.getElementById('us-results-header').innerHTML =
     `✅ <strong>${esc(data.model)}</strong> → <strong>${esc(data.doc_id)}</strong>
      &nbsp;<span style="color:var(--muted)">(${esc(data.uc_type)} / ${esc(data.lang)})</span>
-     &nbsp;· <span style="color:var(--accent)">${sum.n_matched_pages}/${sum.n_pages} pages matched</span>`;
+     &nbsp;· <span style="color:var(--accent)">${sum.n_matched_pages}/${sum.n_pages} pages matched</span>
+     &nbsp;· <span style="color:var(--green)">💾 Saved to Dashboard</span>`;
 
   // Summary grid
   const metrics = [
