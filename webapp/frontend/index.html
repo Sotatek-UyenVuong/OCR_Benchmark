@@ -304,6 +304,42 @@ body { font-family: -apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
 .empty { display:flex; flex-direction:column; align-items:center; justify-content:center;
          height:100%; gap:10px; color:var(--muted); }
 .empty svg { opacity:.25; }
+
+/* ── Upload & Score panel ── */
+.us-body { padding:24px; overflow-y:auto; display:flex; flex-direction:column; gap:20px; }
+.us-form { background:var(--surface); border:1px solid var(--border); border-radius:10px; overflow:hidden; }
+.us-form-title { padding:10px 16px; background:var(--surface2); border-bottom:1px solid var(--border);
+                 font-size:12px; font-weight:700; text-transform:uppercase; letter-spacing:.06em; color:var(--muted); }
+.us-form-body { padding:16px; display:flex; flex-direction:column; gap:14px; }
+.us-row { display:grid; grid-template-columns:1fr 1fr 1fr; gap:12px; }
+@media(max-width:800px){ .us-row { grid-template-columns:1fr; } }
+.us-field { display:flex; flex-direction:column; gap:5px; }
+.us-label { font-size:11px; font-weight:600; color:var(--muted); }
+.us-input { background:var(--bg); border:1px solid var(--border); color:var(--text);
+            padding:7px 10px; border-radius:6px; font-size:13px; outline:none; }
+.us-input:focus { border-color:var(--accent); }
+.us-select { background:var(--bg); border:1px solid var(--border); color:var(--text);
+             padding:7px 10px; border-radius:6px; font-size:13px; outline:none; cursor:pointer; width:100%; }
+.us-select:focus { border-color:var(--accent); }
+.us-file-btn { background:var(--bg); border:1px dashed var(--border); color:var(--muted);
+               padding:7px 10px; border-radius:6px; font-size:13px; cursor:pointer;
+               text-align:center; transition:border-color .15s; }
+.us-file-btn:hover { border-color:var(--accent); color:var(--text); }
+.us-file-chosen { font-size:11px; color:var(--green); margin-top:3px; }
+.us-results { background:var(--surface); border:1px solid var(--border); border-radius:10px; overflow:hidden; }
+.us-summary-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(110px,1fr)); }
+.us-summary-cell { padding:12px 14px; border-right:1px solid var(--border); border-bottom:1px solid var(--border); text-align:center; }
+.us-summary-cell:last-child { border-right:none; }
+.us-metric-label { font-size:10px; color:var(--muted); font-weight:600; text-transform:uppercase; letter-spacing:.05em; margin-bottom:3px; }
+.us-metric-val { font-size:20px; font-weight:700; }
+.us-page-table { width:100%; border-collapse:collapse; font-size:12px; }
+.us-page-table th { padding:7px 10px; background:var(--surface2); color:var(--muted); font-weight:700; text-align:left; border-bottom:1px solid var(--border); }
+.us-page-table td { padding:6px 10px; border-bottom:1px solid #1e2132; font-family:monospace; }
+.us-page-table tr:hover td { background:#1e2132; }
+.us-error { padding:10px 14px; background:#2a1a1a; border:1px solid var(--red); border-radius:8px; color:var(--red); font-size:13px; }
+.us-info-bar { padding:8px 14px; background:var(--surface2); border-top:1px solid var(--border); font-size:12px; color:var(--muted); display:flex; align-items:center; gap:8px; }
+.us-spinner { width:14px; height:14px; border:2px solid var(--border); border-top-color:var(--accent); border-radius:50%; animation:spin .7s linear infinite; }
+@keyframes spin { to { transform:rotate(360deg); } }
 </style>
 </head>
 <body>
@@ -319,6 +355,8 @@ body { font-family: -apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
     <button class="btn btn-ghost" onclick="showDashboard()" id="btn-dashboard"
       style="padding:5px 12px;font-size:12px">📊 Dashboard</button>
     <button class="btn btn-ghost" onclick="refreshAll()" style="padding:5px 12px;font-size:12px">↻ Refresh</button>
+    <button class="btn btn-primary" onclick="showUploadScore()" id="btn-upload-score"
+      style="padding:5px 12px;font-size:12px">⬆ Upload &amp; Score</button>
   </div>
 
   <!-- sidebar -->
@@ -3197,6 +3235,233 @@ window.renderPage = function(pageNum) {
 
 // Boot
 refreshAll();
+</script>
+
+<!-- ══════════════════════════════════════════════════════════
+     Upload & Score overlay
+══════════════════════════════════════════════════════════ -->
+<div id="upload-score-overlay" class="dashboard-overlay" style="display:none"
+     onclick="if(event.target===this)hideUploadScore()">
+  <div class="dashboard-box" style="max-width:860px">
+    <div class="dashboard-header">
+      <h2>⬆ Upload &amp; Score</h2>
+      <span style="font-size:11px;color:var(--muted)">Upload model output (.md per page) → get metrics vs Ground Truth</span>
+      <button class="btn btn-ghost" style="padding:4px 10px;font-size:12px" onclick="hideUploadScore()">✕</button>
+    </div>
+
+    <!-- Form -->
+    <div style="padding:20px;display:flex;flex-direction:column;gap:16px;">
+      <div class="us-row">
+        <!-- Model name -->
+        <div class="us-field">
+          <label class="us-label">Model Name</label>
+          <input id="us-model-name" class="us-input" type="text" maxlength="100"
+                 placeholder="e.g. PaddleOCR-v4, MyModel…">
+        </div>
+        <!-- Doc ID dropdown -->
+        <div class="us-field">
+          <label class="us-label">Document (with Ground Truth)</label>
+          <select id="us-doc-select" class="us-select">
+            <option value="">Loading…</option>
+          </select>
+        </div>
+        <!-- Folder picker -->
+        <div class="us-field">
+          <label class="us-label">Prediction Folder (.md files)</label>
+          <div class="us-file-btn" onclick="document.getElementById('us-file-input').click()">
+            📁 Click to select folder
+          </div>
+          <div class="us-file-chosen" id="us-file-count" style="display:none"></div>
+          <input id="us-file-input" type="file" webkitdirectory multiple
+                 style="display:none" onchange="usOnFilesChosen(this)">
+        </div>
+      </div>
+
+      <div style="display:flex;align-items:center;gap:10px;">
+        <button class="btn btn-primary" id="us-btn-score" onclick="usSubmitScore()">
+          ⚡ Score
+        </button>
+        <div id="us-spinner" style="display:none" class="us-spinner"></div>
+        <span id="us-status" style="font-size:12px;color:var(--muted)"></span>
+      </div>
+
+      <div id="us-error" class="us-error" style="display:none"></div>
+    </div>
+
+    <!-- Results -->
+    <div id="us-results" style="display:none;border-top:1px solid var(--border)">
+      <div id="us-results-header" class="us-info-bar"></div>
+      <!-- Summary grid -->
+      <div id="us-summary-grid" class="us-summary-grid"></div>
+      <!-- Per-page table -->
+      <div style="overflow-x:auto;padding:0 0 16px 0">
+        <table class="us-page-table" id="us-page-table">
+          <thead>
+            <tr>
+              <th>Page</th>
+              <th>CER</th>
+              <th>WER</th>
+              <th>Char F1</th>
+              <th>Word F1</th>
+              <th>Edit Sim</th>
+              <th>TEDS</th>
+            </tr>
+          </thead>
+          <tbody id="us-page-tbody"></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+// ═══════════════════════════════════════════════════════
+// Upload & Score logic
+// ═══════════════════════════════════════════════════════
+const US = { files: null, scoring: false };
+
+function showUploadScore() {
+  document.getElementById('upload-score-overlay').style.display = 'flex';
+  usLoadDocs();
+}
+function hideUploadScore() {
+  document.getElementById('upload-score-overlay').style.display = 'none';
+}
+
+async function usLoadDocs() {
+  const sel = document.getElementById('us-doc-select');
+  try {
+    const docs = await fetch('/api/upload/gt_docs').then(r => r.json());
+    sel.innerHTML = '';
+    if (!docs.length) {
+      sel.innerHTML = '<option value="">No GT documents found</option>';
+      return;
+    }
+    // Group by uc_type/lang
+    const groups = {};
+    for (const d of docs) {
+      const k = `${d.uc_type} / ${d.lang}`;
+      if (!groups[k]) groups[k] = [];
+      groups[k].push(d);
+    }
+    for (const [grp, items] of Object.entries(groups)) {
+      const og = document.createElement('optgroup');
+      og.label = grp;
+      for (const d of items) {
+        const opt = document.createElement('option');
+        opt.value = d.doc_id;
+        opt.textContent = d.doc_id;
+        og.appendChild(opt);
+      }
+      sel.appendChild(og);
+    }
+  } catch(e) {
+    sel.innerHTML = '<option value="">Failed to load documents</option>';
+  }
+}
+
+function usOnFilesChosen(input) {
+  US.files = input.files;
+  const md = Array.from(US.files).filter(f => f.name.endsWith('.md'));
+  const cnt = document.getElementById('us-file-count');
+  cnt.style.display = 'block';
+  cnt.textContent = `${US.files.length} file(s) selected, ${md.length} .md`;
+  document.querySelector('#upload-score-overlay .us-file-btn').textContent = `📁 ${US.files.length} file(s)`;
+}
+
+function usScoreClass(v, lowerBetter=true) {
+  if (v == null) return 'color:var(--muted)';
+  if (lowerBetter) return v < 0.05 ? 'color:var(--green)' : v <= 0.15 ? 'color:var(--orange)' : 'color:var(--red)';
+  return v > 0.9 ? 'color:var(--green)' : v > 0.7 ? 'color:var(--orange)' : 'color:var(--red)';
+}
+
+function usFmt(v, pct=true) {
+  if (v == null) return '—';
+  return pct ? (v*100).toFixed(1)+'%' : v.toFixed(4);
+}
+
+async function usSubmitScore() {
+  const modelName = document.getElementById('us-model-name').value.trim();
+  const docId = document.getElementById('us-doc-select').value;
+  const errEl = document.getElementById('us-error');
+  const resEl = document.getElementById('us-results');
+
+  errEl.style.display = 'none';
+  resEl.style.display = 'none';
+
+  if (!modelName) { errEl.textContent = 'Please enter a model name.'; errEl.style.display='block'; return; }
+  if (!docId)     { errEl.textContent = 'Please select a document.';  errEl.style.display='block'; return; }
+  if (!US.files || !US.files.length) { errEl.textContent = 'Please select a folder with .md files.'; errEl.style.display='block'; return; }
+
+  US.scoring = true;
+  document.getElementById('us-btn-score').disabled = true;
+  document.getElementById('us-spinner').style.display = 'block';
+  document.getElementById('us-status').textContent = 'Scoring…';
+
+  const fd = new FormData();
+  fd.append('model_name', modelName);
+  fd.append('doc_id', docId);
+  for (const f of Array.from(US.files)) fd.append('files', f);
+
+  try {
+    const res = await fetch('/api/upload/score', { method: 'POST', body: fd });
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.detail || `HTTP ${res.status}`);
+    usRenderResults(data);
+  } catch(e) {
+    errEl.textContent = e.message || 'Scoring failed';
+    errEl.style.display = 'block';
+    document.getElementById('us-btn-score').disabled = false;
+  } finally {
+    US.scoring = false;
+    document.getElementById('us-spinner').style.display = 'none';
+    document.getElementById('us-status').textContent = '';
+  }
+}
+
+function usRenderResults(data) {
+  const resEl = document.getElementById('us-results');
+  const sum = data.results?.text?.summary || {};
+  const pages = data.results?.text?.pages || [];
+
+  // Header
+  document.getElementById('us-results-header').innerHTML =
+    `✅ <strong>${esc(data.model)}</strong> → <strong>${esc(data.doc_id)}</strong>
+     &nbsp;<span style="color:var(--muted)">(${esc(data.uc_type)} / ${esc(data.lang)})</span>
+     &nbsp;· <span style="color:var(--accent)">${sum.n_matched_pages}/${sum.n_pages} pages matched</span>`;
+
+  // Summary grid
+  const metrics = [
+    { label:'CER',       val:sum.cer,                          lb:true },
+    { label:'WER',       val:sum.wer,                          lb:true },
+    { label:'Char F1',   val:sum.char_f1,                      lb:false },
+    { label:'Word F1',   val:sum.word_f1,                      lb:false },
+    { label:'Edit Sim',  val:sum.normalized_edit_similarity,   lb:false },
+    { label:'TEDS',      val:sum.table_teds_doc,               lb:false },
+    { label:'Cell F1',   val:sum.table_cell_exact_f1_mean,     lb:false },
+  ];
+  document.getElementById('us-summary-grid').innerHTML = metrics.map(m =>
+    `<div class="us-summary-cell">
+      <div class="us-metric-label">${m.label}</div>
+      <div class="us-metric-val" style="${usScoreClass(m.val, m.lb)}">${usFmt(m.val)}</div>
+    </div>`
+  ).join('');
+
+  // Per-page table
+  document.getElementById('us-page-tbody').innerHTML = pages.map(p => `
+    <tr>
+      <td style="font-weight:600;color:var(--text)">${p.page_num}${p.error ? ' ⚠️' : ''}</td>
+      <td style="${usScoreClass(p.cer,true)}">${usFmt(p.cer)}</td>
+      <td style="${usScoreClass(p.wer,true)}">${usFmt(p.wer)}</td>
+      <td style="${usScoreClass(p.char_f1,false)}">${usFmt(p.char_f1)}</td>
+      <td style="${usScoreClass(p.word_f1,false)}">${usFmt(p.word_f1)}</td>
+      <td style="${usScoreClass(p.normalized_edit_similarity,false)}">${usFmt(p.normalized_edit_similarity)}</td>
+      <td style="${usScoreClass(p.table_teds_doc,false)}">${usFmt(p.table_teds_doc)}</td>
+    </tr>`
+  ).join('');
+
+  resEl.style.display = 'block';
+}
 </script>
 </body>
 </html>

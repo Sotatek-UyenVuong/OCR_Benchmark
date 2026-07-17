@@ -54,6 +54,7 @@ def compute_nwer(gt_text: str, pred_text: str, doc_id: str = "", page_num: int =
     }
 from .gt_review import router as gt_router
 from .ocr_runner import router as ocr_router
+from .upload_scorer import router as upload_router
 
 app = FastAPI(title="OCR Benchmark API", version="0.1.0")
 
@@ -67,6 +68,7 @@ app.add_middleware(
 # Mount routers
 app.include_router(gt_router)
 app.include_router(ocr_router)
+app.include_router(upload_router)
 
 # Serve frontend static files
 FRONTEND_DIR = Path(__file__).parent.parent / "frontend"

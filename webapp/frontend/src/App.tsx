@@ -3,9 +3,13 @@ import { Upload, Zap, FileText, ChevronDown } from 'lucide-react'
 import { ScoreCard } from './components/ScoreCard'
 import { DiffViewer } from './components/DiffViewer'
 import { PdfViewer } from './components/PdfViewer'
+import { UploadScore } from './components/UploadScore'
 import type { Model, UcOption, EvalResult } from './types'
 
+type ActiveTab = 'evaluate' | 'upload'
+
 export default function App() {
+  const [activeTab, setActiveTab] = useState<ActiveTab>('evaluate')
   const [models, setModels] = useState<Model[]>([])
   const [ucOptions, setUcOptions] = useState<UcOption[]>([])
   const [selectedModel, setSelectedModel] = useState('')
@@ -72,10 +76,37 @@ export default function App() {
             <h1 className="font-semibold text-blue-900 text-sm leading-none">OCR Benchmark</h1>
             <p className="text-xs text-slate-400 mt-0.5">Evaluate & visualize OCR quality</p>
           </div>
+          {/* Tab switcher */}
+          <div className="ml-6 flex gap-1 bg-blue-50 rounded-lg p-1">
+            <button
+              onClick={() => setActiveTab('evaluate')}
+              className={`px-3 py-1.5 rounded-md text-xs font-semibold transition-colors cursor-pointer
+                ${activeTab === 'evaluate'
+                  ? 'bg-white text-blue-900 shadow-sm'
+                  : 'text-slate-500 hover:text-blue-700'}`}
+            >
+              Evaluate
+            </button>
+            <button
+              onClick={() => setActiveTab('upload')}
+              className={`px-3 py-1.5 rounded-md text-xs font-semibold transition-colors cursor-pointer flex items-center gap-1.5
+                ${activeTab === 'upload'
+                  ? 'bg-white text-blue-900 shadow-sm'
+                  : 'text-slate-500 hover:text-blue-700'}`}
+            >
+              <Upload size={11} />
+              Upload &amp; Score
+            </button>
+          </div>
         </div>
       </header>
 
       <main className="max-w-7xl mx-auto px-4 py-6 space-y-6">
+        {/* ── Upload & Score tab ── */}
+        {activeTab === 'upload' && <UploadScore />}
+
+        {/* ── Evaluate tab ── */}
+        {activeTab === 'evaluate' && (<>
         {/* Config panel */}
         <section className="bg-white rounded-xl border border-blue-100 p-5 shadow-sm">
           <h2 className="font-semibold text-blue-900 mb-4 text-sm uppercase tracking-wide">Configuration</h2>
@@ -225,6 +256,7 @@ export default function App() {
             </div>
           </>
         )}
+        </>) /* end evaluate tab */}
       </main>
     </div>
   )
