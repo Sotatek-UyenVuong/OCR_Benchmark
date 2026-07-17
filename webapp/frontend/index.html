@@ -371,6 +371,22 @@ body { font-family: -apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
 .us-cmp-table td { padding:4px 0; border-bottom:1px solid #1e2132; font-family:monospace; }
 .us-cmp-table td:first-child { color:var(--muted); font-family:inherit; padding-right:8px; }
 .us-cmp-loading { color:var(--muted); font-size:12px; padding:8px 0; }
+
+/* ── Model combobox ── */
+.us-combo { position:relative; }
+.us-combo-input-wrap { position:relative; display:flex; align-items:center; }
+.us-combo-input-wrap input { flex:1; padding-right:28px; }
+.us-combo-arrow { position:absolute; right:8px; color:var(--muted); cursor:pointer;
+                  font-size:12px; pointer-events:none; }
+.us-combo-dropdown { position:absolute; top:calc(100% + 3px); left:0; right:0; z-index:200;
+                     background:var(--surface); border:1px solid var(--accent); border-radius:7px;
+                     box-shadow:0 6px 24px rgba(0,0,0,.4); max-height:220px; overflow-y:auto; }
+.us-combo-item { padding:8px 12px; cursor:pointer; font-size:13px; color:var(--text);
+                 display:flex; align-items:center; gap:8px; }
+.us-combo-item:hover, .us-combo-item.selected { background:#1e2a4a; color:var(--accent); }
+.us-combo-item .us-combo-check { color:var(--green); font-size:11px; margin-left:auto; opacity:0; }
+.us-combo-item.selected .us-combo-check { opacity:1; }
+.us-combo-empty { padding:8px 12px; font-size:12px; color:var(--muted); font-style:italic; }
 </style>
 </head>
 <body>
@@ -3285,13 +3301,21 @@ refreshAll();
     <!-- Form -->
     <div style="padding:20px;display:flex;flex-direction:column;gap:16px;">
       <div class="us-row">
-        <!-- Model name -->
+        <!-- Model name combobox -->
         <div class="us-field">
           <label class="us-label">Model Name</label>
-          <input id="us-model-name" class="us-input" type="text" maxlength="100"
-                 placeholder="e.g. PaddleOCR-v4, MyModel…"
-                 list="us-model-datalist" autocomplete="off">
-          <datalist id="us-model-datalist"></datalist>
+          <div class="us-combo" id="us-model-combo">
+            <div class="us-combo-input-wrap">
+              <input id="us-model-name" class="us-input" type="text" maxlength="100"
+                     placeholder="Chọn hoặc nhập tên model…"
+                     autocomplete="off"
+                     oninput="usComboFilter()"
+                     onfocus="usComboOpen()"
+                     onblur="setTimeout(usComboClose, 150)">
+              <span class="us-combo-arrow" onclick="document.getElementById('us-model-name').focus();usComboOpen()">▾</span>
+            </div>
+            <div class="us-combo-dropdown" id="us-combo-dropdown" style="display:none"></div>
+          </div>
         </div>
         <!-- Doc ID dropdown -->
         <div class="us-field">
@@ -3399,17 +3423,63 @@ function hideUploadScore() {
   document.getElementById('upload-score-overlay').style.display = 'none';
 }
 
+// ── Model combobox ───────────────────────────────────
+
+let _usModelList = ['marker', 'mistral'];  // built-in defaults
+
 async function usLoadKnownModels() {
   try {
-    const models = await fetch('/api/upload/known_models').then(r => r.json());
-    const list = document.getElementById('us-model-datalist');
-    list.innerHTML = '';
-    for (const m of models) {
-      const opt = document.createElement('option');
-      opt.value = m;
-      list.appendChild(opt);
-    }
+    const saved = await fetch('/api/upload/known_models').then(r => r.json());
+    // Merge built-ins with saved, dedupe, sort
+    const all = [...new Set(['marker', 'mistral', ...saved])].sort();
+    _usModelList = all;
+    // If dropdown is open, re-render
+    const dd = document.getElementById('us-combo-dropdown');
+    if (dd && dd.style.display !== 'none') usComboRender();
   } catch(e) { /* non-critical */ }
+}
+
+function usComboRender(filter = '') {
+  const dd = document.getElementById('us-combo-dropdown');
+  const q = filter.trim().toLowerCase();
+  const current = document.getElementById('us-model-name').value.trim();
+  const items = q
+    ? _usModelList.filter(m => m.toLowerCase().includes(q))
+    : _usModelList;
+
+  if (!items.length && !q) {
+    dd.innerHTML = '<div class="us-combo-empty">Chưa có model nào. Nhập tên mới bên trên.</div>';
+  } else if (!items.length) {
+    dd.innerHTML = `<div class="us-combo-empty">Không tìm thấy — nhấn Enter để dùng "<strong>${esc(filter)}</strong>"</div>`;
+  } else {
+    dd.innerHTML = items.map(m => `
+      <div class="us-combo-item${m===current?' selected':''}" onmousedown="usComboSelect('${esc(m).replace(/'/g,"\\'")}')">
+        ${esc(m)}
+        <span class="us-combo-check">✓</span>
+      </div>`).join('');
+  }
+}
+
+function usComboOpen() {
+  const dd = document.getElementById('us-combo-dropdown');
+  dd.style.display = 'block';
+  usComboRender(document.getElementById('us-model-name').value);
+}
+
+function usComboClose() {
+  const dd = document.getElementById('us-combo-dropdown');
+  if (dd) dd.style.display = 'none';
+}
+
+function usComboFilter() {
+  const dd = document.getElementById('us-combo-dropdown');
+  dd.style.display = 'block';
+  usComboRender(document.getElementById('us-model-name').value);
+}
+
+function usComboSelect(name) {
+  document.getElementById('us-model-name').value = name;
+  usComboClose();
 }
 
 async function usLoadDocs() {
@@ -3592,18 +3662,13 @@ async function usPopulateCmpModels(currentModel) {
   sel.innerHTML = '<option value="">— Select a model —</option>';
   document.getElementById('us-cmp-other-content').innerHTML =
     '<div class="us-cmp-loading">Select a model to compare</div>';
-  try {
-    // Use known_models + hardcoded built-in models
-    const [known] = await Promise.all([
-      fetch('/api/upload/known_models').then(r => r.json()),
-    ]);
-    const all = [...new Set(['marker', 'mistral', ...known])].filter(m => m !== currentModel);
-    all.forEach(m => {
-      const o = document.createElement('option');
-      o.value = m; o.textContent = m;
-      sel.appendChild(o);
-    });
-  } catch(e) {}
+  // Use already-loaded model list
+  const all = _usModelList.filter(m => m !== currentModel);
+  all.forEach(m => {
+    const o = document.createElement('option');
+    o.value = m; o.textContent = m;
+    sel.appendChild(o);
+  });
 }
 
 async function usCmpLoad() {
