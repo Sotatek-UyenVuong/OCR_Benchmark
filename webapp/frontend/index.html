@@ -3671,38 +3671,61 @@ async function refreshLeaderboard() {
   const el = document.getElementById('lb-content');
   el.innerHTML = '<div style="padding:20px;color:var(--muted);font-size:13px">Loading…</div>';
   try {
-    const rows = await fetch('/api/upload/leaderboard').then(r => r.json());
-    if (!rows.length) {
-      el.innerHTML = '<div style="padding:20px;color:var(--muted);font-size:13px">No model has been evaluated on all 24 documents yet.</div>';
-      return;
-    }
-    const pct = v => v == null ? '—' : (v * 100).toFixed(1) + '%';
-    let html = `<table class="lb-table">
-      <thead>
-        <tr>
-          <th style="width:40px">#</th>
-          <th>Model</th>
-          <th style="text-align:right">Docs</th>
-          <th style="text-align:right">Char F1</th>
-          <th style="text-align:right">CER</th>
-          <th style="text-align:right">Avg TEDS</th>
-          <th style="text-align:right">Cell F1</th>
-          <th>Type</th>
-        </tr>
-      </thead>
-      <tbody>`;
-    for (const r of rows) {
-      const rankIcon = r.rank === 1 ? '<span class="lb-crown">👑</span>' :
-                       r.rank === 2 ? '🥈' : r.rank === 3 ? '🥉' : r.rank;
-      const badge = r.source === 'upload'
+    const [ranked, progress] = await Promise.all([
+      fetch('/api/upload/leaderboard').then(r => r.json()),
+      fetch('/api/upload/progress').then(r => r.json()),
+    ]);
+    el.innerHTML = _renderLeaderboard(ranked, progress);
+  } catch(e) {
+    el.innerHTML = `<div style="padding:20px;color:var(--red);font-size:13px">Failed to load: ${e.message}</div>`;
+  }
+}
+
+function _renderLeaderboard(ranked, progress) {
+  const pct = v => v == null ? '—' : (v * 100).toFixed(1) + '%';
+  const TOTAL = 24;
+
+  // ── Ranking criteria explanation ──
+  let html = `
+    <div style="padding:12px 16px;background:var(--bg);border-bottom:1px solid var(--border);font-size:11px;color:var(--muted);display:flex;gap:20px;flex-wrap:wrap">
+      <span>📊 <strong style="color:var(--text)">Tiêu chí xếp hạng:</strong></span>
+      <span>① Char F1 cao hơn = tốt hơn &nbsp;(text recognition quality)</span>
+      <span>② TEDS cao hơn = tốt hơn &nbsp;(table structure quality, tie-breaker)</span>
+      <span style="margin-left:auto">✅ Cần đủ <strong style="color:var(--accent)">${TOTAL}</strong> documents để lên bảng</span>
+    </div>`;
+
+  // ── Ranked models ──
+  if (ranked.length > 0) {
+    html += `
+      <div style="padding:8px 16px 4px;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--accent)">
+        🏆 Bảng xếp hạng (đủ ${TOTAL} docs)
+      </div>
+      <table class="lb-table">
+        <thead>
+          <tr>
+            <th style="width:40px">#</th>
+            <th>Model</th>
+            <th style="text-align:right">Docs</th>
+            <th style="text-align:right">Char F1 ①</th>
+            <th style="text-align:right">CER</th>
+            <th style="text-align:right">TEDS ②</th>
+            <th style="text-align:right">Cell F1</th>
+            <th>Nguồn</th>
+          </tr>
+        </thead>
+        <tbody>`;
+    for (const r of ranked) {
+      const rankIcon = r.rank===1 ? '<span class="lb-crown">👑</span>' :
+                       r.rank===2 ? '🥈' : r.rank===3 ? '🥉' : `<span style="color:var(--muted)">${r.rank}</span>`;
+      const badge = r.source==='upload'
         ? '<span class="lb-badge lb-badge-upload">Upload</span>'
         : '<span class="lb-badge lb-badge-pipeline">Pipeline</span>';
-      const rowStyle = r.is_best ? 'background:#1e2a1a' : '';
-      html += `<tr style="${rowStyle}">
+      const best = r.is_best;
+      html += `<tr style="${best?'background:#1a2e1a':''}">
         <td class="lb-rank">${rankIcon}</td>
-        <td style="font-weight:${r.is_best?700:400};color:${r.is_best?'var(--green)':'var(--text)'}">${esc(r.model)}</td>
-        <td style="text-align:right;color:var(--muted)">${r.docs}</td>
-        <td style="text-align:right;${r.is_best?'color:var(--green);font-weight:700':''}">${pct(r.avg_char_f1)}</td>
+        <td style="font-weight:${best?700:400};color:${best?'var(--green)':'var(--text)'}">${esc(r.model)}</td>
+        <td style="text-align:right;color:var(--muted);font-size:12px">${r.docs}/${TOTAL}</td>
+        <td style="text-align:right;font-weight:${best?700:400};color:${best?'var(--green)':''}">${pct(r.avg_char_f1)}</td>
         <td style="text-align:right">${pct(r.avg_cer)}</td>
         <td style="text-align:right">${pct(r.avg_teds)}</td>
         <td style="text-align:right">${pct(r.avg_cell_f1)}</td>
@@ -3710,10 +3733,50 @@ async function refreshLeaderboard() {
       </tr>`;
     }
     html += '</tbody></table>';
-    el.innerHTML = html;
-  } catch(e) {
-    el.innerHTML = `<div style="padding:20px;color:var(--red);font-size:13px">Failed to load leaderboard: ${e.message}</div>`;
   }
+
+  // ── In-progress models ──
+  const inProgress = progress.filter(r => !r.complete);
+  if (inProgress.length > 0) {
+    html += `
+      <div style="padding:12px 16px 4px;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--orange);border-top:1px solid var(--border)">
+        ⏳ Đang tiến hành (chưa đủ ${TOTAL} docs)
+      </div>`;
+    for (const r of inProgress) {
+      const done = r.docs;
+      const pctDone = Math.round(done / TOTAL * 100);
+      const badge = r.source==='upload'
+        ? '<span class="lb-badge lb-badge-upload">Upload</span>'
+        : '<span class="lb-badge lb-badge-pipeline">Pipeline</span>';
+      html += `
+        <div style="padding:10px 16px;border-bottom:1px solid #1e2132;display:flex;flex-direction:column;gap:6px">
+          <div style="display:flex;align-items:center;gap:10px">
+            <span style="font-weight:600;color:var(--text);flex:1">${esc(r.model)}</span>
+            ${badge}
+            <span style="font-size:12px;color:var(--accent);font-weight:700">${done}/${TOTAL} docs</span>
+            <span style="font-size:11px;color:var(--orange)">${r.missing} còn thiếu</span>
+          </div>
+          <div style="height:5px;background:var(--border);border-radius:3px;overflow:hidden">
+            <div style="height:100%;width:${pctDone}%;background:var(--orange);border-radius:3px;transition:width .4s"></div>
+          </div>
+          ${r.avg_char_f1 != null ? `<div style="font-size:11px;color:var(--muted)">
+            Char F1 hiện tại: <span style="color:var(--text)">${pct(r.avg_char_f1)}</span>
+            &nbsp;·&nbsp; CER: <span style="color:var(--text)">${pct(r.avg_cer)}</span>
+            ${r.avg_teds != null ? `&nbsp;·&nbsp; TEDS: <span style="color:var(--text)">${pct(r.avg_teds)}</span>` : ''}
+            &nbsp;<span style="color:var(--muted);font-style:italic">(tạm thời, chưa đủ để xếp hạng)</span>
+          </div>` : ''}
+          ${r.missing_docs && r.missing_docs.length <= 8 ? `<div style="font-size:10px;color:var(--muted)">
+            Còn thiếu: ${r.missing_docs.map(d => `<span style="background:var(--surface);padding:1px 5px;border-radius:3px;margin:1px">${esc(d)}</span>`).join(' ')}
+          </div>` : (r.missing_docs && r.missing_docs.length > 8 ? `<div style="font-size:10px;color:var(--muted)">Còn thiếu ${r.missing} docs</div>` : '')}
+        </div>`;
+    }
+  }
+
+  if (ranked.length === 0 && inProgress.length === 0) {
+    html += '<div style="padding:24px;color:var(--muted);text-align:center">Chưa có kết quả nào. Upload .md files để bắt đầu đánh giá.</div>';
+  }
+
+  return html;
 }
 </script>
 </body>

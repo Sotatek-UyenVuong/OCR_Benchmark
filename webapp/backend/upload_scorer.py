@@ -171,21 +171,22 @@ def get_doc_result(doc_id: str, model: str):
         raise HTTPException(500, detail="Failed to read result file")
 
 
-@router.get("/leaderboard")
-def get_leaderboard(min_docs: int = 24):
-    """
-    Leaderboard: models with >= min_docs evaluated, ranked by avg_char_f1 desc.
-    Only models with results on ALL min_docs documents appear here.
-    """
-    if not RESULT_ROOT.exists():
-        return []
+def _collect_model_stats() -> dict:
+    """Scan benchmark_results/ and aggregate per-model statistics."""
+    def _avg(lst):
+        v = [x for x in lst if x is not None]
+        return round(_mean(v), 4) if v else None
 
     model_stats: dict[str, dict] = {}
+    if not RESULT_ROOT.exists():
+        return model_stats
+
     for eval_file in RESULT_ROOT.rglob("*_eval.json"):
         parts = eval_file.relative_to(RESULT_ROOT).parts
         if len(parts) < 4:
             continue
         model_name = parts[0]
+        doc_id_stem = eval_file.stem.replace("_eval", "")
         try:
             data = json.loads(eval_file.read_text(encoding="utf-8"))
         except Exception:
@@ -196,9 +197,11 @@ def get_leaderboard(min_docs: int = 24):
                 "model": model_name, "docs": 0,
                 "char_f1": [], "cer": [], "teds": [], "cell_f1": [],
                 "source": data.get("source", "pipeline"),
+                "evaluated_docs": [],
             }
         s = model_stats[model_name]
         s["docs"] += 1
+        s["evaluated_docs"].append(doc_id_stem)
         if data.get("source") == "upload":
             s["source"] = "upload"
 
@@ -213,27 +216,80 @@ def get_leaderboard(min_docs: int = 24):
         if tbl.get("avg_cell_exact_f1") is not None:
             s["cell_f1"].append(tbl["avg_cell_exact_f1"])
 
-    def _avg(lst):
-        v = [x for x in lst if x is not None]
-        return round(_mean(v), 4) if v else None
+    # compute averages in-place
+    for s in model_stats.values():
+        s["avg_char_f1"] = _avg(s["char_f1"])
+        s["avg_cer"]     = _avg(s["cer"])
+        s["avg_teds"]    = _avg(s["teds"])
+        s["avg_cell_f1"] = _avg(s["cell_f1"])
+    return model_stats
 
+
+@router.get("/leaderboard")
+def get_leaderboard(min_docs: int = 24):
+    """
+    Leaderboard: models with >= min_docs evaluated.
+    Ranking criteria (in order):
+      1. Char F1 — higher is better (primary text quality)
+      2. TEDS    — higher is better (table structure quality)
+    Only models with results on ALL min_docs documents appear here.
+    Models still in progress (< min_docs) are NOT shown — use /progress.
+    """
+    stats = _collect_model_stats()
     rows = []
-    for name, s in model_stats.items():
+    for s in stats.values():
         if s["docs"] < min_docs:
             continue
         rows.append({
-            "model": name, "docs": s["docs"],
-            "avg_char_f1": _avg(s["char_f1"]),
-            "avg_cer": _avg(s["cer"]),
-            "avg_teds": _avg(s["teds"]),
-            "avg_cell_f1": _avg(s["cell_f1"]),
+            "model": s["model"], "docs": s["docs"],
+            "avg_char_f1": s["avg_char_f1"],
+            "avg_cer": s["avg_cer"],
+            "avg_teds": s["avg_teds"],
+            "avg_cell_f1": s["avg_cell_f1"],
             "source": s["source"],
         })
-
     rows.sort(key=lambda r: (r["avg_char_f1"] or 0, r["avg_teds"] or 0), reverse=True)
     for i, r in enumerate(rows):
         r["rank"] = i + 1
         r["is_best"] = (i == 0)
+    return rows
+
+
+@router.get("/progress")
+def get_model_progress(total_docs: int = 24):
+    """
+    Progress for ALL models (including incomplete ones).
+    Shows how many of total_docs have been evaluated so far.
+    Used in Leaderboard UI to show 'X/24 — Y more needed' for in-progress models.
+    Includes list of which doc_ids are still missing.
+    """
+    # Build the full list of 24 doc_ids from GT
+    all_docs: set[str] = set()
+    if GT_ROOT.exists():
+        for path in GT_ROOT.rglob("*.json"):
+            parts = path.relative_to(GT_ROOT).parts
+            if len(parts) == 3:
+                all_docs.add(path.stem)
+
+    stats = _collect_model_stats()
+    rows = []
+    for s in stats.values():
+        evaluated = set(s.get("evaluated_docs", []))
+        missing = sorted(all_docs - evaluated)
+        rows.append({
+            "model": s["model"],
+            "docs": s["docs"],
+            "total_docs": total_docs,
+            "missing": len(missing),
+            "missing_docs": missing,
+            "complete": s["docs"] >= total_docs,
+            "avg_char_f1": s["avg_char_f1"],
+            "avg_cer": s["avg_cer"],
+            "avg_teds": s["avg_teds"],
+            "avg_cell_f1": s["avg_cell_f1"],
+            "source": s["source"],
+        })
+    rows.sort(key=lambda r: r["docs"], reverse=True)
     return rows
 
 
