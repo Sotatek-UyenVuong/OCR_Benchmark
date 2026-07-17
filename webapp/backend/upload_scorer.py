@@ -124,7 +124,10 @@ def _parse_doc_id(doc_id: str) -> tuple[str, str]:
     parts = doc_id.split("_")
     if len(parts) < 3 or not parts[0] or not parts[1]:
         raise HTTPException(422, detail=f"Invalid doc_id '{doc_id}'. Expected: {{uc_type}}_{{lang}}_{{seq}}")
-    return parts[0], parts[1]
+    # Text-layer document IDs use the compact "textlayer_*" prefix while the
+    # dataset directory is named "text_layer".
+    uc_type = "text_layer" if parts[0] == "textlayer" else parts[0]
+    return uc_type, parts[1]
 
 
 def _safe_mean(vals: list) -> Optional[float]:
@@ -158,10 +161,7 @@ def list_known_models() -> list[str]:
 @router.get("/doc_result")
 def get_doc_result(doc_id: str, model: str):
     """Load saved eval result for a specific doc + model. Used by compare panel."""
-    parts = doc_id.split("_")
-    if len(parts) < 3:
-        raise HTTPException(422, detail=f"Invalid doc_id: {doc_id}")
-    uc_type, lang = parts[0], parts[1]
+    uc_type, lang = _parse_doc_id(doc_id)
     path = _result_path(model, uc_type, lang, doc_id)
     if not path.exists():
         raise HTTPException(404, detail=f"No result for model='{model}' doc='{doc_id}'")
