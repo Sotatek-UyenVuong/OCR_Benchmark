@@ -4162,6 +4162,9 @@ async function cuSubmit() {
     const scoreContext = `Model "${modelName}" scored on "${docId}" (${data.uc_type}/${data.lang}): CER=${pct(sum.cer)}, Char F1=${pct(sum.char_f1)}, TEDS=${pct(sum.table_teds_doc)}, ${sum.n_matched_pages}/${sum.n_pages} pages. Per-page: ${pageLines}`;
     CHAT.history.push({ role: 'user', content: scoreContext });
 
+    const scoreContext = `Model "${modelName}" scored on "${docId}" (${data.uc_type}/${data.lang}): CER=${pct(sum.cer)}, Char F1=${pct(sum.char_f1)}, TEDS=${pct(sum.table_teds_doc)}, ${sum.n_matched_pages}/${sum.n_pages} pages. Per-page: ${pageLines}`;
+    CHAT.history.push({ role: 'user', content: scoreContext });
+
     // Auto-trigger: load comparison data directly (no LLM needed)
     const analysisDiv = _chatAppend('assistant',
       '<div class="chat-thinking"><span></span><span></span><span></span></div> <span style="color:var(--muted);font-size:12px">Đang lấy so sánh…</span>');
