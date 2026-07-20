@@ -563,6 +563,74 @@ async def _run_agentic_loop(
     return tools_called, iteration, _final_stream()
 
 
+# ── Query Rewrite ─────────────────────────────────────────────────────────────
+
+async def _rewrite_query(message: str, history: list) -> str:
+    """
+    Rewrite a short/ambiguous follow-up question into a specific question
+    with full benchmark context resolved from conversation history.
+    
+    Only activates when:
+    - message is short (< 80 chars) — likely a vague follow-up
+    - history has a SCORE RESULT or COMPARISON block — context available
+    
+    Returns the original message if rewrite fails or is unnecessary.
+    """
+    if len(message.strip()) >= 80:
+        return message  # already specific enough
+
+    # Find the most recent score/comparison context block in history
+    context_block = next(
+        (m["content"] for m in reversed(history)
+         if m.get("role") == "assistant"
+         and any(tag in m.get("content", "") for tag in ["[SCORE RESULT", "[COMPARISON"])),
+        None
+    )
+    if not context_block:
+        return message  # no context to expand with
+
+    rewrite_prompt = f"""You are a context resolver for an OCR benchmark chat system.
+
+AVAILABLE CONTEXT:
+{context_block[:600]}
+
+SHORT QUESTION: "{message}"
+
+Rewrite the short question into ONE complete, specific question that:
+- Names the exact model, document, and page number when relevant
+- Uses the same language as the question (Vietnamese or English)
+- Is self-contained (no pronouns like "it", "that", "the above")
+- Stays concise (1 sentence max)
+
+Output ONLY the rewritten question, nothing else:"""
+
+    try:
+        headers = {
+            "Authorization": f"Bearer {_API_KEY}",
+            "Content-Type": "application/json",
+            **_API_HEADERS_EXTRA,
+        }
+        body = {
+            "model": MODEL,
+            "messages": [{"role": "user", "content": rewrite_prompt}],
+            "stream": False,
+            "temperature": 0,
+            "max_tokens": 120,
+        }
+        async with httpx.AsyncClient(timeout=10) as client:
+            resp = await client.post(_API_URL, headers=headers, json=body)
+            if resp.status_code == 200:
+                rewritten = resp.json()["choices"][0]["message"]["content"].strip()
+                # Sanity check: rewrite shouldn't be empty or way longer than needed
+                if rewritten and len(rewritten) < 300:
+                    logger.info("Query rewrite: %r -> %r", message, rewritten)
+                    return rewritten
+    except Exception as exc:
+        logger.warning("Query rewrite failed (using original): %s", exc)
+
+    return message
+
+
 # ── History helpers ───────────────────────────────────────────────────────────
 
 def _append_history(entry: dict) -> None:
@@ -599,13 +667,23 @@ async def chat_message(request: Request):
             yield 'event: error\ndata: {"message": "Empty message"}\n\n'
         return StreamingResponse(_empty(), media_type="text/event-stream")
 
-    # Build messages
+    # ── Query rewrite: expand short/ambiguous follow-ups using history context ──
+    effective_message = await _rewrite_query(user_message, history)
+    if effective_message != user_message:
+        # Emit rewrite info as SSE event so FE can optionally show it
+        pass  # transparent to user — agent sees the rewritten version
+
+    # Build messages — use last 8 turns (more context = better resolution)
     messages: list[dict] = [{"role": "system", "content": _build_system_prompt()}]
-    # Include last 6 turns of history
-    for turn in history[-6:]:
+    for turn in history[-8:]:
         if turn.get("role") in ("user", "assistant"):
             messages.append({"role": turn["role"], "content": turn.get("content", "")})
-    messages.append({"role": "user", "content": user_message})
+    # Push both original (for history continuity) and rewritten (for agent understanding)
+    if effective_message != user_message:
+        # Agent sees rewritten; history logs original
+        messages.append({"role": "user", "content": effective_message})
+    else:
+        messages.append({"role": "user", "content": user_message})
 
     async def _event_stream():
         full_response = ""

@@ -4159,16 +4159,20 @@ async function cuSubmit() {
     const pages = data.results?.text?.pages || [];
     const pageLines = pages.map(p =>
       `P${p.page_num}: CER=${p.cer!=null?(p.cer*100).toFixed(1)+'%':'—'} F1=${p.char_f1!=null?(p.char_f1*100).toFixed(1)+'%':'—'} TEDS=${p.table_teds_doc!=null?(p.table_teds_doc*100).toFixed(1)+'%':'—'}`
-    ).join(', ');
+    ).join(' | ');
 
-    const scoreContext = `Model "${modelName}" scored on "${docId}" (${data.uc_type}/${data.lang}): CER=${pct(sum.cer)}, Char F1=${pct(sum.char_f1)}, TEDS=${pct(sum.table_teds_doc)}, ${sum.n_matched_pages}/${sum.n_pages} pages. Per-page: ${pageLines}`;
+    // Find worst pages
+    const worstCer  = pages.length ? pages.reduce((a, b) => ((a.cer||0)  > (b.cer||0)  ? a : b)) : null;
+    const worstF1   = pages.length ? pages.reduce((a, b) => ((a.char_f1||1) < (b.char_f1||1) ? a : b)) : null;
 
-    // Add assistant context so agent knows which page is worst without needing to call tools
-    const worstPage = pages.reduce((a, b) => ((a.cer||0) > (b.cer||0) ? a : b), pages[0]);
-    const worstNote = worstPage
-      ? ` Worst page by CER: P${worstPage.page_num} (CER=${worstPage.cer!=null?(worstPage.cer*100).toFixed(1)+'%':'—'}).`
-      : '';
-    CHAT.history.push({ role: 'user', content: scoreContext + worstNote });
+    // Push as ASSISTANT role so LLM treats it as "already known information"
+    const scoreContextMsg = `[SCORE RESULT — ${modelName} on ${docId} (${data.uc_type}/${data.lang})]
+Overall: CER=${pct(sum.cer)}, Char F1=${pct(sum.char_f1)}, TEDS=${pct(sum.table_teds_doc)}, ${sum.n_matched_pages}/${sum.n_pages} pages matched.
+Per-page: ${pageLines}
+${worstCer  ? `Worst CER: P${worstCer.page_num} (${(worstCer.cer*100).toFixed(1)}%) — call get_page_evidence(doc_id="${docId}", page_num=${worstCer.page_num}, model="${modelName}") to explain.` : ''}
+${worstF1 && worstF1.page_num !== worstCer?.page_num ? `Worst F1: P${worstF1.page_num} (${(worstF1.char_f1*100).toFixed(1)}%)` : ''}`;
+
+    CHAT.history.push({ role: 'assistant', content: scoreContextMsg });
 
     // Auto-trigger: load comparison data directly (no LLM needed)
     const analysisDiv = _chatAppend('assistant',
@@ -4232,12 +4236,12 @@ async function cuSubmit() {
 
         analysisDiv.innerHTML = html;
 
-        // Add lightweight context to history for follow-up Q&A
+        // Add comparison to history as structured assistant context
         const ctxLines = sorted.map(n => {
           const m = models[n];
-          return `${n}: CER=${pct(m.cer)} Char F1=${pct(m.char_f1)} TEDS=${pct(m.teds)}`;
-        }).join('; ');
-        CHAT.history.push({role:'assistant', content:`Comparison on ${docId}: ${ctxLines}`});
+          return `  ${n}${n===modelName?' (just uploaded)':''}: CER=${pct(m.cer)} Char F1=${pct(m.char_f1)} TEDS=${pct(m.teds)} Cell F1=${pct(m.cell_f1)}`;
+        }).join('\n');
+        CHAT.history.push({role:'assistant', content:`[COMPARISON on ${docId}]\n${ctxLines}\nBest Char F1: ${sorted[0]} | Best TEDS: ${[...sorted].sort((a,b)=>(models[b].teds||0)-(models[a].teds||0))[0]}`});
       }
     } catch(e) {
       analysisDiv.innerHTML = `<span style="color:var(--muted);font-size:12px">Không thể tải so sánh.</span>`;
