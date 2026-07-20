@@ -401,6 +401,24 @@ body { font-family: -apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
 .chat-send:hover  { background:#6366f1; }
 .chat-send:disabled { opacity:.4; cursor:default; }
 
+/* Chat upload mini-form */
+.chat-upload-bar { padding:8px 12px; background:var(--bg); border-top:1px solid var(--border);
+                   display:flex; flex-direction:column; gap:6px; flex-shrink:0; }
+.chat-upload-bar-row { display:flex; gap:6px; align-items:center; flex-wrap:wrap; }
+.chat-upload-input { background:var(--surface); border:1px solid var(--border); color:var(--text);
+                     padding:5px 8px; border-radius:5px; font-size:12px; outline:none; flex:1; min-width:0; }
+.chat-upload-input:focus { border-color:var(--accent); }
+.chat-upload-select { background:var(--surface); border:1px solid var(--border); color:var(--text);
+                      padding:5px 8px; border-radius:5px; font-size:12px; outline:none; cursor:pointer; flex:1; min-width:0; }
+.chat-upload-filebtn { background:var(--border); border:none; color:var(--text); padding:5px 10px;
+                       border-radius:5px; font-size:12px; cursor:pointer; white-space:nowrap; }
+.chat-upload-filebtn:hover { background:var(--accent); color:#fff; }
+.chat-attach-btn { background:var(--border); border:none; color:var(--muted); width:32px; height:32px;
+                   border-radius:6px; cursor:pointer; font-size:15px; flex-shrink:0;
+                   display:flex; align-items:center; justify-content:center; transition:background .1s; }
+.chat-attach-btn:hover { background:var(--accent); color:#fff; }
+.chat-attach-btn.active { background:var(--accent); color:#fff; }
+
 /* ── Leaderboard overlay ── */
 .lb-overlay { position:fixed; inset:0; background:rgba(0,0,0,.65); z-index:910;
               display:flex; align-items:flex-start; justify-content:center;
@@ -3976,12 +3994,35 @@ function _renderLeaderboard(ranked, progress) {
       </div>
     </div>
     <div class="chat-input-row">
+      <button class="chat-attach-btn" id="chat-attach-btn"
+              onclick="chatToggleUpload()" title="Upload & Score trong chat">📎</button>
       <textarea class="chat-input" id="chat-input" rows="1"
                 placeholder="Hỏi về benchmark…"
                 oninput="this.style.height='auto';this.style.height=Math.min(this.scrollHeight,100)+'px'"
                 onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();chatSend()}"
       ></textarea>
       <button class="chat-send" id="chat-send-btn" onclick="chatSend()" title="Send">↑</button>
+    </div>
+    <!-- Upload mini-form (hidden by default) -->
+    <div class="chat-upload-bar" id="chat-upload-bar" style="display:none">
+      <div style="font-size:11px;color:var(--accent);font-weight:700">⬆ Upload & Score</div>
+      <div class="chat-upload-bar-row">
+        <input class="chat-upload-input" id="cu-model" type="text" maxlength="100"
+               placeholder="Model name…" list="cu-model-list" autocomplete="off">
+        <datalist id="cu-model-list"></datalist>
+        <select class="chat-upload-select" id="cu-doc"></select>
+      </div>
+      <div class="chat-upload-bar-row">
+        <button class="chat-upload-filebtn" onclick="document.getElementById('cu-files').click()">
+          📁 <span id="cu-file-label">Chọn folder .md</span>
+        </button>
+        <input id="cu-files" type="file" webkitdirectory multiple style="display:none"
+               onchange="cuOnFiles(this)">
+        <button class="chat-send" id="cu-score-btn" onclick="cuSubmit()"
+                style="width:auto;padding:0 12px;border-radius:5px;font-size:12px;font-weight:600">
+          ⚡ Score
+        </button>
+      </div>
     </div>
   </div>
 </div>
@@ -3996,6 +4037,125 @@ const CHAT = {
   queuedMsg:  null,
   userScrolledUp: false,
 };
+
+// ── Chat Upload Mini-form ─────────────────────────────────────────────────────
+const CU = { files: null, uploadOpen: false };
+
+function chatToggleUpload() {
+  CU.uploadOpen = !CU.uploadOpen;
+  document.getElementById('chat-upload-bar').style.display = CU.uploadOpen ? 'block' : 'none';
+  document.getElementById('chat-attach-btn').classList.toggle('active', CU.uploadOpen);
+  if (CU.uploadOpen && !document.getElementById('cu-doc').options.length) {
+    cuLoadDocs();
+    cuLoadModels();
+  }
+}
+
+async function cuLoadDocs() {
+  const sel = document.getElementById('cu-doc');
+  try {
+    const docs = await fetch('/api/upload/gt_docs').then(r => r.json());
+    sel.innerHTML = '';
+    const groups = {};
+    for (const d of docs) {
+      const k = `${d.uc_type} / ${d.lang}`;
+      if (!groups[k]) groups[k] = [];
+      groups[k].push(d);
+    }
+    for (const [g, items] of Object.entries(groups)) {
+      const og = document.createElement('optgroup');
+      og.label = g;
+      for (const d of items) {
+        const o = document.createElement('option');
+        o.value = d.doc_id; o.textContent = d.doc_id;
+        og.appendChild(o);
+      }
+      sel.appendChild(og);
+    }
+  } catch(e) { sel.innerHTML = '<option value="">Failed to load</option>'; }
+}
+
+async function cuLoadModels() {
+  try {
+    const models = await fetch('/api/upload/known_models').then(r => r.json());
+    const dl = document.getElementById('cu-model-list');
+    dl.innerHTML = '';
+    const all = [...new Set(['marker','mistral',...models])].sort();
+    for (const m of all) {
+      const o = document.createElement('option'); o.value = m; dl.appendChild(o);
+    }
+  } catch(e) {}
+}
+
+function cuOnFiles(input) {
+  CU.files = input.files;
+  const md = Array.from(CU.files).filter(f => f.name.endsWith('.md'));
+  document.getElementById('cu-file-label').textContent =
+    `${CU.files.length} file(s), ${md.length} .md`;
+}
+
+async function cuSubmit() {
+  const modelName = document.getElementById('cu-model').value.trim();
+  const docId     = document.getElementById('cu-doc').value;
+  if (!modelName) { _chatAppend('error','⚠️ Nhập tên model trước.'); return; }
+  if (!docId)     { _chatAppend('error','⚠️ Chọn document trước.'); return; }
+  if (!CU.files || !CU.files.length) { _chatAppend('error','⚠️ Chọn folder .md trước.'); return; }
+
+  // Close upload bar
+  CU.uploadOpen = false;
+  document.getElementById('chat-upload-bar').style.display = 'none';
+  document.getElementById('chat-attach-btn').classList.remove('active');
+
+  const mdCount = Array.from(CU.files).filter(f => f.name.endsWith('.md')).length;
+  _chatAppend('user', `⬆ Upload <strong>${esc(modelName)}</strong> → <strong>${esc(docId)}</strong> (${mdCount} .md files)`);
+
+  const scoringDiv = _chatAppend('assistant',
+    '<div class="chat-thinking"><span></span><span></span><span></span></div> Đang score…');
+
+  const fd = new FormData();
+  fd.append('model_name', modelName);
+  fd.append('doc_id', docId);
+  for (const f of Array.from(CU.files)) fd.append('files', f);
+
+  try {
+    const resp = await fetch('/api/upload/score', { method:'POST', body: fd });
+    const data = await resp.json();
+
+    if (!resp.ok) {
+      scoringDiv.remove();
+      _chatAppend('error', `⚠️ ${esc(data.detail || 'Score failed')}`);
+      return;
+    }
+
+    const sum = data.results?.text?.summary || {};
+    const pct = v => v == null ? '—' : (v*100).toFixed(1)+'%';
+
+    scoringDiv.innerHTML = `
+      ✅ <strong>${esc(data.model)}</strong> → <strong>${esc(data.doc_id)}</strong>
+      <span style="color:var(--muted);font-size:11px">(${esc(data.uc_type)}/${esc(data.lang)})</span>
+      <span style="color:var(--green);font-size:11px">💾 Saved</span><br>
+      <span style="font-size:12px">
+        CER <span style="${sum.cer>=0.15?'color:var(--red)':sum.cer>=0.05?'color:var(--orange)':'color:var(--green)'}">${pct(sum.cer)}</span>
+        &nbsp; Char F1 <span style="${sum.char_f1>0.9?'color:var(--green)':sum.char_f1>0.7?'color:var(--orange)':'color:var(--red)'}">${pct(sum.char_f1)}</span>
+        &nbsp; TEDS <span style="${sum.table_teds_doc!=null?(sum.table_teds_doc>0.8?'color:var(--green)':'color:var(--orange)'):'color:var(--muted)'}">${pct(sum.table_teds_doc)}</span>
+        &nbsp; Pages ${sum.n_matched_pages}/${sum.n_pages}
+      </span><br>
+      <span style="font-size:11px;color:var(--muted)">Bây giờ bạn có thể hỏi: "Tại sao page X bị điểm thấp?"</span>`;
+
+    // Add to history so follow-up questions have context
+    CHAT.history.push({
+      role: 'user',
+      content: `User vừa upload model "${modelName}" cho doc "${docId}". CER=${pct(sum.cer)}, Char F1=${pct(sum.char_f1)}.`,
+    });
+
+    // Refresh model list
+    cuLoadModels();
+
+  } catch(e) {
+    scoringDiv.remove();
+    _chatAppend('error', `⚠️ ${esc(e.message || 'Network error')}`);
+  }
+}
 
 function chatToggle() {
   CHAT.open = !CHAT.open;
