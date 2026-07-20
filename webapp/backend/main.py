@@ -22,6 +22,15 @@ import sys
 from pathlib import Path
 sys.path.insert(0, str(Path(__file__).resolve().parents[2]))
 
+# Load .env before importing any module that reads env vars
+_ENV_FILE = Path(__file__).resolve().parents[2] / ".env"
+if _ENV_FILE.exists():
+    for _line in _ENV_FILE.read_text().splitlines():
+        _line = _line.strip()
+        if _line and not _line.startswith("#") and "=" in _line:
+            _k, _, _v = _line.partition("=")
+            os.environ.setdefault(_k.strip(), _v.strip())
+
 from ocr_benchmark.eval.scan import eval_scan
 from ocr_benchmark.eval.table import eval_table
 from ocr_benchmark.eval.text_layer import eval_text_layer
@@ -55,6 +64,7 @@ def compute_nwer(gt_text: str, pred_text: str, doc_id: str = "", page_num: int =
 from .gt_review import router as gt_router
 from .ocr_runner import router as ocr_router
 from .upload_scorer import router as upload_router
+from .chat_agent import router as chat_router, OPEN_ROUTER_KEY
 
 app = FastAPI(title="OCR Benchmark API", version="0.1.0")
 
@@ -69,6 +79,16 @@ app.add_middleware(
 app.include_router(gt_router)
 app.include_router(ocr_router)
 app.include_router(upload_router)
+
+# Chat agent — only if OPEN_ROUTER key is set
+if OPEN_ROUTER_KEY:
+    app.include_router(chat_router)
+else:
+    import logging as _logging
+    _logging.getLogger(__name__).warning(
+        "Chat Agent disabled: OPEN_ROUTER env var not set. "
+        "Add OPEN_ROUTER=sk-or-v1-... to .env to enable."
+    )
 
 # Serve frontend static files
 FRONTEND_DIR = Path(__file__).parent.parent / "frontend"

@@ -135,6 +135,189 @@ def _safe_mean(vals: list) -> Optional[float]:
     return round(sum(valid) / len(valid), 6) if valid else None
 
 
+# ── Evidence Collection ────────────────────────────────────────────────────────
+
+import difflib as _difflib
+import logging as _logging
+
+_logger = _logging.getLogger(__name__)
+
+_VALID_METRICS = {
+    "cer", "wer", "char_f1", "word_f1",
+    "normalized_edit_similarity", "table_teds_doc", "table_cell_exact_f1_mean",
+}
+
+
+def collect_evidence(gt_page: dict, pred_page: dict, metrics: dict) -> dict:
+    """
+    Extract per-page evidence from GT and prediction content.
+    Stored as pages[i]._evidence in eval JSON for later agent retrieval.
+
+    Returns dict with:
+      gt_text         : str (≤400 Unicode chars, normalized)
+      pred_text       : str (≤400 Unicode chars, normalized)
+      inserted_chunks : list[str] — top-4 word sequences pred added
+      deleted_chunks  : list[str] — top-4 word sequences pred removed
+      structural_flags: {has_table: bool, figure_mentions: bool}
+      candidate_signals: list[str] — up to 5 diagnostic strings
+    """
+    # ── Normalize texts ────────────────────────────────────────────────────
+    gt_raw   = gt_page.get("full_text", "") or ""
+    pred_raw = pred_page.get("full_text", "") or ""
+
+    if _NORMALIZE_AVAILABLE:
+        gt_norm   = normalize_ocr_text(gt_raw)
+        pred_norm = normalize_ocr_text(pred_raw)
+    else:
+        gt_norm   = gt_raw
+        pred_norm = pred_raw
+
+    gt_text   = gt_norm[:400]
+    pred_text = pred_norm[:400]
+
+    # ── Word-level diff ────────────────────────────────────────────────────
+    gt_words   = gt_norm.split()
+    pred_words = pred_norm.split()
+    sm = _difflib.SequenceMatcher(None, gt_words, pred_words, autojunk=False)
+
+    inserted_all: list[str] = []
+    deleted_all:  list[str] = []
+
+    for tag, i1, i2, j1, j2 in sm.get_opcodes():
+        if tag in ("insert", "replace") and j2 > j1:
+            inserted_all.append(" ".join(pred_words[j1:j2]))
+        if tag in ("delete", "replace") and i2 > i1:
+            deleted_all.append(" ".join(gt_words[i1:i2]))
+
+    # Top-4 by length (most informative chunks first)
+    inserted_chunks = sorted(inserted_all, key=len, reverse=True)[:4]
+    deleted_chunks  = sorted(deleted_all,  key=len, reverse=True)[:4]
+
+    ins_words = sum(len(c.split()) for c in inserted_all)
+    del_words = sum(len(c.split()) for c in deleted_all)
+    gt_len    = max(len(gt_norm), 1)
+    pred_len  = max(len(pred_norm), 1)
+    size_ratio = pred_len / gt_len
+
+    # ── Structural flags ────────────────────────────────────────────────────
+    # Use raw pred markdown if available, else fall back to pred_text
+    pred_md_raw = pred_page.get("_raw_content", pred_norm)
+    has_table      = bool(re.search(r'<table\b', pred_md_raw, re.IGNORECASE))
+    figure_mentions = bool(re.search(r'(?i)\bfigure\b', pred_md_raw))
+
+    # ── Candidate signals ───────────────────────────────────────────────────
+    signals: list[str] = []
+
+    if size_ratio > 1.3 and ins_words > del_words * 1.5:
+        signals.append(
+            f"Pred thêm ~{ins_words} từ so GT ({size_ratio:.1f}x) — "
+            f"có thể GT thiếu nội dung hoặc model đọc thừa"
+        )
+    if size_ratio < 0.65 and del_words > ins_words * 1.5:
+        signals.append(
+            f"Pred thiếu ~{del_words} từ của GT — "
+            "model bỏ sót nội dung, có thể do layout phức tạp"
+        )
+
+    gt_table_count = len(gt_page.get("tables") or [])
+    pred_table_count = len(pred_page.get("tables") or [])
+    if gt_table_count > 0 and not has_table and pred_table_count == 0:
+        signals.append(
+            f"GT có {gt_table_count} bảng nhưng pred không có cấu trúc bảng — "
+            "model flatten bảng thành text"
+        )
+    if figure_mentions and ins_words > 10:
+        signals.append("Pred chứa nội dung hình minh họa (FIGURE) có thể không nằm trong GT")
+
+    cer  = metrics.get("cer", 0) or 0
+    cf1  = metrics.get("char_f1", 0) or 0
+    if cf1 > 0.80 and cer > 0.25 and 0.85 < size_ratio < 1.2:
+        signals.append(
+            f"Char F1 cao ({cf1:.0%}) nhưng CER cao ({cer:.0%}) — "
+            "nội dung giống nhưng thứ tự đọc có thể khác (reading order)"
+        )
+
+    signals = signals[:5]  # cap at 5
+
+    return {
+        "gt_text":         gt_text,
+        "pred_text":       pred_text,
+        "inserted_chunks": inserted_chunks,
+        "deleted_chunks":  deleted_chunks,
+        "structural_flags": {
+            "has_table":       has_table,
+            "figure_mentions": figure_mentions,
+        },
+        "candidate_signals": signals,
+        # Raw counts for agent tools
+        "_meta": {
+            "gt_text_len":    len(gt_norm),
+            "pred_text_len":  len(pred_norm),
+            "size_ratio":     round(size_ratio, 3),
+            "ins_word_count": ins_words,
+            "del_word_count": del_words,
+            "gt_table_count": gt_table_count,
+            "pred_table_count": pred_table_count,
+        },
+    }
+
+
+def get_page_evidence(doc_id: str, page_num: int, model: Optional[str] = None) -> dict:
+    """
+    Load _evidence from saved eval file for a specific page.
+    Used by chat agent tools.
+    """
+    uc_type, lang = _parse_doc_id(doc_id)
+
+    # Resolve model if not provided
+    if not model:
+        candidates = list(RESULT_ROOT.glob(f"*/{uc_type}/{lang}/{doc_id}_eval.json"))
+        if not candidates:
+            return {"error": "document_not_found",
+                    "details": f"No eval found for doc '{doc_id}' in any model directory"}
+        model = candidates[0].relative_to(RESULT_ROOT).parts[0]
+
+    eval_path = _result_path(model, uc_type, lang, doc_id)
+    if not eval_path.exists():
+        all_docs = [p.stem.replace("_eval", "")
+                    for p in (RESULT_ROOT / model).rglob("*_eval.json")] if (RESULT_ROOT / model).exists() else []
+        return {"error": "document_not_found",
+                "details": f"No eval for model='{model}' doc='{doc_id}'",
+                "available_docs": all_docs[:20]}
+
+    try:
+        data = json.loads(eval_path.read_text(encoding="utf-8"))
+    except Exception:
+        return {"error": "read_error", "details": "Failed to read eval file"}
+
+    pages = (data.get("text") or {}).get("pages") or []
+    page_nums = [p.get("page_num") for p in pages]
+
+    if page_num not in page_nums:
+        return {"error": "page_out_of_range",
+                "details": f"page_num={page_num} not found",
+                "valid_range": [min(page_nums), max(page_nums)] if page_nums else []}
+
+    page = next(p for p in pages if p.get("page_num") == page_num)
+    evidence = page.get("_evidence")
+
+    if not evidence:
+        return {"error": "evidence_unavailable",
+                "details": "This page was scored before evidence collection was added.",
+                "suggestion": "Re-score this document to collect evidence.",
+                "metrics": {k: v for k, v in page.items()
+                            if k != "_evidence" and isinstance(v, (int, float))}}
+
+    return {
+        "doc_id":    doc_id,
+        "page_num":  page_num,
+        "model":     model,
+        "evidence":  evidence,
+        "metrics":   {k: v for k, v in page.items()
+                      if k not in ("_evidence", "_meta") and isinstance(v, (int, float))},
+    }
+
+
 # ── Endpoints ─────────────────────────────────────────────────────────────────
 
 @router.get("/gt_docs", response_model=list[GTDocEntry])
@@ -395,6 +578,16 @@ async def score_upload(
         except Exception as exc:
             metrics = {"error": str(exc)[:200]}
         metrics["page_num"] = pnum
+
+        # Collect evidence for chat agent retrieval
+        try:
+            # Pass raw_content for structural flag detection
+            pred_page_with_raw = {**pred_page, "_raw_content": (pred_entry or {}).get("raw_content", "")}
+            metrics["_evidence"] = collect_evidence(gt_page, pred_page_with_raw, metrics)
+        except Exception as exc:
+            _logger.error("collect_evidence failed for page %d: %s", pnum, exc)
+        # (no _evidence key if exception — page still saved)
+
         page_results.append(metrics)
 
     summary: dict = {"n_pages": len(gt_pages_raw), "n_matched_pages": n_matched}

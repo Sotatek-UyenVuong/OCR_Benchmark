@@ -341,6 +341,66 @@ body { font-family: -apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
 .us-spinner { width:14px; height:14px; border:2px solid var(--border); border-top-color:var(--accent); border-radius:50%; animation:spin .7s linear infinite; }
 @keyframes spin { to { transform:rotate(360deg); } }
 
+/* ── Chat Panel ── */
+#chat-fab { position:fixed; bottom:24px; right:24px; z-index:940;
+            width:52px; height:52px; border-radius:50%; background:var(--accent);
+            border:none; color:#fff; font-size:22px; cursor:pointer;
+            box-shadow:0 4px 20px rgba(0,0,0,.45); transition:transform .15s,background .15s; }
+#chat-fab:hover { background:#6366f1; transform:scale(1.08); }
+.chat-overlay { position:fixed; inset:0; background:rgba(0,0,0,.55); z-index:950;
+                display:flex; align-items:flex-end; justify-content:flex-end;
+                padding:24px; pointer-events:none; }
+.chat-box { background:var(--surface); border:1px solid var(--border); border-radius:12px;
+            width:min(440px,calc(100vw - 32px)); height:min(620px,calc(100vh - 48px));
+            display:flex; flex-direction:column; box-shadow:0 8px 40px rgba(0,0,0,.5);
+            pointer-events:all; }
+.chat-header { padding:11px 16px; background:var(--surface2); border-bottom:1px solid var(--border);
+               border-radius:12px 12px 0 0; display:flex; align-items:center; gap:8px; flex-shrink:0; }
+.chat-header-title { flex:1; font-size:13px; font-weight:700; color:var(--text); }
+.chat-header-status { font-size:11px; color:var(--green); }
+.chat-messages { flex:1; overflow-y:auto; padding:12px; display:flex;
+                 flex-direction:column; gap:10px; scroll-behavior:smooth; }
+.chat-msg { max-width:92%; padding:9px 13px; border-radius:10px; font-size:13px; line-height:1.65;
+            word-break:break-word; }
+.chat-msg.user      { background:#1e2a4a; color:var(--accent); align-self:flex-end;
+                       border-radius:10px 10px 3px 10px; }
+.chat-msg.assistant { background:var(--surface2); color:var(--text); align-self:flex-start;
+                       border-radius:10px 10px 10px 3px; }
+.chat-msg.error     { background:#2a1010; color:var(--red); align-self:flex-start;
+                       border:1px solid #7f1d1d; }
+.chat-msg.tool-call { background:var(--bg); color:var(--muted); font-size:11px;
+                       font-style:italic; align-self:flex-start; padding:5px 10px;
+                       border-left:2px solid var(--accent); }
+/* Markdown inside assistant messages */
+.chat-msg.assistant strong { color:var(--cyan); }
+.chat-msg.assistant code   { background:var(--bg); padding:1px 5px; border-radius:3px;
+                              font-size:11px; color:var(--cyan); }
+.chat-msg.assistant pre    { background:var(--bg); padding:8px 10px; border-radius:6px;
+                              font-size:11px; overflow-x:auto; margin:6px 0; }
+.chat-msg.assistant ul, .chat-msg.assistant ol { margin-left:16px; margin-top:4px; }
+.chat-msg.assistant table { border-collapse:collapse; width:100%; font-size:12px; margin:4px 0; }
+.chat-msg.assistant td, .chat-msg.assistant th { border:1px solid var(--border);
+                                                   padding:3px 7px; }
+.chat-msg.assistant th { background:var(--surface); color:var(--accent); }
+.chat-thinking { display:inline-flex; gap:3px; align-items:center; }
+.chat-thinking span { width:5px; height:5px; border-radius:50%; background:var(--muted);
+                      animation:chat-bounce .9s infinite; }
+.chat-thinking span:nth-child(2) { animation-delay:.2s; }
+.chat-thinking span:nth-child(3) { animation-delay:.4s; }
+@keyframes chat-bounce { 0%,80%,100% { transform:scale(.6);opacity:.4; } 40% { transform:scale(1);opacity:1; } }
+.chat-input-row { padding:10px 12px; border-top:1px solid var(--border); display:flex;
+                  gap:8px; align-items:flex-end; flex-shrink:0; }
+.chat-input { flex:1; background:var(--bg); border:1px solid var(--border); color:var(--text);
+              padding:8px 10px; border-radius:7px; font-size:13px; outline:none;
+              resize:none; max-height:100px; min-height:36px; line-height:1.5;
+              font-family:inherit; overflow-y:auto; }
+.chat-input:focus { border-color:var(--accent); }
+.chat-send { background:var(--accent); border:none; color:#fff; width:34px; height:34px;
+             border-radius:7px; cursor:pointer; font-size:16px; flex-shrink:0;
+             display:flex; align-items:center; justify-content:center; }
+.chat-send:hover  { background:#6366f1; }
+.chat-send:disabled { opacity:.4; cursor:default; }
+
 /* ── Leaderboard overlay ── */
 .lb-overlay { position:fixed; inset:0; background:rgba(0,0,0,.65); z-index:910;
               display:flex; align-items:flex-start; justify-content:center;
@@ -3891,3 +3951,198 @@ function _renderLeaderboard(ranked, progress) {
 </script>
 </body>
 </html>
+
+<!-- ══════════════════════════════════════════════════════════
+     Chat Agent — Floating Panel
+══════════════════════════════════════════════════════════ -->
+<button id="chat-fab" onclick="chatToggle()" title="Chat with Benchmark Agent" aria-label="Chat with Benchmark Agent">💬</button>
+
+<div id="chat-overlay" class="chat-overlay" style="display:none"
+     onclick="if(event.target===this)chatToggle()">
+  <div class="chat-box" id="chat-box">
+    <div class="chat-header">
+      <span style="font-size:16px">🤖</span>
+      <span class="chat-header-title">OCR Benchmark Analyst</span>
+      <span class="chat-header-status" id="chat-status">● Gemini 2.5 Flash</span>
+      <button class="btn btn-ghost" style="padding:2px 8px;font-size:11px" onclick="chatToggle()">✕</button>
+    </div>
+    <div class="chat-messages" id="chat-messages">
+      <div class="chat-msg assistant">
+        Xin chào! Tôi có thể giúp bạn phân tích kết quả benchmark OCR.<br><br>
+        Ví dụ bạn có thể hỏi:<br>
+        &bull; <em>"Tại sao scan_en_001 page 5 bị CER 78%?"</em><br>
+        &bull; <em>"So sánh marker và mistral"</em><br>
+        &bull; <em>"Model nào tốt nhất trên table tiếng Việt?"</em>
+      </div>
+    </div>
+    <div class="chat-input-row">
+      <textarea class="chat-input" id="chat-input" rows="1"
+                placeholder="Hỏi về benchmark…"
+                oninput="this.style.height='auto';this.style.height=Math.min(this.scrollHeight,100)+'px'"
+                onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();chatSend()}"
+      ></textarea>
+      <button class="chat-send" id="chat-send-btn" onclick="chatSend()" title="Send">↑</button>
+    </div>
+  </div>
+</div>
+
+<script>
+// ── Chat Agent ───────────────────────────────────────────────────────────────
+const CHAT = {
+  open:       false,
+  streaming:  false,
+  history:    [],
+  sessionId:  (typeof crypto !== 'undefined' && crypto.randomUUID) ? crypto.randomUUID() : Date.now().toString(36),
+  queuedMsg:  null,
+  userScrolledUp: false,
+};
+
+function chatToggle() {
+  CHAT.open = !CHAT.open;
+  document.getElementById('chat-overlay').style.display = CHAT.open ? 'flex' : 'none';
+}
+
+document.addEventListener('keydown', e => {
+  if (e.key === 'Escape' && CHAT.open) chatToggle();
+});
+
+// Detect manual scroll-up in chat
+const _chatMsgEl = document.getElementById('chat-messages');
+if (_chatMsgEl) {
+  _chatMsgEl.addEventListener('scroll', function() {
+    CHAT.userScrolledUp = this.scrollTop < this.scrollHeight - this.clientHeight - 40;
+  }, {passive: true});
+}
+
+function _chatMaybeScroll() {
+  if (CHAT.userScrolledUp) return;
+  const el = document.getElementById('chat-messages');
+  if (el) el.scrollTop = el.scrollHeight;
+}
+
+function _chatAppend(role, html) {
+  const el = document.getElementById('chat-messages');
+  const div = document.createElement('div');
+  div.className = `chat-msg ${role}`;
+  div.innerHTML = html;
+  el.appendChild(div);
+  _chatMaybeScroll();
+  return div;
+}
+
+// Minimal Markdown renderer
+function _renderMd(text) {
+  let h = esc(text);
+  // fenced code
+  h = h.replace(/```[\w-]*\n?([\s\S]*?)```/g, (_, c) =>
+    `<pre><code>${c.replace(/&amp;/g,'&').replace(/&lt;/g,'<').replace(/&gt;/g,'>')}</code></pre>`);
+  h = h.replace(/`([^`\n]+)`/g, '<code>$1</code>');
+  h = h.replace(/\*\*([^*\n]+)\*\*/g, '<strong>$1</strong>');
+  h = h.replace(/\*([^*\n]+)\*/g, '<em>$1</em>');
+  h = h.replace(/(?:^|\n)[ \t]*[-*] (.+)/g, (_, t) => `\n<li>${t}</li>`);
+  h = h.replace(/(<li>[\s\S]*?<\/li>)/g, '<ul>$1</ul>');
+  h = h.replace(/\n\n+/g,'</p><p>').replace(/\n/g,'<br>');
+  return `<p>${h}</p>`.replace(/<p>\s*<\/p>/g,'');
+}
+
+async function chatSend() {
+  const input = document.getElementById('chat-input');
+  const msg = input.value.trim();
+  if (!msg) return;
+
+  if (CHAT.streaming) { CHAT.queuedMsg = msg; input.value = ''; return; }
+
+  input.value = '';
+  input.style.height = 'auto';
+  CHAT.userScrolledUp = false;
+
+  _chatAppend('user', esc(msg));
+  CHAT.history.push({role: 'user', content: msg});
+
+  CHAT.streaming = true;
+  document.getElementById('chat-send-btn').disabled = true;
+  document.getElementById('chat-status').textContent = '● Thinking…';
+
+  const thinkBubble = _chatAppend('assistant',
+    '<div class="chat-thinking"><span></span><span></span><span></span></div>');
+
+  try {
+    const resp = await fetch('/api/chat/message', {
+      method: 'POST',
+      headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify({
+        session_id: CHAT.sessionId,
+        message: msg,
+        history: CHAT.history.slice(-6),
+      }),
+    });
+
+    if (!resp.ok || !resp.body) throw new Error(`HTTP ${resp.status}`);
+
+    const reader  = resp.body.getReader();
+    const decoder = new TextDecoder();
+    let buffer = '', fullText = '', firstText = true, answerDiv = null;
+
+    const _processLine = (line, currentEvent) => {
+      if (!line.startsWith('data: ')) return currentEvent;
+      const raw = line.slice(6).trim();
+      if (!raw || raw === '{}') return currentEvent;
+
+      if (currentEvent === 'tool_call') {
+        try {
+          const tc = JSON.parse(raw);
+          if (firstText) { thinkBubble.remove(); firstText = false; }
+          _chatAppend('tool-call', `🔍 Calling <strong>${esc(tc.name)}</strong>…`);
+        } catch(e) {}
+      } else if (currentEvent === 'error') {
+        try {
+          const err = JSON.parse(raw);
+          if (firstText) { thinkBubble.remove(); firstText = false; }
+          _chatAppend('error', `⚠️ ${esc(err.message || 'Unknown error')}`);
+        } catch(e) {}
+      } else if (currentEvent !== 'done') {
+        try {
+          const payload = JSON.parse(raw);
+          const chunk = payload.text || '';
+          if (chunk) {
+            if (firstText) { thinkBubble.remove(); firstText = false;
+              answerDiv = _chatAppend('assistant', ''); }
+            fullText += chunk;
+            if (answerDiv) { answerDiv.innerHTML = _renderMd(fullText); _chatMaybeScroll(); }
+          }
+        } catch(e) {}
+      }
+      return '';
+    };
+
+    outer: while (true) {
+      const {done, value} = await reader.read();
+      if (done) break;
+      buffer += decoder.decode(value, {stream: true});
+      const lines = buffer.split('\n');
+      buffer = lines.pop() || '';
+      let currentEvent = '';
+      for (const line of lines) {
+        if (line.startsWith('event: ')) { currentEvent = line.slice(7).trim(); }
+        else { currentEvent = _processLine(line, currentEvent); }
+        if (currentEvent === 'done') break outer;
+      }
+    }
+
+    CHAT.history.push({role: 'assistant', content: fullText});
+
+  } catch(e) {
+    if (thinkBubble.parentNode) thinkBubble.remove();
+    _chatAppend('error', `⚠️ ${esc(e.message || 'Connection error. Please retry.')}`);
+  } finally {
+    CHAT.streaming = false;
+    document.getElementById('chat-send-btn').disabled = false;
+    document.getElementById('chat-status').textContent = '● Gemini 2.5 Flash';
+    if (CHAT.queuedMsg) {
+      const q = CHAT.queuedMsg; CHAT.queuedMsg = null;
+      document.getElementById('chat-input').value = q;
+      chatSend();
+    }
+  }
+}
+</script>
