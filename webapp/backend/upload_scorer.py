@@ -355,10 +355,19 @@ def get_doc_result(doc_id: str, model: str):
 
 
 def _collect_model_stats() -> dict:
-    """Scan benchmark_results/ and aggregate per-model statistics."""
+    """Scan benchmark_results/ and aggregate per-model statistics.
+
+    Returns dict keyed by model name with:
+      - overall averages: avg_char_f1, avg_cer, avg_teds, avg_cell_f1
+      - by_uc: {uc_type: {lang: {char_f1, cer, teds, cell_f1, docs}}}
+        for granular queries like "best model for scan/vi"
+    """
     def _avg(lst):
         v = [x for x in lst if x is not None]
         return round(_mean(v), 4) if v else None
+
+    def _uc_lang_bucket():
+        return {"char_f1": [], "cer": [], "teds": [], "cell_f1": [], "docs": 0}
 
     model_stats: dict[str, dict] = {}
     if not RESULT_ROOT.exists():
@@ -369,18 +378,22 @@ def _collect_model_stats() -> dict:
         if len(parts) < 4:
             continue
         model_name = parts[0]
+        uc_type    = parts[1]   # scan | table | text_layer
+        lang       = parts[2]   # en | vi | ja
         doc_id_stem = eval_file.stem.replace("_eval", "")
         try:
             data = json.loads(eval_file.read_text(encoding="utf-8"))
         except Exception:
             continue
 
+        # ── Overall model entry ──────────────────────────────────────────
         if model_name not in model_stats:
             model_stats[model_name] = {
                 "model": model_name, "docs": 0,
                 "char_f1": [], "cer": [], "teds": [], "cell_f1": [],
                 "source": data.get("source", "pipeline"),
                 "evaluated_docs": [],
+                "by_uc": {},    # uc_type -> lang -> bucket
             }
         s = model_stats[model_name]
         s["docs"] += 1
@@ -388,42 +401,69 @@ def _collect_model_stats() -> dict:
         if data.get("source") == "upload":
             s["source"] = "upload"
 
+        # ── by_uc bucket ─────────────────────────────────────────────────
+        by_uc = s["by_uc"]
+        if uc_type not in by_uc:
+            by_uc[uc_type] = {}
+        if lang not in by_uc[uc_type]:
+            by_uc[uc_type][lang] = _uc_lang_bucket()
+        bucket = by_uc[uc_type][lang]
+        bucket["docs"] += 1
+
+        # ── Collect metrics ───────────────────────────────────────────────
         txt = (data.get("text") or {}).get("summary") or {}
-        if txt.get("avg_char_f1") is not None:
-            s["char_f1"].append(txt["avg_char_f1"])
-        if txt.get("avg_cer") is not None:
-            s["cer"].append(txt["avg_cer"])
         tbl = (data.get("table") or {}).get("summary") or {}
+        pages = (data.get("text") or {}).get("pages") or []
+
+        # char_f1 / cer
+        cf1 = txt.get("avg_char_f1")
+        cer = txt.get("avg_cer")
+        if cf1 is not None:
+            s["char_f1"].append(cf1);  bucket["char_f1"].append(cf1)
+        if cer is not None:
+            s["cer"].append(cer);      bucket["cer"].append(cer)
+
+        # teds
+        teds_val = None
         if tbl.get("avg_teds") is not None:
-            s["teds"].append(tbl["avg_teds"])
+            teds_val = tbl["avg_teds"]
         elif txt.get("table_teds_doc") is not None:
-            # upload results: TEDS stored directly in text.summary
-            s["teds"].append(txt["table_teds_doc"])
+            teds_val = txt["table_teds_doc"]
         else:
-            # upload results: compute average from pages
-            pages = (data.get("text") or {}).get("pages") or []
             page_teds = [p["table_teds_doc"] for p in pages
                          if isinstance(p.get("table_teds_doc"), (int, float))]
             if page_teds:
-                s["teds"].append(sum(page_teds) / len(page_teds))
+                teds_val = sum(page_teds) / len(page_teds)
+        if teds_val is not None:
+            s["teds"].append(teds_val);  bucket["teds"].append(teds_val)
 
+        # cell_f1
+        cell_val = None
         if tbl.get("avg_cell_exact_f1") is not None:
-            s["cell_f1"].append(tbl["avg_cell_exact_f1"])
+            cell_val = tbl["avg_cell_exact_f1"]
         elif txt.get("table_cell_exact_f1_mean") is not None:
-            s["cell_f1"].append(txt["table_cell_exact_f1_mean"])
+            cell_val = txt["table_cell_exact_f1_mean"]
         else:
-            pages = (data.get("text") or {}).get("pages") or []
             page_cell = [p["table_cell_exact_f1_mean"] for p in pages
                          if isinstance(p.get("table_cell_exact_f1_mean"), (int, float))]
             if page_cell:
-                s["cell_f1"].append(sum(page_cell) / len(page_cell))
+                cell_val = sum(page_cell) / len(page_cell)
+        if cell_val is not None:
+            s["cell_f1"].append(cell_val);  bucket["cell_f1"].append(cell_val)
 
-    # compute averages in-place
+    # ── Compute averages ─────────────────────────────────────────────────────
     for s in model_stats.values():
         s["avg_char_f1"] = _avg(s["char_f1"])
         s["avg_cer"]     = _avg(s["cer"])
         s["avg_teds"]    = _avg(s["teds"])
         s["avg_cell_f1"] = _avg(s["cell_f1"])
+        # Compute by_uc averages
+        for uc, langs in s["by_uc"].items():
+            for lang, b in langs.items():
+                b["avg_char_f1"] = _avg(b["char_f1"])
+                b["avg_cer"]     = _avg(b["cer"])
+                b["avg_teds"]    = _avg(b["teds"])
+                b["avg_cell_f1"] = _avg(b["cell_f1"])
     return model_stats
 
 

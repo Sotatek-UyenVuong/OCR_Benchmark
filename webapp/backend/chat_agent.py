@@ -163,6 +163,38 @@ TOOL_DEFINITIONS = [
             },
         },
     },
+    {
+        "type": "function",
+        "function": {
+            "name": "get_model_recommendation",
+            "description": (
+                "Gợi ý model tốt nhất cho một use case cụ thể: loại tài liệu (scan/table/text_layer) "
+                "và/hoặc ngôn ngữ (en/vi/ja). Trả về ranking và phân tích điểm mạnh/yếu từng model. "
+                "Dùng khi user hỏi: 'nên dùng model nào cho scan tiếng Việt', 'model nào tốt nhất cho "
+                "table tiếng Nhật', 'model phù hợp nhất cho text_layer tiếng Anh', v.v."
+            ),
+            "parameters": {
+                "type": "object",
+                "properties": {
+                    "uc_type": {
+                        "type": "string",
+                        "enum": ["scan", "table", "text_layer"],
+                        "description": "Loại tài liệu cần gợi ý. Bỏ trống = so sánh tất cả uc_type.",
+                    },
+                    "lang": {
+                        "type": "string",
+                        "enum": ["en", "vi", "ja"],
+                        "description": "Ngôn ngữ cần gợi ý. Bỏ trống = so sánh tất cả ngôn ngữ.",
+                    },
+                    "metric": {
+                        "type": "string",
+                        "enum": ["char_f1", "cer", "teds", "cell_f1"],
+                        "description": "Metric chính để xếp hạng. Mặc định: char_f1 cho scan/text_layer, teds cho table.",
+                    },
+                },
+            },
+        },
+    },
 ]
 
 
@@ -208,32 +240,125 @@ def _tool_get_model_comparison(
     lang: Optional[str] = None,
     models: Optional[list[str]] = None,
 ) -> dict:
-    """Return cross-model comparison table of average metrics."""
+    """Return cross-model comparison table, filtered by uc_type/lang when provided."""
     stats = _collect_model_stats()
+    use_breakdown = (uc_type and uc_type != "all") or (lang and lang != "all")
 
     rows = []
     for name, s in stats.items():
         if models and name not in models:
             continue
 
-        # Filter by uc_type/lang via by_uc breakdown if needed
-        # (simplified: use overall averages, trust _collect_model_stats)
-        rows.append({
-            "model":       name,
-            "docs":        s["docs"],
-            "avg_char_f1": s["avg_char_f1"],
-            "avg_cer":     s["avg_cer"],
-            "avg_teds":    s["avg_teds"],
-            "avg_cell_f1": s["avg_cell_f1"],
-            "source":      s["source"],
-        })
+        if use_breakdown:
+            # Pull metrics from granular by_uc breakdown
+            by_uc = s.get("by_uc", {})
+            uc_keys  = [uc_type] if (uc_type and uc_type != "all") else list(by_uc.keys())
+            lang_keys = [lang]   if (lang and lang != "all") else None
+
+            cf1_vals, cer_vals, teds_vals, cell_vals, docs = [], [], [], [], 0
+            for uc in uc_keys:
+                for lg, b in (by_uc.get(uc) or {}).items():
+                    if lang_keys and lg not in lang_keys:
+                        continue
+                    docs += b.get("docs", 0)
+                    if b.get("avg_char_f1") is not None: cf1_vals.append(b["avg_char_f1"])
+                    if b.get("avg_cer")     is not None: cer_vals.append(b["avg_cer"])
+                    if b.get("avg_teds")    is not None: teds_vals.append(b["avg_teds"])
+                    if b.get("avg_cell_f1") is not None: cell_vals.append(b["avg_cell_f1"])
+
+            def _m(lst): return round(sum(lst)/len(lst), 4) if lst else None
+            row = {
+                "model": name, "docs": docs,
+                "avg_char_f1": _m(cf1_vals), "avg_cer": _m(cer_vals),
+                "avg_teds": _m(teds_vals), "avg_cell_f1": _m(cell_vals),
+                "source": s["source"],
+            }
+        else:
+            row = {
+                "model":       name,
+                "docs":        s["docs"],
+                "avg_char_f1": s["avg_char_f1"],
+                "avg_cer":     s["avg_cer"],
+                "avg_teds":    s["avg_teds"],
+                "avg_cell_f1": s["avg_cell_f1"],
+                "source":      s["source"],
+            }
+
+        if row["docs"] > 0:  # skip models with no data for this filter
+            rows.append(row)
 
     rows.sort(key=lambda r: (r["avg_char_f1"] or 0), reverse=True)
-
     return {
         "filters": {"uc_type": uc_type or "all", "lang": lang or "all",
                     "models": models or "all"},
         "comparison": rows,
+    }
+
+
+def _tool_get_model_recommendation(
+    uc_type: Optional[str] = None,
+    lang: Optional[str] = None,
+    metric: Optional[str] = None,
+) -> dict:
+    """Return ranked models + analysis for a specific uc_type × lang combination."""
+    stats = _collect_model_stats()
+
+    # Default metric: teds for table, char_f1 for others
+    if not metric:
+        metric = "teds" if uc_type == "table" else "char_f1"
+
+    lower_is_better = metric == "cer"
+    metric_key = f"avg_{metric}"
+
+    # Determine which uc_type×lang combos to cover
+    all_ucs  = ["scan", "table", "text_layer"]
+    all_langs = ["en", "vi", "ja"]
+    uc_filter   = [uc_type] if uc_type else all_ucs
+    lang_filter = [lang]    if lang    else all_langs
+
+    results = {}  # (uc, lang) -> list of {model, value, docs}
+
+    for uc in uc_filter:
+        for lg in lang_filter:
+            combo_rows = []
+            for name, s in stats.items():
+                b = (s.get("by_uc") or {}).get(uc, {}).get(lg)
+                if not b or b.get("docs", 0) == 0:
+                    continue
+                val = b.get(metric_key)
+                if val is None:
+                    continue
+                combo_rows.append({
+                    "model": name,
+                    "value": round(val * 100, 1),  # percent
+                    "docs":  b["docs"],
+                    "char_f1": round((b.get("avg_char_f1") or 0) * 100, 1),
+                    "cer":     round((b.get("avg_cer")     or 0) * 100, 1),
+                    "teds":    round((b.get("avg_teds")    or 0) * 100, 1) if b.get("avg_teds") else None,
+                    "cell_f1": round((b.get("avg_cell_f1") or 0) * 100, 1) if b.get("avg_cell_f1") else None,
+                })
+            if combo_rows:
+                combo_rows.sort(key=lambda r: r["value"], reverse=not lower_is_better)
+                results[f"{uc}/{lg}"] = {
+                    "ranked": combo_rows,
+                    "best":   combo_rows[0]["model"],
+                    "metric": metric,
+                }
+
+    if not results:
+        return {
+            "error": "no_data",
+            "details": f"Không có dữ liệu cho uc_type={uc_type!r} lang={lang!r}",
+        }
+
+    return {
+        "query":   {"uc_type": uc_type or "all", "lang": lang or "all", "metric": metric},
+        "results": results,
+        "note": (
+            "Giá trị tính theo %. "
+            f"{'CER thấp hơn = tốt hơn.' if lower_is_better else 'Điểm cao hơn = tốt hơn.'} "
+            "Chỉ hiện model có dữ liệu cho combination đó."
+        ),
     }
 
 
@@ -293,10 +418,11 @@ def _tool_find_worst_pages(
 
 
 TOOL_DISPATCH = {
-    "get_page_evidence":   _tool_get_page_evidence,
-    "get_doc_summary":     _tool_get_doc_summary,
-    "get_model_comparison": _tool_get_model_comparison,
-    "find_worst_pages":    _tool_find_worst_pages,
+    "get_page_evidence":        _tool_get_page_evidence,
+    "get_doc_summary":          _tool_get_doc_summary,
+    "get_model_comparison":     _tool_get_model_comparison,
+    "get_model_recommendation": _tool_get_model_recommendation,
+    "find_worst_pages":         _tool_find_worst_pages,
 }
 
 
@@ -328,11 +454,15 @@ METRICS (cite values in answers):
 TOOLS — call autonomously when needed:
 - get_page_evidence(doc_id,page_num,model?): GT vs pred text + diff. USE for "why low score" questions.
 - get_doc_summary(doc_id): all models' scores per page for one doc.
-- get_model_comparison(uc_type?,lang?,models?): cross-model table.
+- get_model_comparison(uc_type?,lang?,models?): cross-model table, filtered by uc_type/lang.
+- get_model_recommendation(uc_type?,lang?,metric?): best model for a specific use case (scan/table/text_layer × en/vi/ja). USE when user asks "which model is best for Vietnamese scan", "recommend model for Japanese table", etc.
 - find_worst_pages(model,metric,doc_id?,top_k?): worst scoring pages.
 
-RULES: Always cite metric values + model names. Distinguish "model error" vs "GT scope issue".
-When asked about high CER or low scores, call get_page_evidence for the SINGLE worst page only — do NOT call multiple pages in parallel unless explicitly asked."""
+RULES:
+- Always cite metric values + model names.
+- Distinguish "model error" vs "GT scope issue".
+- For "which model is best for X": use get_model_recommendation, NOT get_model_comparison.
+- When asked about high CER or low scores: call get_page_evidence for the SINGLE worst page only."""
 
 
 
