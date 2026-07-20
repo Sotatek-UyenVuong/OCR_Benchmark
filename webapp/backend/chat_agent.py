@@ -8,11 +8,13 @@ GET  /api/chat/history  — last 50 conversation turns
 """
 from __future__ import annotations
 
+import asyncio
 import datetime
 import json
 import logging
 import os
 import sys
+import time
 from pathlib import Path
 from typing import AsyncGenerator, Optional
 
@@ -414,7 +416,7 @@ async def _call_openrouter_sync(messages: list[dict]) -> dict:
 
 
 async def _stream_openrouter_final(messages: list[dict]) -> AsyncGenerator[str, None]:
-    """Streaming call for the final answer — no tools."""
+    """Fallback streaming call for final answer synthesis — no tools."""
     headers = {
         "Authorization":  f"Bearer {_API_KEY}",
         "Content-Type":   "application/json",
@@ -461,9 +463,11 @@ async def _run_agentic_loop(
 
     # Collected SSE non-text events to emit before streaming
     pre_events: list[str] = []
+    final_direct_content: str = ""  # holds LLM's last text response
 
     while iteration < MAX_ITER:
         iteration += 1
+        t0 = time.time()
 
         try:
             response = await _call_openrouter_sync(messages)
@@ -472,24 +476,25 @@ async def _run_agentic_loop(
         except httpx.HTTPStatusError as e:
             raise RuntimeError(f"OpenRouter HTTP {e.response.status_code}: {e.response.text[:200]}")
 
+        elapsed = time.time() - t0
         choice = response.get("choices", [{}])[0]
         finish_reason = choice.get("finish_reason", "stop")
         message = choice.get("message", {})
+        tool_calls = message.get("tool_calls") or []
+        logger.debug("[LOOP iter=%d] %.2fs finish=%r tools=%s", iteration, elapsed,
+                     finish_reason, [tc['function']['name'] for tc in tool_calls])
 
         # ── Tool call ────────────────────────────────────────────────────
         if finish_reason == "tool_calls" or message.get("tool_calls"):
             tool_calls = message.get("tool_calls") or []
 
             if iteration >= MAX_ITER:
-                # Hit limit — stop, ask LLM to answer with what it has
-                messages.append({
-                    "role": "system",
-                    "content": "Đã đạt giới hạn tool calls. Hãy trả lời dựa trên thông tin hiện có.",
-                })
+                # Hit limit — stop; final_direct_content stays empty,
+                # fallback _stream_openrouter_final will synthesize
                 break
 
-            # Append assistant tool_use message
-            messages.append({"role": "assistant", "tool_calls": tool_calls, "content": ""})
+            # Append assistant tool_use message — content must be None for OpenAI compat
+            messages.append({"role": "assistant", "tool_calls": tool_calls, "content": None})
 
             # Emit SSE signals + collect tool names
             for tc in tool_calls:
@@ -500,8 +505,6 @@ async def _run_agentic_loop(
                 )
 
             # Execute all tools in parallel (faster than sequential)
-            import asyncio as _asyncio
-
             async def _exec_tool(tc):
                 fn_name = tc["function"]["name"]
                 try:
@@ -513,7 +516,7 @@ async def _run_agentic_loop(
                     res = {"error": "tool_execution_error", "details": str(exc)[:200]}
                 return tc, res
 
-            results = await _asyncio.gather(*[_exec_tool(tc) for tc in tool_calls])
+            results = await asyncio.gather(*[_exec_tool(tc) for tc in tool_calls])
             for tc, res in results:
                 messages.append({
                     "role":         "tool",
@@ -525,8 +528,8 @@ async def _run_agentic_loop(
             continue  # next iteration
 
         # ── Final text answer ────────────────────────────────────────────
-        # If LLM returned text directly without tool calls
-        direct_content = message.get("content", "")
+        # LLM returned text directly (no tool calls in this iteration)
+        final_direct_content = message.get("content") or ""
         break
 
     # Build the final streaming generator
@@ -535,27 +538,19 @@ async def _run_agentic_loop(
         for ev in pre_events:
             yield ev
 
-        final_messages = messages.copy()
+        logger.debug("[STREAM] has_tools=%s direct_len=%d", bool(pre_events), len(final_direct_content))
 
-        # If LLM gave direct text answer (no tool calls ever), emit it
-        has_direct = (
-            not pre_events  # no tools were called
-            and any(
-                m.get("role") == "assistant" and m.get("content")
-                for m in reversed(final_messages)
-            )
-        )
-        if has_direct:
-            direct_msg = next(
-                (m["content"] for m in reversed(final_messages)
-                 if m.get("role") == "assistant" and m.get("content")), ""
-            )
-            chunk_size = 8
-            for i in range(0, len(direct_msg), chunk_size):
-                yield f"data: {json.dumps({'text': direct_msg[i:i+chunk_size]}, ensure_ascii=False)}\n\n"
+        if final_direct_content:
+            # Stream the LLM's direct response (already generated — no extra API call needed)
+            chunk_size = 16
+            for i in range(0, len(final_direct_content), chunk_size):
+                yield f"data: {json.dumps({'text': final_direct_content[i:i+chunk_size]}, ensure_ascii=False)}\n\n"
         else:
-            # Tools were called — get final synthesis via streaming
-            async for chunk in _stream_openrouter_final(final_messages):
+            # Fallback: ask LLM to synthesize (shouldn't normally happen)
+            logger.warning("[STREAM] fallback synthesis — no direct content from loop")
+            chunk_count = 0
+            async for chunk in _stream_openrouter_final(messages):
+                chunk_count += 1
                 yield f"data: {json.dumps({'text': chunk}, ensure_ascii=False)}\n\n"
 
         yield "event: done\ndata: {}\n\n"
@@ -667,11 +662,13 @@ async def chat_message(request: Request):
             yield 'event: error\ndata: {"message": "Empty message"}\n\n'
         return StreamingResponse(_empty(), media_type="text/event-stream")
 
+    # ── Logging ───────────────────────────────────────────────────────────────
+    logger.info("[CHAT] session=%s query=%r history_turns=%d", session_id, user_message[:80], len(history))
+
     # ── Query rewrite: expand short/ambiguous follow-ups using history context ──
     effective_message = await _rewrite_query(user_message, history)
     if effective_message != user_message:
-        # Emit rewrite info as SSE event so FE can optionally show it
-        pass  # transparent to user — agent sees the rewritten version
+        logger.info("[REWRITE] %r → %r", user_message[:60], effective_message[:80])
 
     # Build messages — use last 8 turns (more context = better resolution)
     messages: list[dict] = [{"role": "system", "content": _build_system_prompt()}]
@@ -693,6 +690,7 @@ async def chat_message(request: Request):
 
         try:
             tools_called, iterations, final_gen = await _run_agentic_loop(messages)
+            logger.info("[CHAT] tools=%s iterations=%d session=%s", tools_called, iterations, session_id)
 
             async for chunk in final_gen:
                 # Extract text content from data events for history
@@ -706,11 +704,12 @@ async def chat_message(request: Request):
 
         except TimeoutError:
             error_occurred = True
+            logger.warning("[CHAT] timeout session=%s", session_id)
             yield f'event: error\ndata: {json.dumps({"message": "Request timed out. Please try again."})}\n\n'
             yield "event: done\ndata: {}\n\n"
         except Exception as exc:
             error_occurred = True
-            logger.error("Chat agent error: %s", exc)
+            logger.error("[CHAT] error session=%s %s: %s", session_id, type(exc).__name__, exc)
             safe_msg = str(exc)[:200]
             yield f'event: error\ndata: {json.dumps({"message": f"Agent error: {safe_msg}"})}\n\n'
             yield "event: done\ndata: {}\n\n"

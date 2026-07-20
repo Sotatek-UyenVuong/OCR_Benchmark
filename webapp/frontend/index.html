@@ -8,6 +8,11 @@
 <!-- Handsontable CE v14: Excel-like grid editor (bundled locally for offline/server use) -->
 <link rel="stylesheet" href="/vendor/handsontable.full.min.css">
 <script src="/vendor/handsontable.full.min.js"></script>
+<!-- KaTeX: render LaTeX math in chat responses -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css">
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js"></script>
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/contrib/auto-render.min.js"
+        onload="window._katexReady=true"></script>
 <style>
 * { box-sizing: border-box; margin: 0; padding: 0; }
 :root {
@@ -391,6 +396,18 @@ body { font-family: -apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
 .chat-msg.assistant td, .chat-msg.assistant th { border:1px solid var(--border);
                                                    padding:3px 7px; }
 .chat-msg.assistant th { background:var(--surface); color:var(--accent); }
+/* Headings inside chat */
+.chat-msg.assistant h1,.chat-msg.assistant h2,.chat-msg.assistant h3,
+.chat-msg.assistant h4,.chat-msg.assistant h5,.chat-msg.assistant h6 {
+  color:var(--accent); margin:8px 0 4px; font-size:13px; font-weight:700; }
+.chat-msg.assistant h1 { font-size:15px; }
+.chat-msg.assistant h2 { font-size:14px; }
+/* Math blocks */
+.chat-msg.assistant .math-block { overflow-x:auto; margin:6px 0; padding:4px 0;
+  text-align:center; font-size:13px; }
+.chat-msg.assistant .math-inline { font-size:13px; }
+.chat-msg.assistant .katex-display { margin:6px 0; overflow-x:auto; }
+.chat-msg.assistant hr { border:none; border-top:1px solid var(--border); margin:8px 0; }
 .chat-thinking { display:inline-flex; gap:3px; align-items:center; }
 .chat-thinking span { width:5px; height:5px; border-radius:50%; background:var(--muted);
                       animation:chat-bounce .9s infinite; }
@@ -4337,17 +4354,121 @@ function _chatAppend(role, html) {
 
 // Minimal Markdown renderer
 function _renderMd(text) {
+  // ── 1. Protect fenced code blocks (extract before escaping) ──────────────
+  const codeBlocks = [];
+  text = text.replace(/```([\w-]*)\n?([\s\S]*?)```/g, (_, lang, code) => {
+    codeBlocks.push(`<pre><code class="lang-${lang}">${esc(code.trim())}</code></pre>`);
+    return `\x00CODE${codeBlocks.length - 1}\x00`;
+  });
+
+  // ── 2. Protect LaTeX blocks before HTML-escaping ─────────────────────────
+  const mathBlocks = [];
+  // Display math: \[...\]  or  $$...$$
+  text = text.replace(/\\\[([\s\S]*?)\\\]|\$\$([\s\S]*?)\$\$/g, (_, a, b) => {
+    mathBlocks.push({ display: true,  src: (a || b).trim() });
+    return `\x00MATH${mathBlocks.length - 1}\x00`;
+  });
+  // Inline math: \(...\)  or  $...$  (no whitespace at boundaries)
+  text = text.replace(/\\\((.+?)\\\)|\$([^\s$][^$]*?[^\s$]|\S)\$/g, (_, a, b) => {
+    mathBlocks.push({ display: false, src: (a || b).trim() });
+    return `\x00MATH${mathBlocks.length - 1}\x00`;
+  });
+
+  // ── 3. HTML-escape the plain text ─────────────────────────────────────────
   let h = esc(text);
-  // fenced code
-  h = h.replace(/```[\w-]*\n?([\s\S]*?)```/g, (_, c) =>
-    `<pre><code>${c.replace(/&amp;/g,'&').replace(/&lt;/g,'<').replace(/&gt;/g,'>')}</code></pre>`);
+
+  // ── 4. Inline code ────────────────────────────────────────────────────────
   h = h.replace(/`([^`\n]+)`/g, '<code>$1</code>');
-  h = h.replace(/\*\*([^*\n]+)\*\*/g, '<strong>$1</strong>');
-  h = h.replace(/\*([^*\n]+)\*/g, '<em>$1</em>');
-  h = h.replace(/(?:^|\n)[ \t]*[-*] (.+)/g, (_, t) => `\n<li>${t}</li>`);
-  h = h.replace(/(<li>[\s\S]*?<\/li>)/g, '<ul>$1</ul>');
-  h = h.replace(/\n\n+/g,'</p><p>').replace(/\n/g,'<br>');
-  return `<p>${h}</p>`.replace(/<p>\s*<\/p>/g,'');
+
+  // ── 5. Headings (### ## #) ────────────────────────────────────────────────
+  h = h.replace(/(?:^|\n)######\s+(.+)/g, (_, t) => `\n<h6>${t}</h6>`);
+  h = h.replace(/(?:^|\n)#####\s+(.+)/g,  (_, t) => `\n<h5>${t}</h5>`);
+  h = h.replace(/(?:^|\n)####\s+(.+)/g,   (_, t) => `\n<h4>${t}</h4>`);
+  h = h.replace(/(?:^|\n)###\s+(.+)/g,    (_, t) => `\n<h3>${t}</h3>`);
+  h = h.replace(/(?:^|\n)##\s+(.+)/g,     (_, t) => `\n<h2>${t}</h2>`);
+  h = h.replace(/(?:^|\n)#\s+(.+)/g,      (_, t) => `\n<h1>${t}</h1>`);
+
+  // ── 6. Bold / italic ──────────────────────────────────────────────────────
+  h = h.replace(/\*\*\*([^*\n]+)\*\*\*/g, '<strong><em>$1</em></strong>');
+  h = h.replace(/\*\*([^*\n]+)\*\*/g,     '<strong>$1</strong>');
+  h = h.replace(/\*([^*\n]+)\*/g,         '<em>$1</em>');
+  h = h.replace(/__([^_\n]+)__/g,         '<strong>$1</strong>');
+  h = h.replace(/_([^_\n]+)_/g,           '<em>$1</em>');
+
+  // ── 7. Horizontal rule ────────────────────────────────────────────────────
+  h = h.replace(/(?:^|\n)---+\n/g, '\n<hr>\n');
+
+  // ── 8. Unordered list ─────────────────────────────────────────────────────
+  h = h.replace(/(?:(?:^|\n)[ \t]*[-*+] .+)+/g, match => {
+    const items = match.trim().split('\n').map(l => {
+      const m = l.match(/^[ \t]*[-*+] (.+)/);
+      return m ? `<li>${m[1]}</li>` : '';
+    }).join('');
+    return `\n<ul>${items}</ul>`;
+  });
+
+  // ── 9. Ordered list ───────────────────────────────────────────────────────
+  h = h.replace(/(?:(?:^|\n)[ \t]*\d+\. .+)+/g, match => {
+    const items = match.trim().split('\n').map(l => {
+      const m = l.match(/^[ \t]*\d+\. (.+)/);
+      return m ? `<li>${m[1]}</li>` : '';
+    }).join('');
+    return `\n<ol>${items}</ol>`;
+  });
+
+  // ── 10. Simple Markdown table ─────────────────────────────────────────────
+  h = h.replace(/(?:(?:^|\n)\|.+\|[ \t]*)+/g, match => {
+    const rows = match.trim().split('\n').filter(r => r.trim());
+    // Remove separator row (|---|---|)
+    const dataRows = rows.filter(r => !/^\|[-:| ]+\|$/.test(r.trim()));
+    if (dataRows.length < 1) return match;
+    let html = '<div style="overflow-x:auto"><table>';
+    dataRows.forEach((row, i) => {
+      const cells = row.split('|').slice(1, -1).map(c => c.trim());
+      const tag = i === 0 ? 'th' : 'td';
+      html += `<tr>${cells.map(c => `<${tag}>${c}</${tag}>`).join('')}</tr>`;
+    });
+    return html + '</table></div>';
+  });
+
+  // ── 11. Paragraph / line breaks ───────────────────────────────────────────
+  h = h.replace(/\n\n+/g, '</p><p>').replace(/\n/g, '<br>');
+  h = `<p>${h}</p>`.replace(/<p>\s*<\/p>/g, '');
+
+  // ── 12. Restore code blocks ───────────────────────────────────────────────
+  h = h.replace(/\x00CODE(\d+)\x00/g, (_, i) => codeBlocks[+i]);
+
+  // ── 13. Restore math — render via KaTeX if available ─────────────────────
+  h = h.replace(/\x00MATH(\d+)\x00/g, (_, i) => {
+    const { display, src } = mathBlocks[+i];
+    try {
+      if (window.katex) {
+        return katex.renderToString(src, { displayMode: display, throwOnError: false });
+      }
+    } catch(e) {}
+    // Fallback: show raw LaTeX in a styled span
+    return display
+      ? `<div class="math-block">\\[${esc(src)}\\]</div>`
+      : `<span class="math-inline">\\(${esc(src)}\\)</span>`;
+  });
+
+  return h;
+}
+
+// Trigger KaTeX re-render on an element (for when KaTeX loads after content)
+function _renderMathIn(el) {
+  if (!el || !window.renderMathInElement) return;
+  try {
+    renderMathInElement(el, {
+      delimiters: [
+        { left: '$$',  right: '$$',  display: true  },
+        { left: '\\[', right: '\\]', display: true  },
+        { left: '$',   right: '$',   display: false },
+        { left: '\\(', right: '\\)', display: false },
+      ],
+      throwOnError: false,
+    });
+  } catch(e) {}
 }
 
 async function chatSend() {
@@ -4388,7 +4509,11 @@ async function chatSend() {
 
     const reader  = resp.body.getReader();
     const decoder = new TextDecoder();
-    let buffer = '', fullText = '', firstText = true, answerDiv = null;
+    let buffer = '', fullText = '', thinkRemoved = false, answerDiv = null;
+
+    const _removeThink = () => {
+      if (!thinkRemoved) { thinkBubble.remove(); thinkRemoved = true; }
+    };
 
     const _processLine = (line, currentEvent) => {
       if (!line.startsWith('data: ')) return currentEvent;
@@ -4398,13 +4523,13 @@ async function chatSend() {
       if (currentEvent === 'tool_call') {
         try {
           const tc = JSON.parse(raw);
-          if (firstText) { thinkBubble.remove(); firstText = false; }
+          _removeThink();
           _chatAppend('tool-call', `🔍 Calling <strong>${esc(tc.name)}</strong>…`);
         } catch(e) {}
       } else if (currentEvent === 'error') {
         try {
           const err = JSON.parse(raw);
-          if (firstText) { thinkBubble.remove(); firstText = false; }
+          _removeThink();
           _chatAppend('error', `⚠️ ${esc(err.message || 'Unknown error')}`);
         } catch(e) {}
       } else if (currentEvent !== 'done') {
@@ -4412,10 +4537,12 @@ async function chatSend() {
           const payload = JSON.parse(raw);
           const chunk = payload.text || '';
           if (chunk) {
-            if (firstText) { thinkBubble.remove(); firstText = false;
-              answerDiv = _chatAppend('assistant', ''); }
+            _removeThink();
+            if (!answerDiv) { answerDiv = _chatAppend('assistant', ''); }
             fullText += chunk;
-            if (answerDiv) { answerDiv.innerHTML = _renderMd(fullText); _chatMaybeScroll(); }
+            answerDiv.innerHTML = _renderMd(fullText);
+            _renderMathIn(answerDiv);
+            _chatMaybeScroll();
           }
         } catch(e) {}
       }
@@ -4439,7 +4566,7 @@ async function chatSend() {
     CHAT.history.push({role: 'assistant', content: fullText});
 
   } catch(e) {
-    if (thinkBubble.parentNode) thinkBubble.remove();
+    if (!thinkRemoved && thinkBubble.parentNode) thinkBubble.remove();
     _chatAppend('error', `⚠️ ${esc(e.message || 'Connection error. Please retry.')}`);
   } finally {
     CHAT.streaming = false;
