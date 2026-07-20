@@ -534,13 +534,15 @@ async def _run_agentic_loop(
         for ev in pre_events:
             yield ev
 
-        # Stream final answer
-        # Always use stream=True here — no extra non-streaming round needed
         final_messages = messages.copy()
-        # If LLM returned direct text in the last iteration (no tools), emit it
-        has_direct = any(
-            m.get("role") == "assistant" and m.get("content")
-            for m in reversed(final_messages)
+
+        # If LLM gave direct text answer (no tool calls ever), emit it
+        has_direct = (
+            not pre_events  # no tools were called
+            and any(
+                m.get("role") == "assistant" and m.get("content")
+                for m in reversed(final_messages)
+            )
         )
         if has_direct:
             direct_msg = next(
@@ -551,7 +553,7 @@ async def _run_agentic_loop(
             for i in range(0, len(direct_msg), chunk_size):
                 yield f"data: {json.dumps({'text': direct_msg[i:i+chunk_size]}, ensure_ascii=False)}\n\n"
         else:
-            # Tool calls were made — stream the final synthesis
+            # Tools were called — get final synthesis via streaming
             async for chunk in _stream_openrouter_final(final_messages):
                 yield f"data: {json.dumps({'text': chunk}, ensure_ascii=False)}\n\n"
 

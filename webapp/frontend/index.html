@@ -3999,7 +3999,9 @@ function _renderLeaderboard(ranked, progress) {
       <textarea class="chat-input" id="chat-input" rows="1"
                 placeholder="Hỏi về benchmark…"
                 oninput="this.style.height='auto';this.style.height=Math.min(this.scrollHeight,100)+'px'"
-                onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();chatSend()}"
+                onkeydown="if(event.key==='Enter'&&!event.shiftKey&&!event.isComposing){event.preventDefault();chatSend()}"
+                oncompositionend="CHAT._composing=false"
+                oncompositionstart="CHAT._composing=true"
       ></textarea>
       <button class="chat-send" id="chat-send-btn" onclick="chatSend()" title="Send">↑</button>
     </div>
@@ -4036,6 +4038,7 @@ const CHAT = {
   sessionId:  (typeof crypto !== 'undefined' && crypto.randomUUID) ? crypto.randomUUID() : Date.now().toString(36),
   queuedMsg:  null,
   userScrolledUp: false,
+  _composing: false,   // IME composition guard (prevents double-send on CJK/Vietnamese input)
 };
 
 // ── Chat Upload Mini-form ─────────────────────────────────────────────────────
@@ -4209,9 +4212,11 @@ async function chatSend() {
   const input = document.getElementById('chat-input');
   const msg = input.value.trim();
   if (!msg) return;
+  if (CHAT._composing) return;  // don't send while IME is composing
 
-  if (CHAT.streaming) { CHAT.queuedMsg = msg; input.value = ''; return; }
+  if (CHAT.streaming) { CHAT.queuedMsg = msg; input.value = ''; input.style.height='auto'; return; }
 
+  // Clear input immediately to prevent double-send
   input.value = '';
   input.style.height = 'auto';
   CHAT.userScrolledUp = false;
