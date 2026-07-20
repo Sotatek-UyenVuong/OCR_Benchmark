@@ -4177,10 +4177,12 @@ async function cuSubmit() {
       } else {
         // Determine best per metric
         const METRICS = [
-          {key:'cer',     label:'CER',   lb:true},
-          {key:'char_f1', label:'F1',    lb:false},
-          {key:'teds',    label:'TEDS',  lb:false},
-          {key:'cell_f1', label:'Cell',  lb:false},
+          {key:'cer',     label:'CER',      lb:true},
+          {key:'char_f1', label:'Char F1',  lb:false},
+          {key:'word_f1', label:'Word F1',  lb:false},
+          {key:'edit_sim',label:'Edit Sim', lb:false},
+          {key:'teds',    label:'TEDS',     lb:false},
+          {key:'cell_f1', label:'Cell F1',  lb:false},
         ];
         const pct = v => v==null ? '—' : (v*100).toFixed(1)+'%';
         const best = {};
