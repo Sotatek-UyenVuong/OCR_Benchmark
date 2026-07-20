@@ -495,7 +495,49 @@ def get_model_progress(total_docs: int = 24):
     return rows
 
 
-@router.post("/score")
+@router.get("/doc_comparison")
+def get_doc_comparison(doc_id: str) -> dict:
+    """
+    Return all models' summary scores for one document side-by-side.
+    Used by chat upload panel to show instant comparison without LLM call.
+    """
+    uc_type, lang = _parse_doc_id(doc_id)
+    pattern = f"*/{uc_type}/{lang}/{doc_id}_eval.json"
+    
+    models_data = {}
+    for eval_path in RESULT_ROOT.glob(pattern):
+        model_name = eval_path.relative_to(RESULT_ROOT).parts[0]
+        try:
+            data = json.loads(eval_path.read_text(encoding="utf-8"))
+        except Exception:
+            continue
+        
+        txt = (data.get("text") or {}).get("summary") or {}
+        tbl = (data.get("table") or {}).get("summary") or {}
+        pages = (data.get("text") or {}).get("pages") or []
+        
+        # Resolve metrics with fallback to page averages
+        def _resolve(key, alt=None):
+            v = txt.get(key) or txt.get(f"avg_{key}")
+            if v is not None: return v
+            if alt: v = tbl.get(alt)
+            if v is not None: return v
+            vals = [p[key] for p in pages if isinstance(p.get(key), (int, float))]
+            return round(sum(vals)/len(vals), 4) if vals else None
+        
+        models_data[model_name] = {
+            "cer":     _resolve("cer",   "avg_cer"),
+            "wer":     _resolve("wer",   "avg_wer"),
+            "char_f1": _resolve("char_f1", "avg_char_f1"),
+            "word_f1": _resolve("word_f1", "avg_word_f1"),
+            "edit_sim": _resolve("normalized_edit_similarity"),
+            "teds":    _resolve("table_teds_doc", "avg_teds"),
+            "cell_f1": _resolve("table_cell_exact_f1_mean", "avg_cell_exact_f1"),
+            "n_pages": txt.get("n_pages") or len(pages),
+            "source":  data.get("source", "pipeline"),
+        }
+    
+    return {"doc_id": doc_id, "uc_type": uc_type, "lang": lang, "models": models_data}
 async def score_upload(
     files: list[UploadFile] = File(...),
     model_name: str = Form(...),
