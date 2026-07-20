@@ -39,17 +39,29 @@ logger = logging.getLogger(__name__)
 
 # ── Startup guard ─────────────────────────────────────────────────────────────
 OPEN_ROUTER_KEY = os.environ.get("OPEN_ROUTER", "")
-if not OPEN_ROUTER_KEY:
-    logger.error(
-        "OPEN_ROUTER environment variable is not set. "
-        "Chat Agent router will NOT be registered. "
-        "Set OPEN_ROUTER=sk-or-v1-... in .env to enable."
-    )
+OPENAI_KEY      = os.environ.get("OPENAI_API_KEY", "")
 
-OPENROUTER_URL = "https://openrouter.ai/api/v1/chat/completions"
-MODEL          = "google/gemini-2.5-flash"
-APP_REFERER    = "http://localhost:8000"
-APP_TITLE      = "OCR Benchmark Analyst"
+# Use OpenAI directly if available, otherwise fall back to OpenRouter
+if OPENAI_KEY:
+    _API_KEY     = OPENAI_KEY
+    _API_URL     = "https://api.openai.com/v1/chat/completions"
+    _API_HEADERS_EXTRA = {}
+    MODEL        = "gpt-4o-mini"
+    _ENABLED     = True
+elif OPEN_ROUTER_KEY:
+    _API_KEY     = OPEN_ROUTER_KEY
+    _API_URL     = "https://openrouter.ai/api/v1/chat/completions"
+    _API_HEADERS_EXTRA = {"HTTP-Referer": APP_REFERER, "X-Title": APP_TITLE}
+    MODEL        = "google/gemini-2.5-flash"
+    _ENABLED     = True
+else:
+    _API_KEY = _API_URL = MODEL = ""
+    _API_HEADERS_EXTRA = {}
+    _ENABLED = False
+    logger.error(
+        "Neither OPENAI_API_KEY nor OPEN_ROUTER is set. "
+        "Chat Agent router will NOT be registered."
+    )
 
 HISTORY_FILE = RESULT_ROOT / ".chat_history.jsonl"
 
@@ -343,10 +355,9 @@ def _build_system_prompt() -> str:
 async def _call_openrouter_sync(messages: list[dict]) -> dict:
     """Non-streaming call — for tool-selection iterations."""
     headers = {
-        "Authorization":  f"Bearer {OPEN_ROUTER_KEY}",
+        "Authorization":  f"Bearer {_API_KEY}",
         "Content-Type":   "application/json",
-        "HTTP-Referer":   APP_REFERER,
-        "X-Title":        APP_TITLE,
+        **_API_HEADERS_EXTRA,
     }
     body = {
         "model":    MODEL,
@@ -356,7 +367,7 @@ async def _call_openrouter_sync(messages: list[dict]) -> dict:
         "temperature": 0.2,
     }
     async with httpx.AsyncClient(timeout=30) as client:
-        resp = await client.post(OPENROUTER_URL, headers=headers, json=body)
+        resp = await client.post(_API_URL, headers=headers, json=body)
         resp.raise_for_status()
         return resp.json()
 
@@ -364,10 +375,9 @@ async def _call_openrouter_sync(messages: list[dict]) -> dict:
 async def _stream_openrouter_final(messages: list[dict]) -> AsyncGenerator[str, None]:
     """Streaming call for the final answer — no tools."""
     headers = {
-        "Authorization":  f"Bearer {OPEN_ROUTER_KEY}",
+        "Authorization":  f"Bearer {_API_KEY}",
         "Content-Type":   "application/json",
-        "HTTP-Referer":   APP_REFERER,
-        "X-Title":        APP_TITLE,
+        **_API_HEADERS_EXTRA,
     }
     body = {
         "model":       MODEL,
@@ -377,7 +387,7 @@ async def _stream_openrouter_final(messages: list[dict]) -> AsyncGenerator[str, 
         "max_tokens":  2048,
     }
     async with httpx.AsyncClient(timeout=60) as client:
-        async with client.stream("POST", OPENROUTER_URL, headers=headers, json=body) as resp:
+        async with client.stream("POST", _API_URL, headers=headers, json=body) as resp:
             resp.raise_for_status()
             async for line in resp.aiter_lines():
                 if line.startswith("data: "):
@@ -525,9 +535,9 @@ async def chat_message(request: Request):
     Body: {"session_id": str, "message": str, "history": list[dict]}
     Returns: text/event-stream with data:, event:tool_call, event:done, event:error events.
     """
-    if not OPEN_ROUTER_KEY:
+    if not _ENABLED:
         async def _err():
-            yield 'event: error\ndata: {"message": "OPEN_ROUTER key not configured"}\n\n'
+            yield 'event: error\ndata: {"message": "No LLM API key configured (set OPENAI_API_KEY or OPEN_ROUTER in .env)"}\n\n'
         return StreamingResponse(_err(), media_type="text/event-stream")
 
     body = await request.json()

@@ -64,7 +64,7 @@ def compute_nwer(gt_text: str, pred_text: str, doc_id: str = "", page_num: int =
 from .gt_review import router as gt_router
 from .ocr_runner import router as ocr_router
 from .upload_scorer import router as upload_router
-from .chat_agent import router as chat_router, OPEN_ROUTER_KEY
+from .chat_agent import router as chat_router, _ENABLED as _CHAT_ENABLED
 
 app = FastAPI(title="OCR Benchmark API", version="0.1.0")
 
@@ -80,14 +80,13 @@ app.include_router(gt_router)
 app.include_router(ocr_router)
 app.include_router(upload_router)
 
-# Chat agent — only if OPEN_ROUTER key is set
-if OPEN_ROUTER_KEY:
+# Chat agent — requires OPENAI_API_KEY or OPEN_ROUTER in .env
+if _CHAT_ENABLED:
     app.include_router(chat_router)
 else:
     import logging as _logging
     _logging.getLogger(__name__).warning(
-        "Chat Agent disabled: OPEN_ROUTER env var not set. "
-        "Add OPEN_ROUTER=sk-or-v1-... to .env to enable."
+        "Chat Agent disabled: set OPENAI_API_KEY or OPEN_ROUTER in .env to enable."
     )
 
 # Serve frontend static files
