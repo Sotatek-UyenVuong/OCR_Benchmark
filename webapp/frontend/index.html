@@ -2559,6 +2559,23 @@ function buildScoreCard(title, metrics){
 }
 
 function buildPageTable(pages, type){
+  // For table pages from pipeline eval: aggregate cell metrics from tables[] if not pre-computed
+  if (type === 'table') {
+    pages = pages.map(p => {
+      if (p.table_cell_exact_f1_mean != null && p.table_cell_text_similarity_mean != null) return p;
+      const tbls = p.tables || [];
+      if (!tbls.length) return p;
+      // cell_accuracy = exact F1 equivalent in pipeline eval format
+      const cellF1Vals  = tbls.map(t => t.cell_accuracy        ?? t.cell_exact_f1).filter(v => v != null);
+      const cellSimVals = tbls.map(t => t.cell_text_similarity  ?? t.cell_sim      ).filter(v => v != null);
+      const avg = arr => arr.length ? arr.reduce((a,b)=>a+b,0)/arr.length : null;
+      return {
+        ...p,
+        table_cell_exact_f1_mean:         p.table_cell_exact_f1_mean         ?? avg(cellF1Vals),
+        table_cell_text_similarity_mean:  p.table_cell_text_similarity_mean  ?? avg(cellSimVals),
+      };
+    });
+  }
   const card=document.createElement('div');
   card.className='score-card';
   card.style.marginTop='8px';
