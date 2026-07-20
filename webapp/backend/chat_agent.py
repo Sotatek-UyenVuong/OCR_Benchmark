@@ -329,7 +329,8 @@ TOOLS — call autonomously when needed:
 - get_model_comparison(uc_type?,lang?,models?): cross-model table.
 - find_worst_pages(model,metric,doc_id?,top_k?): worst scoring pages.
 
-RULES: Always cite metric values + model names. Distinguish "model error" vs "GT scope issue"."""
+RULES: Always cite metric values + model names. Distinguish "model error" vs "GT scope issue".
+When asked about high CER or low scores, call get_page_evidence for the SINGLE worst page only — do NOT call multiple pages in parallel unless explicitly asked."""
 
 
 

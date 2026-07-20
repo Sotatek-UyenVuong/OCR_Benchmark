@@ -4162,7 +4162,13 @@ async function cuSubmit() {
     ).join(', ');
 
     const scoreContext = `Model "${modelName}" scored on "${docId}" (${data.uc_type}/${data.lang}): CER=${pct(sum.cer)}, Char F1=${pct(sum.char_f1)}, TEDS=${pct(sum.table_teds_doc)}, ${sum.n_matched_pages}/${sum.n_pages} pages. Per-page: ${pageLines}`;
-    CHAT.history.push({ role: 'user', content: scoreContext });
+
+    // Add assistant context so agent knows which page is worst without needing to call tools
+    const worstPage = pages.reduce((a, b) => ((a.cer||0) > (b.cer||0) ? a : b), pages[0]);
+    const worstNote = worstPage
+      ? ` Worst page by CER: P${worstPage.page_num} (CER=${worstPage.cer!=null?(worstPage.cer*100).toFixed(1)+'%':'—'}).`
+      : '';
+    CHAT.history.push({ role: 'user', content: scoreContext + worstNote });
 
     // Auto-trigger: load comparison data directly (no LLM needed)
     const analysisDiv = _chatAppend('assistant',
