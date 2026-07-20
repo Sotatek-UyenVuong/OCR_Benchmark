@@ -353,7 +353,14 @@ body { font-family: -apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
 .chat-box { background:var(--surface); border:1px solid var(--border); border-radius:12px;
             width:min(440px,calc(100vw - 32px)); height:min(620px,calc(100vh - 48px));
             display:flex; flex-direction:column; box-shadow:0 8px 40px rgba(0,0,0,.5);
-            pointer-events:all; }
+            pointer-events:all; position:relative; }
+/* resize handle — top-left corner */
+.chat-resize-handle { position:absolute; top:0; left:0; width:16px; height:16px;
+                      cursor:nw-resize; z-index:10; border-radius:12px 0 0 0; }
+.chat-resize-handle::after { content:''; position:absolute; top:4px; left:4px;
+                              width:8px; height:8px;
+                              border-top:2px solid var(--border); border-left:2px solid var(--border);
+                              border-radius:2px 0 0 0; }
 .chat-header { padding:11px 16px; background:var(--surface2); border-bottom:1px solid var(--border);
                border-radius:12px 12px 0 0; display:flex; align-items:center; gap:8px; flex-shrink:0; }
 .chat-header-title { flex:1; font-size:13px; font-weight:700; color:var(--text); }
@@ -3978,6 +3985,7 @@ function _renderLeaderboard(ranked, progress) {
 <div id="chat-overlay" class="chat-overlay" style="display:none"
      onclick="if(event.target===this)chatToggle()">
   <div class="chat-box" id="chat-box">
+    <div class="chat-resize-handle" id="chat-resize-handle"></div>
     <div class="chat-header">
       <span style="font-size:16px">🤖</span>
       <span class="chat-header-title">OCR Benchmark Analyst</span>
@@ -4237,6 +4245,53 @@ function chatToggle() {
   CHAT.open = !CHAT.open;
   document.getElementById('chat-overlay').style.display = CHAT.open ? 'flex' : 'none';
 }
+
+// ── Chat resize ───────────────────────────────────────────────────────────────
+(function() {
+  let resizing = false, startX, startY, startW, startH;
+  const MIN_W = 280, MIN_H = 360;
+
+  function onDown(e) {
+    e.preventDefault();
+    resizing = true;
+    const box = document.getElementById('chat-box');
+    const rect = box.getBoundingClientRect();
+    startX = e.clientX; startY = e.clientY;
+    startW = rect.width;  startH = rect.height;
+    document.body.style.userSelect = 'none';
+  }
+
+  function onMove(e) {
+    if (!resizing) return;
+    const box = document.getElementById('chat-box');
+    // dragging top-left corner → width grows left, height grows up
+    const dw = startX - e.clientX;
+    const dh = startY - e.clientY;
+    const newW = Math.max(MIN_W, Math.min(startW + dw, window.innerWidth  - 48));
+    const newH = Math.max(MIN_H, Math.min(startH + dh, window.innerHeight - 48));
+    box.style.width  = newW + 'px';
+    box.style.height = newH + 'px';
+    box.style.maxWidth  = 'none';
+    box.style.maxHeight = 'none';
+  }
+
+  function onUp() {
+    resizing = false;
+    document.body.style.userSelect = '';
+  }
+
+  document.addEventListener('DOMContentLoaded', () => {
+    const handle = document.getElementById('chat-resize-handle');
+    if (handle) {
+      handle.addEventListener('mousedown', onDown);
+      handle.addEventListener('touchstart', e => onDown(e.touches[0]), {passive:false});
+    }
+  });
+  document.addEventListener('mousemove', onMove);
+  document.addEventListener('mouseup',   onUp);
+  document.addEventListener('touchmove', e => onMove(e.touches[0]), {passive:false});
+  document.addEventListener('touchend',  onUp);
+})();
 
 document.addEventListener('keydown', e => {
   if (e.key === 'Escape' && CHAT.open) chatToggle();
