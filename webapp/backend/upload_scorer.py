@@ -661,3 +661,127 @@ async def score_upload(
         "lang": lang,
         "results": {"text": {"summary": summary, "pages": page_results}},
     }
+
+
+@router.post("/score")
+async def score_upload(
+    files: list[UploadFile] = File(...),
+    model_name: str = Form(...),
+    doc_id: str = Form(...),
+):
+    """
+    Score uploaded .md prediction files against the server-side Ground Truth.
+    Saves result to benchmark_results/ for dashboard and leaderboard.
+    """
+    if not model_name or not model_name.strip():
+        raise HTTPException(422, detail="model_name must be a non-empty string")
+    model_name = model_name.strip()[:100]
+    if not doc_id or not doc_id.strip():
+        raise HTTPException(422, detail="doc_id is required")
+    doc_id = doc_id.strip()
+
+    md_files = [f for f in files if (f.filename or "").lower().endswith(".md")]
+    if not md_files:
+        raise HTTPException(422, detail="No .md files found in the uploaded folder.")
+    if len(md_files) > 500:
+        raise HTTPException(422, detail=f"File limit exceeded: max 500 .md files (got {len(md_files)})")
+
+    uc_type, lang = _parse_doc_id(doc_id)
+
+    gt_path = GT_ROOT / uc_type / lang / f"{doc_id}.json"
+    if not gt_path.exists():
+        raise HTTPException(404, detail=f"Ground Truth not found for '{doc_id}' (expected: ground_truth/{uc_type}/{lang}/{doc_id}.json)")
+    try:
+        gt_data = json.loads(gt_path.read_text(encoding="utf-8"))
+    except json.JSONDecodeError:
+        raise HTTPException(422, detail=f"Ground Truth file for '{doc_id}' is corrupt or invalid JSON")
+    gt_pages_raw = gt_data.get("pages")
+    if not gt_pages_raw:
+        raise HTTPException(422, detail=f"Ground Truth for '{doc_id}' has no pages")
+
+    parsed_pages: list[dict] = []
+    for f in md_files:
+        filename = Path(f.filename or "").name
+        m = _PAGE_FILENAME_RE.match(filename)
+        if not m:
+            continue
+        page_index = int(m.group(2))
+        content = (await f.read()).decode("utf-8", errors="replace")
+        parsed_pages.append({"page_index": page_index, "raw_content": content})
+
+    if not parsed_pages:
+        raise HTTPException(422, detail=f"No valid page files. Name them like: {doc_id}_0.md, {doc_id}_1.md, ...")
+
+    base_index = min(p["page_index"] for p in parsed_pages)
+    for p in parsed_pages:
+        p["page_num"] = p["page_index"] - base_index + 1
+
+    parsed_pages.sort(key=lambda p: p["page_index"])
+    seen: set[int] = set()
+    deduped = [p for p in parsed_pages if p["page_num"] not in seen and not seen.add(p["page_num"])]  # type: ignore
+
+    for p in deduped:
+        p["filtered_text"] = _filter_content(p["raw_content"])
+        p["tables"] = _extract_html_tables(p["raw_content"])
+
+    pred_by_num: dict[int, dict] = {p["page_num"]: p for p in deduped}
+
+    if not _METRICS_AVAILABLE:
+        return {"model": model_name, "doc_id": doc_id, "uc_type": uc_type, "lang": lang,
+                "error": "Scoring dependencies not available",
+                "results": {"text": {"summary": {"n_pages": len(gt_pages_raw), "n_matched_pages": 0}, "pages": []}}}
+
+    page_results: list[dict] = []
+    n_matched = 0
+    for gt_page in gt_pages_raw:
+        pnum = gt_page.get("page_num", 1)
+        pred_entry = pred_by_num.get(pnum)
+        if pred_entry is not None:
+            n_matched += 1
+            pred_page = {"full_text": pred_entry["filtered_text"], "tables": pred_entry.get("tables", [])}
+        else:
+            pred_page = {"full_text": "", "tables": []}
+        try:
+            metrics = compute_all_metrics(gt_page, pred_page)
+        except Exception as exc:
+            metrics = {"error": str(exc)[:200]}
+        metrics["page_num"] = pnum
+
+        # Collect evidence for chat agent retrieval
+        try:
+            pred_page_with_raw = {**pred_page, "_raw_content": (pred_entry or {}).get("raw_content", "")}
+            metrics["_evidence"] = collect_evidence(gt_page, pred_page_with_raw, metrics)
+        except Exception as exc:
+            _logger.error("collect_evidence failed for page %d: %s", pnum, exc)
+
+        page_results.append(metrics)
+
+    summary: dict = {"n_pages": len(gt_pages_raw), "n_matched_pages": n_matched}
+    for metric in _AVERAGED_METRICS:
+        summary[metric] = _safe_mean([r.get(metric) for r in page_results])
+
+    # Save with avg_ keys so dashboard GET /api/ocr/summary reads it correctly
+    result_for_save = {
+        "text": {
+            "summary": {
+                "avg_cer":    summary.get("cer"),
+                "avg_wer":    summary.get("wer"),
+                "avg_char_f1": summary.get("char_f1"),
+                "avg_word_f1": summary.get("word_f1"),
+                "avg_normalized_edit_similarity": summary.get("normalized_edit_similarity"),
+                "n_pages":    summary["n_pages"],
+                "n_matched_pages": summary["n_matched_pages"],
+            },
+            "pages": page_results,
+        }
+    }
+    _save_result(model_name, uc_type, lang, doc_id, result_for_save)
+    _save_model_name(model_name)
+
+    return {
+        "model": model_name,
+        "doc_id": doc_id,
+        "uc_type": uc_type,
+        "lang": lang,
+        "results": {"text": {"summary": summary, "pages": page_results}},
+    }
