@@ -4169,12 +4169,10 @@ async function cuSubmit() {
       } else {
         // Determine best per metric
         const METRICS = [
-          {key:'cer',     label:'CER',      lb:true},
-          {key:'char_f1', label:'Char F1',  lb:false},
-          {key:'word_f1', label:'Word F1',  lb:false},
-          {key:'edit_sim',label:'Edit Sim', lb:false},
-          {key:'teds',    label:'TEDS',     lb:false},
-          {key:'cell_f1', label:'Cell F1',  lb:false},
+          {key:'cer',     label:'CER',   lb:true},
+          {key:'char_f1', label:'F1',    lb:false},
+          {key:'teds',    label:'TEDS',  lb:false},
+          {key:'cell_f1', label:'Cell',  lb:false},
         ];
         const pct = v => v==null ? '—' : (v*100).toFixed(1)+'%';
         const best = {};
@@ -4183,35 +4181,36 @@ async function cuSubmit() {
           if (vals.length) best[m.key] = m.lb ? Math.min(...vals) : Math.max(...vals);
         }
 
-        let html = `<div style="font-size:12px;margin-bottom:6px;color:var(--accent);font-weight:700">📊 So sánh trên <strong>${esc(docId)}</strong></div>`;
-        html += `<div style="overflow-x:auto"><table style="border-collapse:collapse;font-size:11px;width:100%">`;
-        html += `<tr><th style="padding:4px 8px;text-align:left;border-bottom:1px solid var(--border);color:var(--muted)">Model</th>`;
+        let html = `<div style="font-size:11px;margin-bottom:6px;color:var(--accent);font-weight:700">📊 So sánh trên <strong>${esc(docId)}</strong></div>`;
+        html += `<div style="overflow-x:auto"><table style="border-collapse:collapse;font-size:11px;width:100%;min-width:320px">`;
+        html += `<thead><tr style="border-bottom:1px solid var(--border)">`;
+        html += `<th style="padding:4px 6px;text-align:left;color:var(--muted);font-weight:600;white-space:nowrap">Model</th>`;
         for (const m of METRICS) {
-          html += `<th style="padding:4px 8px;text-align:right;border-bottom:1px solid var(--border);color:var(--muted)">${m.label}</th>`;
+          html += `<th style="padding:4px 6px;text-align:right;color:var(--muted);font-weight:600;white-space:nowrap">${m.label}</th>`;
         }
-        html += `<th style="padding:4px 8px;text-align:right;border-bottom:1px solid var(--border);color:var(--muted)">Nguồn</th></tr>`;
+        html += `<th style="padding:4px 6px;text-align:right;color:var(--muted);font-weight:600">Src</th></tr></thead><tbody>`;
 
-        // Sort: best char_f1 first
         const sorted = [...modelNames].sort((a,b) => (models[b].char_f1||0) - (models[a].char_f1||0));
         for (const name of sorted) {
           const m = models[name];
           const isNew = name === modelName;
-          html += `<tr style="${isNew?'background:rgba(124,131,255,.1)':''}">`;
-          html += `<td style="padding:4px 8px;font-weight:${isNew?700:400};color:${isNew?'var(--accent)':'var(--text)'}">${esc(name)}${isNew?' ✨':''}</td>`;
+          html += `<tr style="${isNew?'background:rgba(124,131,255,.08)':''}border-bottom:1px solid var(--border)">`;
+          // Model name — truncate long names
+          const shortName = name.length > 14 ? name.slice(0,13)+'…' : name;
+          html += `<td style="padding:4px 6px;font-weight:${isNew?700:400};color:${isNew?'var(--accent)':'var(--text)'};white-space:nowrap" title="${esc(name)}">${esc(shortName)}${isNew?' ✨':''}</td>`;
           for (const met of METRICS) {
             const v = m[met.key];
             const isBest = v != null && best[met.key] != null && Math.abs(v - best[met.key]) < 0.0001;
             const col = isBest ? 'var(--green)' : 'var(--text)';
-            html += `<td style="padding:4px 8px;text-align:right;color:${col};font-weight:${isBest?700:400}">${pct(v)}</td>`;
+            html += `<td style="padding:4px 6px;text-align:right;color:${col};font-weight:${isBest?700:400};white-space:nowrap;font-family:monospace">${pct(v)}</td>`;
           }
           const src = m.source === 'upload'
-            ? '<span style="color:var(--green);font-size:10px">Upload</span>'
-            : '<span style="color:var(--accent);font-size:10px">Pipeline</span>';
-          html += `<td style="padding:4px 8px;text-align:right">${src}</td>`;
-          html += '</tr>';
+            ? '<span style="color:var(--green);font-size:10px">⬆</span>'
+            : '<span style="color:var(--muted);font-size:10px">⚙</span>';
+          html += `<td style="padding:4px 6px;text-align:center">${src}</td></tr>`;
         }
-        html += '</table></div>';
-        html += `<div style="font-size:11px;color:var(--muted);margin-top:6px">✨ = model vừa upload | 🟩 = tốt nhất | Hỏi thêm để phân tích từng trang.</div>`;
+        html += '</tbody></table></div>';
+        html += `<div style="font-size:10px;color:var(--muted);margin-top:4px">✨ = vừa upload &nbsp;|&nbsp; 🟩 = tốt nhất &nbsp;|&nbsp; ⬆ = Upload &nbsp; ⚙ = Pipeline</div>`;
 
         analysisDiv.innerHTML = html;
 
