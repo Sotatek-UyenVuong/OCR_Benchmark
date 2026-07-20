@@ -2558,6 +2558,27 @@ function buildScoreCard(title, metrics){
   return card;
 }
 
+// Levenshtein distance (used for cell text similarity fallback)
+function _levenshtein(a, b) {
+  if (a === b) return 0;
+  if (!a.length) return b.length;
+  if (!b.length) return a.length;
+  // Cap length to avoid perf issue on very long strings
+  if (a.length > 200) a = a.slice(0, 200);
+  if (b.length > 200) b = b.slice(0, 200);
+  const row = Array.from({length: b.length + 1}, (_, i) => i);
+  for (let i = 1; i <= a.length; i++) {
+    let prev = i;
+    for (let j = 1; j <= b.length; j++) {
+      const val = a[i-1] === b[j-1] ? row[j-1] : Math.min(row[j-1], row[j], prev) + 1;
+      row[j-1] = prev;
+      prev = val;
+    }
+    row[b.length] = prev;
+  }
+  return row[b.length];
+}
+
 function buildPageTable(pages, type){
   // For table pages from pipeline eval: aggregate cell metrics from tables[] if not pre-computed
   if (type === 'table') {
@@ -2567,7 +2588,33 @@ function buildPageTable(pages, type){
       if (!tbls.length) return p;
       // cell_accuracy = exact F1 equivalent in pipeline eval format
       const cellF1Vals  = tbls.map(t => t.cell_accuracy        ?? t.cell_exact_f1).filter(v => v != null);
-      const cellSimVals = tbls.map(t => t.cell_text_similarity  ?? t.cell_sim      ).filter(v => v != null);
+      // cell_text_similarity: compute from cell_diff if not pre-computed
+      const cellSimVals = tbls.map(t => {
+        if (t.cell_text_similarity != null) return t.cell_text_similarity;
+        // Derive from cell_diff + cell_accuracy:
+        // matched cells contribute 1.0, mismatched cells use normalized edit sim
+        const acc = t.cell_accuracy ?? t.cell_exact_f1;
+        if (acc == null) return null;
+        const diffs = t.cell_diff || [];
+        if (!diffs.length) return acc;  // no diffs = all matched = sim equals accuracy
+        // Estimate total cells from ground_truth_html
+        const gtHtml = t.ground_truth_html || '';
+        const nCells = (gtHtml.match(/<t[dh]/gi) || []).length || 1;
+        const nMatched = Math.round(acc * nCells);
+        // For mismatched cells, compute character-level similarity
+        let simSum = nMatched;  // matched cells each contribute 1.0
+        for (const diff of diffs) {
+          const gt = (diff.gt_text || '').toLowerCase();
+          const pr = (diff.pred_text || '').toLowerCase();
+          if (!gt.length && !pr.length) { simSum += 1; continue; }
+          const maxLen = Math.max(gt.length, pr.length);
+          if (!maxLen) { simSum += 1; continue; }
+          // Simple char bigram similarity
+          const editDist = _levenshtein(gt, pr);
+          simSum += Math.max(0, 1 - editDist / maxLen);
+        }
+        return simSum / nCells;
+      }).filter(v => v != null);
       const avg = arr => arr.length ? arr.reduce((a,b)=>a+b,0)/arr.length : null;
       return {
         ...p,
