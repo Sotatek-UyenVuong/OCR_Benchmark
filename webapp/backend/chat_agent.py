@@ -453,6 +453,7 @@ METRICS (cite values in answers):
 
 TOOLS — call autonomously when needed:
 - get_page_evidence(doc_id,page_num,model?): GT vs pred text + diff. USE for "why low score" questions.
+  Returns pred_md_full (full page markdown) when available (upload models) for deep content comparison.
 - get_doc_summary(doc_id): all models' scores per page for one doc.
 - get_model_comparison(uc_type?,lang?,models?): cross-model table, filtered by uc_type/lang.
 - get_model_recommendation(uc_type?,lang?,metric?): best model for a specific use case (scan/table/text_layer × en/vi/ja). USE when user asks "which model is best for Vietnamese scan", "recommend model for Japanese table", etc.

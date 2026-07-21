@@ -106,6 +106,22 @@ def _save_result(model: str, uc_type: str, lang: str, doc_id: str, result: dict)
     path.write_text(json.dumps(payload, ensure_ascii=False, indent=2), encoding="utf-8")
 
 
+def _save_raw_pages(model: str, uc_type: str, lang: str, doc_id: str, parsed_pages: list[dict]) -> None:
+    """Save each page's raw .md content to benchmark_results/{model}/{uc_type}/{lang}/{doc_id}/
+    so the chat agent can later read full prediction text for deep page-level comparison.
+
+    File naming: {doc_id}_p{page_num}.md  (e.g. scan_en_001_p1.md)
+    """
+    pred_dir = RESULT_ROOT / model / uc_type / lang / doc_id
+    pred_dir.mkdir(parents=True, exist_ok=True)
+    for p in parsed_pages:
+        page_file = pred_dir / f"{doc_id}_p{p['page_num']}.md"
+        try:
+            page_file.write_text(p["raw_content"], encoding="utf-8")
+        except Exception as exc:
+            _logger.warning("Failed to save raw page %d: %s", p["page_num"], exc)
+
+
 def _extract_html_tables(raw_md: str) -> list[dict]:
     return [{"table_id": i, "html": m.group(0)} for i, m in enumerate(_TABLE_RE.finditer(raw_md), start=1)]
 
@@ -308,7 +324,16 @@ def get_page_evidence(doc_id: str, page_num: int, model: Optional[str] = None) -
                 "metrics": {k: v for k, v in page.items()
                             if k != "_evidence" and isinstance(v, (int, float))}}
 
-    return {
+    # Try to load full raw prediction .md for this page (saved by upload flow)
+    raw_page_file = RESULT_ROOT / model / uc_type / lang / doc_id / f"{doc_id}_p{page_num}.md"
+    pred_full = None
+    if raw_page_file.exists():
+        try:
+            pred_full = raw_page_file.read_text(encoding="utf-8")
+        except Exception:
+            pass
+
+    result = {
         "doc_id":    doc_id,
         "page_num":  page_num,
         "model":     model,
@@ -316,7 +341,9 @@ def get_page_evidence(doc_id: str, page_num: int, model: Optional[str] = None) -
         "metrics":   {k: v for k, v in page.items()
                       if k not in ("_evidence", "_meta") and isinstance(v, (int, float))},
     }
-
+    if pred_full is not None:
+        result["pred_md_full"] = pred_full  # full page prediction (not truncated)
+    return result
 
 # ── Endpoints ─────────────────────────────────────────────────────────────────
 
@@ -692,6 +719,7 @@ async def score_upload(
         }
     }
     _save_result(model_name, uc_type, lang, doc_id, result_for_save)
+    _save_raw_pages(model_name, uc_type, lang, doc_id, deduped)
     _save_model_name(model_name)
 
     return {
@@ -816,6 +844,7 @@ async def score_upload(
         }
     }
     _save_result(model_name, uc_type, lang, doc_id, result_for_save)
+    _save_raw_pages(model_name, uc_type, lang, doc_id, deduped)
     _save_model_name(model_name)
 
     return {
