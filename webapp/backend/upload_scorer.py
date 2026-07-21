@@ -49,9 +49,10 @@ _FIGCAPTION_RE = re.compile(r'<figcaption\b[^>]*>.*?</figcaption>', re.IGNORECAS
 _DIV_IMG_RE    = re.compile(r'<div\b[^>]*>\s*<img\b[^>]*/?\s*>\s*</div>', re.IGNORECASE | re.DOTALL)
 # Match: ![alt](url) optionally followed by blank lines + a plain-text paragraph (the AI caption)
 # The caption paragraph ends at the next blank line or end of string.
+# Excluded from "caption": lines starting with <, #, !, * (markdown formatting = real content)
 _MD_IMAGE_RE   = re.compile(
     r'!\[[^\]]*\]\([^)]*\)'   # ![alt](url)
-    r'(?:\s*\n[ \t]*\n[^\n<#!][^\n]*(?:\n[^\n<#!][^\n]*)*)?',  # optional following paragraph
+    r'(?:\s*\n[ \t]*\n[^\n<#!*][^\n]*(?:\n[^\n<#!*][^\n]*)*)?',  # optional following AI caption paragraph
     re.DOTALL,
 )
 _TABLE_RE      = re.compile(r'<table\b[^>]*>.*?</table>', re.IGNORECASE | re.DOTALL)
