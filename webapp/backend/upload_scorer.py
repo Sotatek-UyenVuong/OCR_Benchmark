@@ -47,7 +47,13 @@ router = APIRouter(prefix="/api/upload", tags=["Upload & Score"])
 _FIGURE_RE     = re.compile(r'<figure\b[^>]*>.*?</figure>', re.IGNORECASE | re.DOTALL)
 _FIGCAPTION_RE = re.compile(r'<figcaption\b[^>]*>.*?</figcaption>', re.IGNORECASE | re.DOTALL)
 _DIV_IMG_RE    = re.compile(r'<div\b[^>]*>\s*<img\b[^>]*/?\s*>\s*</div>', re.IGNORECASE | re.DOTALL)
-_MD_IMAGE_RE   = re.compile(r'!\[([^\]]*)\]\([^)]*\)', re.DOTALL)  # ![alt](url)
+# Match: ![alt](url) optionally followed by blank lines + a plain-text paragraph (the AI caption)
+# The caption paragraph ends at the next blank line or end of string.
+_MD_IMAGE_RE   = re.compile(
+    r'!\[[^\]]*\]\([^)]*\)'   # ![alt](url)
+    r'(?:\s*\n[ \t]*\n[^\n<#!][^\n]*(?:\n[^\n<#!][^\n]*)*)?',  # optional following paragraph
+    re.DOTALL,
+)
 _TABLE_RE      = re.compile(r'<table\b[^>]*>.*?</table>', re.IGNORECASE | re.DOTALL)
 _PAGE_FILENAME_RE = re.compile(r'^(.+?)_(\d+)\.md$')
 
@@ -131,36 +137,7 @@ def _filter_content(text: str) -> str:
     text = _FIGURE_RE.sub("", text)
     text = _FIGCAPTION_RE.sub("", text)
     text = _DIV_IMG_RE.sub("", text)
-
-    # Remove ![alt](url) AND any following paragraph that duplicates the alt text.
-    # Some models (e.g. Chadra 2) emit: ![Donut chart...](img.webp)\n\nDonut chart...
-    # We collect all alt texts first, then strip the image tags, then strip duplicate paragraphs.
-    alt_texts: list[str] = []
-    def _collect_and_remove(m: re.Match) -> str:
-        alt = m.group(1).strip()
-        if alt:
-            alt_texts.append(alt)
-        return ""
-    text = _MD_IMAGE_RE.sub(_collect_and_remove, text)
-
-    # Strip paragraphs that start with (or ARE) one of the collected alt texts
-    if alt_texts:
-        lines = text.split("\n")
-        cleaned: list[str] = []
-        skip_until_blank = False
-        for line in lines:
-            stripped = line.strip()
-            if skip_until_blank:
-                if stripped == "":
-                    skip_until_blank = False
-                continue
-            # Check if this line begins a duplicate-description paragraph
-            if stripped and any(stripped.startswith(alt[:40]) for alt in alt_texts if len(alt) >= 10):
-                skip_until_blank = True
-                continue
-            cleaned.append(line)
-        text = "\n".join(cleaned)
-
+    text = _MD_IMAGE_RE.sub("", text)   # remove ![alt](url) + any following caption paragraph
     text = _TABLE_RE.sub("", text)
     if _NORMALIZE_AVAILABLE:
         text = normalize_ocr_text(text)
