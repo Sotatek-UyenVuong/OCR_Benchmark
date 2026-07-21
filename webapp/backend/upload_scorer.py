@@ -55,6 +55,7 @@ _MD_IMAGE_RE   = re.compile(
     r'(?:\s*\n[ \t]*\n[^\n<#!*][^\n]*(?:\n[^\n<#!*][^\n]*)*)?',  # optional following AI caption paragraph
     re.DOTALL,
 )
+_FENCED_CODE_RE = re.compile(r'```[\w-]*\n[\s\S]*?```', re.DOTALL)  # ```lang\n...\n``` blocks (diagrams, code)
 _TABLE_RE      = re.compile(r'<table\b[^>]*>.*?</table>', re.IGNORECASE | re.DOTALL)
 _PAGE_FILENAME_RE = re.compile(r'^(.+?)_(\d+)\.md$')
 
@@ -139,6 +140,7 @@ def _filter_content(text: str) -> str:
     text = _FIGCAPTION_RE.sub("", text)
     text = _DIV_IMG_RE.sub("", text)
     text = _MD_IMAGE_RE.sub("", text)   # remove ![alt](url) + any following caption paragraph
+    text = _FENCED_CODE_RE.sub("", text)  # remove ```graph TD```, ```python```, etc.
     text = _TABLE_RE.sub("", text)
     if _NORMALIZE_AVAILABLE:
         text = normalize_ocr_text(text)
