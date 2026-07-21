@@ -4565,7 +4565,7 @@ async function chatSend() {
       body: JSON.stringify({
         session_id: CHAT.sessionId,
         message: msg,
-        history: CHAT.history.slice(-10),
+        history: CHAT.history.slice(-20),
       }),
     });
 

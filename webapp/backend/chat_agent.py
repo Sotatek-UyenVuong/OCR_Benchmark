@@ -801,9 +801,9 @@ async def chat_message(request: Request):
     if effective_message != user_message:
         logger.info("[REWRITE] %r → %r", user_message[:60], effective_message[:80])
 
-    # Build messages — use last 10 turns (more context = better resolution)
+    # Build messages — use last 20 turns (more context = better resolution)
     messages: list[dict] = [{"role": "system", "content": _build_system_prompt()}]
-    for turn in history[-10:]:
+    for turn in history[-20:]:
         if turn.get("role") in ("user", "assistant"):
             messages.append({"role": turn["role"], "content": turn.get("content", "")})
     # Push both original (for history continuity) and rewritten (for agent understanding)
