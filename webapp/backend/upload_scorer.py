@@ -27,7 +27,7 @@ _PROJECT_ROOT = Path(__file__).resolve().parents[2]
 if str(_PROJECT_ROOT) not in sys.path:
     sys.path.insert(0, str(_PROJECT_ROOT))
 
-from .config import GT_ROOT, RESULT_ROOT
+from .config import GT_ROOT, RESULT_ROOT, RAW_ROOT
 
 try:
     from ocr_benchmark.metrics.uet_metrics import compute_all_metrics
@@ -278,6 +278,77 @@ def collect_evidence(gt_page: dict, pred_page: dict, metrics: dict) -> dict:
     }
 
 
+def _build_evidence_from_raw(
+    model: str, uc_type: str, lang: str, doc_id: str, page_num: int
+) -> Optional[dict]:
+    """
+    Build evidence dict for pipeline models (marker/mistral) that don't
+    store _evidence in eval JSON.
+
+    Reads prediction from:
+      raw/{uc_type}/{lang}/{model}_output/{doc_id}_text_prediction.json
+      (pages[].full_text keyed by page_num)
+
+    Returns same schema as collect_evidence() or None if unavailable.
+    """
+    # Normalize model name to folder name: "marker" → "marker_output"
+    model_slug = model.lower().replace(" ", "_")
+    raw_pred_json = RAW_ROOT / uc_type / lang / f"{model_slug}_output" / f"{doc_id}_text_prediction.json"
+    if not raw_pred_json.exists():
+        return None
+
+    try:
+        raw_data = json.loads(raw_pred_json.read_text(encoding="utf-8"))
+    except Exception:
+        return None
+
+    raw_pages = raw_data.get("pages") or []
+    raw_page = next((p for p in raw_pages if p.get("page_num") == page_num), None)
+    if not raw_page:
+        return None
+
+    pred_raw = raw_page.get("full_text") or ""
+
+    # Read GT text
+    gt_path = GT_ROOT / uc_type / lang / f"{doc_id}.json"
+    gt_text = ""
+    if gt_path.exists():
+        try:
+            gt_data = json.loads(gt_path.read_text(encoding="utf-8"))
+            gt_page = next(
+                (p for p in (gt_data.get("pages") or []) if p.get("page_num") == page_num),
+                None,
+            )
+            if gt_page:
+                gt_text = gt_page.get("full_text") or ""
+        except Exception:
+            pass
+
+    # Normalize both
+    try:
+        from ocr_benchmark.normalize import normalize_for_text_benchmark
+        pred_norm = normalize_for_text_benchmark(pred_raw)
+        gt_norm   = normalize_for_text_benchmark(gt_text)
+    except Exception:
+        pred_norm = pred_raw
+        gt_norm   = gt_text
+
+    # Simple diff: find inserted / deleted chunks (word level)
+    gt_words   = set(gt_norm.split())
+    pred_words = set(pred_norm.split())
+    deleted  = list(gt_words   - pred_words)[:20]
+    inserted = list(pred_words - gt_words  )[:20]
+
+    return {
+        "gt_text":         gt_norm[:600],
+        "pred_text":       pred_norm[:600],
+        "pred_text_full":  pred_raw,          # not truncated
+        "deleted_chunks":  deleted,
+        "inserted_chunks": inserted,
+        "source":          "pipeline_raw",
+    }
+
+
 def get_page_evidence(doc_id: str, page_num: int, model: Optional[str] = None) -> dict:
     """
     Load _evidence from saved eval file for a specific page.
@@ -318,11 +389,21 @@ def get_page_evidence(doc_id: str, page_num: int, model: Optional[str] = None) -
     evidence = page.get("_evidence")
 
     if not evidence:
-        return {"error": "evidence_unavailable",
-                "details": "This page was scored before evidence collection was added.",
-                "suggestion": "Re-score this document to collect evidence.",
+        # ── Pipeline model fallback ──────────────────────────────────────
+        # Pipeline evals (marker/mistral) don't run collect_evidence().
+        # Try to reconstruct evidence from raw prediction files in raw/.
+        evidence = _build_evidence_from_raw(model, uc_type, lang, doc_id, page_num)
+        if not evidence:
+            return {
+                "error": "evidence_unavailable",
+                "details": (
+                    "This page has no evidence. For pipeline models (marker/mistral), "
+                    "raw prediction files are read from raw/{uc_type}/{lang}/{model}_output/. "
+                    "For upload models, re-score the document to collect evidence."
+                ),
                 "metrics": {k: v for k, v in page.items()
-                            if k != "_evidence" and isinstance(v, (int, float))}}
+                            if k != "_evidence" and isinstance(v, (int, float))},
+            }
 
     # Try to load full raw prediction .md for this page (saved by upload flow)
     raw_page_file = RESULT_ROOT / model / uc_type / lang / doc_id / f"{doc_id}_p{page_num}.md"
