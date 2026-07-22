@@ -620,33 +620,34 @@ def _collect_model_stats() -> dict:
 @router.get("/leaderboard")
 def get_leaderboard(min_docs: int = 0):
     """
-    Leaderboard: models with >= min_docs evaluated.
-    If min_docs=0 (default), use total GT docs count automatically.
+    Leaderboard: show ALL models, sorted by Char F1.
+    total_docs = number of GT docs available.
+    is_complete = True if model has evaluated >= total_docs.
+    min_docs param kept for backward compat but ignored (show all).
     """
     # Count GT docs dynamically
     total_gt = sum(1 for _ in GT_ROOT.rglob("*.json")
                    if len(_.relative_to(GT_ROOT).parts) == 3) if GT_ROOT.exists() else 24
-    if min_docs == 0:
-        min_docs = total_gt
 
     stats = _collect_model_stats()
     rows = []
     for s in stats.values():
-        if s["docs"] < min_docs:
-            continue
         rows.append({
-            "model": s["model"], "docs": s["docs"],
+            "model":       s["model"],
+            "docs":        s["docs"],
             "avg_char_f1": s["avg_char_f1"],
-            "avg_cer": s["avg_cer"],
-            "avg_teds": s["avg_teds"],
+            "avg_cer":     s["avg_cer"],
+            "avg_teds":    s["avg_teds"],
             "avg_cell_f1": s["avg_cell_f1"],
-            "source": s["source"],
-            "total_docs": total_gt,
+            "source":      s["source"],
+            "total_docs":  total_gt,
+            "is_complete": s["docs"] >= total_gt,
         })
-    rows.sort(key=lambda r: (r["avg_char_f1"] or 0, r["avg_teds"] or 0), reverse=True)
+    # Sort: complete models first (by Char F1), then incomplete (by Char F1)
+    rows.sort(key=lambda r: (not r["is_complete"], -(r["avg_char_f1"] or 0), -(r["avg_teds"] or 0)))
     for i, r in enumerate(rows):
         r["rank"] = i + 1
-        r["is_best"] = (i == 0)
+        r["is_best"] = (i == 0 and r["is_complete"])
     return rows
 
 
