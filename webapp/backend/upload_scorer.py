@@ -135,13 +135,44 @@ def _extract_html_tables(raw_md: str) -> list[dict]:
     return [{"table_id": i, "html": m.group(0)} for i, m in enumerate(_TABLE_RE.finditer(raw_md), start=1)]
 
 
+def _flatten_html_table_text(html: str) -> str:
+    """Extract all cell text from an HTML table as a single space-separated string."""
+    import re as _re
+    # Extract text from <td> and <th> tags
+    cells = _re.findall(r'<t[dh][^>]*>(.*?)</t[dh]>', html, _re.IGNORECASE | _re.DOTALL)
+    # Strip inner HTML tags from each cell
+    cell_texts = [_re.sub(r'<[^>]+>', ' ', c).strip() for c in cells]
+    return ' '.join(t for t in cell_texts if t)
+
+
+def _build_full_text_for_scoring(gt_page: dict) -> str:
+    """
+    Build full text for scoring that includes BOTH prose text AND table cell content.
+    This ensures text metrics (CER/F1) are computed on all readable content,
+    not just the non-table portion.
+    """
+    parts = [gt_page.get("full_text") or ""]
+    for tbl in (gt_page.get("tables") or []):
+        # Prefer cells[] for clean text extraction
+        cells = tbl.get("cells") or []
+        if cells:
+            cell_text = " ".join(c.get("text", "") for c in cells if c.get("text", "").strip())
+        else:
+            cell_text = _flatten_html_table_text(tbl.get("html") or "")
+        if cell_text:
+            parts.append(cell_text)
+    return "\n".join(p for p in parts if p)
+
+
 def _filter_content(text: str) -> str:
+    """Strip non-text elements (images, figures, code blocks) but KEEP table text as flat text."""
     text = _FIGURE_RE.sub("", text)
     text = _FIGCAPTION_RE.sub("", text)
     text = _DIV_IMG_RE.sub("", text)
     text = _MD_IMAGE_RE.sub("", text)   # remove ![alt](url) + any following caption paragraph
     text = _FENCED_CODE_RE.sub("", text)  # remove ```graph TD```, ```python```, etc.
-    text = _TABLE_RE.sub("", text)
+    # Replace HTML tables with their flattened text content
+    text = _TABLE_RE.sub(lambda m: "\n" + _flatten_html_table_text(m.group(0)) + "\n", text)
     if _NORMALIZE_AVAILABLE:
         text = normalize_ocr_text(text)
     return text
@@ -657,8 +688,7 @@ def get_model_progress(total_docs: int = 24):
 @router.get("/doc_comparison")
 def get_doc_comparison(doc_id: str) -> dict:
     """
-    Return all models' summary scores for one document side-by-side.
-    Used by chat upload panel to show instant comparison without LLM call.
+    Return all models' summary scores for one document side-by-side.    Used by chat upload panel to show instant comparison without LLM call.
     """
     uc_type, lang = _parse_doc_id(doc_id)
     pattern = f"*/{uc_type}/{lang}/{doc_id}_eval.json"
@@ -774,8 +804,10 @@ async def score_upload(
             pred_page = {"full_text": pred_entry["filtered_text"], "tables": pred_entry.get("tables", [])}
         else:
             pred_page = {"full_text": "", "tables": []}
+        # GT full_text + flatten table cells → text metrics cover whole page content
+        gt_page_for_scoring = {**gt_page, "full_text": _build_full_text_for_scoring(gt_page)}
         try:
-            metrics = compute_all_metrics(gt_page, pred_page)
+            metrics = compute_all_metrics(gt_page_for_scoring, pred_page)
         except Exception as exc:
             metrics = {"error": str(exc)[:200]}
         metrics["page_num"] = pnum
@@ -901,8 +933,9 @@ async def score_upload(
             pred_page = {"full_text": pred_entry["filtered_text"], "tables": pred_entry.get("tables", [])}
         else:
             pred_page = {"full_text": "", "tables": []}
+        gt_page_for_scoring = {**gt_page, "full_text": _build_full_text_for_scoring(gt_page)}
         try:
-            metrics = compute_all_metrics(gt_page, pred_page)
+            metrics = compute_all_metrics(gt_page_for_scoring, pred_page)
         except Exception as exc:
             metrics = {"error": str(exc)[:200]}
         metrics["page_num"] = pnum
