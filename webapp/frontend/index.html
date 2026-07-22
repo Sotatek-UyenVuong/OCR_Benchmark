@@ -2513,7 +2513,6 @@ function renderScores(data, container){
     el.appendChild(buildScoreCard('📝 Text Evaluation', [
       {label:'CER',         val:s.avg_cer,                         lower:true},
       {label:'WER',         val:s.avg_wer,                         lower:true},
-      {label:'nWER',        val:s.avg_nwer,                        lower:true},
       {label:'Char F1',     val:s.avg_char_f1,                     lower:false},
       {label:'Word F1',     val:s.avg_word_f1,                     lower:false},
       {label:'Edit Sim',    val:s.avg_normalized_edit_similarity,   lower:false},
@@ -2629,7 +2628,7 @@ function buildPageTable(pages, type){
 
   const cols = type==='table'
     ? ['Page','Avg TEDS','Cell F1','Cell Sim']
-    : ['Page','CER','WER','nWER','Char F1','Word F1'];
+    : ['Page','CER','WER','Char F1','Word F1'];
 
   card.innerHTML=`<div class="card-block-title" style="padding:8px 16px">Per-page detail</div>
     <table class="page-table">
@@ -2642,7 +2641,6 @@ function buildPageTable(pages, type){
             <td>${((p.table_cell_text_similarity_mean||0)*100).toFixed(1)}%</td>`
           :`<td class="${scoreClass(p.cer,true)}">${(p.cer*100).toFixed(2)}%</td>
             <td class="${scoreClass(p.wer,true)}">${((p.wer||0)*100).toFixed(2)}%</td>
-            <td class="${scoreClass(p.nwer,true)}">${((p.nwer||0)*100).toFixed(2)}%</td>
             <td class="${scoreClass(p.char_f1||0,false)}">${((p.char_f1||0)*100).toFixed(1)}%</td>
             <td class="${scoreClass(p.word_f1||0,false)}">${((p.word_f1||0)*100).toFixed(1)}%</td>`}
       </tr>`).join('')}</tbody>
