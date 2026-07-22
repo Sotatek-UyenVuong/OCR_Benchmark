@@ -76,7 +76,8 @@ def _uc_type_from_path(uc_dir: str) -> str:
     return uc_dir  # directory name IS the uc_type
 
 def _lang_label(lang: str) -> str:
-    return {"vi": "Tiếng Việt", "en": "English", "ja": "日本語"}.get(lang, lang)
+    return {"vi": "Tiếng Việt", "en": "English", "ja": "日本語",
+            "ko": "한국어", "zh": "中文"}.get(lang, lang)
 
 def _pred_path(model: str, uc_type: str, lang: str, doc_id: str) -> Path:
     """predictions/<model>/<uc_type>/<lang>/<doc_id>.json"""
@@ -98,16 +99,25 @@ def _safe_mean(vals):
 @router.get("/pdfs")
 def list_pdfs():
     """
-    List all PDF files in raw/ with their OCR and GT status per model.
+    List all source files in raw/ (PDF or images) with their OCR and GT status per model.
     """
+    _SOURCE_EXTS = {".pdf", ".png", ".jpg", ".jpeg", ".webp"}
     pdfs = []
-    for pdf in sorted(RAW_ROOT.rglob("*.pdf")):
-        rel = pdf.relative_to(RAW_ROOT)
+    seen: set[str] = set()
+
+    for src in sorted(RAW_ROOT.rglob("*")):
+        if src.suffix.lower() not in _SOURCE_EXTS:
+            continue
+        rel = src.relative_to(RAW_ROOT)
         parts = rel.parts
-        if len(parts) != 3:   # <uc_type>/<lang>/<doc_id>.pdf
+        if len(parts) != 3:   # <uc_type>/<lang>/<doc_id>.<ext>
             continue
         uc_type, lang, filename = parts
-        doc_id = pdf.stem
+        doc_id = src.stem
+        key = f"{uc_type}/{lang}/{doc_id}"
+        if key in seen:
+            continue
+        seen.add(key)
 
         # Check per-model prediction status
         ocr_done = {}
@@ -122,21 +132,23 @@ def list_pdfs():
             has_text_pred_by_model[m]  = text_pred.exists() or unified.exists()
             has_table_pred_by_model[m] = table_pred.exists()
 
-        # Legacy compat: has_text_pred / has_table_pred for default model (marker)
-        marker_subdir = MODEL_SUBDIR["marker"]
-
         # Check GT saved
         gt_file = _gt_path(uc_type, lang, doc_id)
 
         # Check eval result per model
         eval_done = {m: _result_path(m, uc_type, lang, doc_id).exists() for m in MODEL_SUBDIR}
 
+        # Build URL — PDF gets served via pdf endpoint, images served as static
+        is_pdf = src.suffix.lower() == ".pdf"
+        pdf_url = f"/api/gt/pdf/{uc_type}/{lang}/{filename}" if is_pdf else None
+
         pdfs.append({
             "doc_id": doc_id,
             "uc_type": uc_type,
             "lang": lang,
             "lang_label": _lang_label(lang),
-            "pdf_url": f"/api/gt/pdf/{uc_type}/{lang}/{filename}",
+            "pdf_url": pdf_url,
+            "source_ext": src.suffix.lower(),
             "ocr_done": ocr_done,
             "gt_saved": gt_file.exists(),
             "eval_done": eval_done,
@@ -164,9 +176,16 @@ async def run_ocr(req: RunOCRRequest, background_tasks: BackgroundTasks):
     Idempotent: if prediction already exists, skip (unless force=True).
     Returns job_id to poll status.
     """
-    pdf_path = RAW_ROOT / req.uc_type / req.lang / f"{req.doc_id}.pdf"
-    if not pdf_path.exists():
-        raise HTTPException(404, f"PDF not found: {pdf_path.relative_to(PROJECT_ROOT)}")
+    # Find source file — PDF or image
+    _SOURCE_EXTS = [".pdf", ".png", ".jpg", ".jpeg", ".webp"]
+    pdf_path: Path | None = None
+    for ext in _SOURCE_EXTS:
+        candidate = RAW_ROOT / req.uc_type / req.lang / f"{req.doc_id}{ext}"
+        if candidate.exists():
+            pdf_path = candidate
+            break
+    if pdf_path is None:
+        raise HTTPException(404, f"Source file not found for {req.doc_id} in raw/{req.uc_type}/{req.lang}/")
 
     # Check if already done for THIS model
     model_subdir = _model_subdir(req.model)
