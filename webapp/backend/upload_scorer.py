@@ -618,15 +618,17 @@ def _collect_model_stats() -> dict:
 
 
 @router.get("/leaderboard")
-def get_leaderboard(min_docs: int = 24):
+def get_leaderboard(min_docs: int = 0):
     """
     Leaderboard: models with >= min_docs evaluated.
-    Ranking criteria (in order):
-      1. Char F1 — higher is better (primary text quality)
-      2. TEDS    — higher is better (table structure quality)
-    Only models with results on ALL min_docs documents appear here.
-    Models still in progress (< min_docs) are NOT shown — use /progress.
+    If min_docs=0 (default), use total GT docs count automatically.
     """
+    # Count GT docs dynamically
+    total_gt = sum(1 for _ in GT_ROOT.rglob("*.json")
+                   if len(_.relative_to(GT_ROOT).parts) == 3) if GT_ROOT.exists() else 24
+    if min_docs == 0:
+        min_docs = total_gt
+
     stats = _collect_model_stats()
     rows = []
     for s in stats.values():
@@ -639,6 +641,7 @@ def get_leaderboard(min_docs: int = 24):
             "avg_teds": s["avg_teds"],
             "avg_cell_f1": s["avg_cell_f1"],
             "source": s["source"],
+            "total_docs": total_gt,
         })
     rows.sort(key=lambda r: (r["avg_char_f1"] or 0, r["avg_teds"] or 0), reverse=True)
     for i, r in enumerate(rows):
@@ -648,20 +651,19 @@ def get_leaderboard(min_docs: int = 24):
 
 
 @router.get("/progress")
-def get_model_progress(total_docs: int = 24):
+def get_model_progress():
     """
     Progress for ALL models (including incomplete ones).
-    Shows how many of total_docs have been evaluated so far.
-    Used in Leaderboard UI to show 'X/24 — Y more needed' for in-progress models.
-    Includes list of which doc_ids are still missing.
+    total_docs is computed dynamically from GT files.
     """
-    # Build the full list of 24 doc_ids from GT
+    # Build the full list of doc_ids from GT
     all_docs: set[str] = set()
     if GT_ROOT.exists():
         for path in GT_ROOT.rglob("*.json"):
             parts = path.relative_to(GT_ROOT).parts
             if len(parts) == 3:
                 all_docs.add(path.stem)
+    total_docs = len(all_docs) or 1  # avoid division by zero
 
     stats = _collect_model_stats()
     rows = []

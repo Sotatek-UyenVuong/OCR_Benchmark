@@ -3570,7 +3570,7 @@ refreshAll();
   <div class="lb-box">
     <div class="dashboard-header">
       <h2>🏆 Model Leaderboard</h2>
-      <span style="font-size:11px;color:var(--muted)">Models with results on all 24 documents</span>
+      <span style="font-size:11px;color:var(--muted)">Models with results on all benchmark documents</span>
       <button class="btn btn-ghost" style="padding:4px 10px;font-size:12px" onclick="refreshLeaderboard()">↻</button>
       <button class="btn btn-ghost" style="padding:4px 10px;font-size:12px" onclick="hideLeaderboard()">✕</button>
     </div>
@@ -3965,7 +3965,10 @@ async function refreshLeaderboard() {
 
 function _renderLeaderboard(ranked, progress) {
   const pct = v => v == null ? '—' : (v * 100).toFixed(1) + '%';
-  const TOTAL = 24;
+  // Use total_docs from first ranked entry or progress, fallback to counting
+  const TOTAL = ranked[0]?.total_docs
+    || progress[0]?.total_docs
+    || 24;
 
   // ── Ranking criteria explanation ──
   let html = `
