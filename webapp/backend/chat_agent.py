@@ -181,7 +181,7 @@ TOOL_DEFINITIONS = [
                     "uc_type": {
                         "type": "string",
                         "enum": ["scan", "table", "text_layer"],
-                        "description": "Loại tài liệu cần gợi ý. Bỏ trống = so sánh tất cả uc_type.",
+                        "description": "Loại tài liệu cần gợi ý. Bỏ trống (không truyền) = trả về TẤT CẢ uc_type trong 1 lần gọi. ƯU TIÊN bỏ trống khi user hỏi chung chung.",
                     },
                     "lang": {
                         "type": "string",
@@ -462,7 +462,7 @@ TOOLS — call autonomously when needed:
   Returns pred_md_full (full page markdown) when available (upload models) for deep content comparison.
 - get_doc_summary(doc_id): all models' scores per page for one doc.
 - get_model_comparison(uc_type?,lang?,models?): cross-model table, filtered by uc_type/lang.
-- get_model_recommendation(uc_type?,lang?,metric?): best model for a specific use case (scan/table/text_layer × en/vi/ja). USE when user asks "which model is best for Vietnamese scan", "recommend model for Japanese table", etc.
+- get_model_recommendation(uc_type?,lang?,metric?): best model for a specific use case (scan/table/text_layer × en/vi/ja). USE when user asks "which model is best for Vietnamese scan", "recommend model for Japanese table", etc. Call ONCE with lang only (omit uc_type) to get all doc types at once.
 - find_worst_pages(model,metric,doc_id?,top_k?): worst scoring pages.
 
 RULES:
