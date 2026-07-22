@@ -91,6 +91,52 @@ def _iter_draft_files():
             "gt_path": str(gt_path.relative_to(PROJECT_ROOT)) if gt_saved else None,
         }
 
+    # Also yield image-based docs (PNG/JPG) that don't have a prediction JSON yet
+    # raw/<uc_type>/<lang>/<doc_id>.png or .jpg  (not inside any subfolder)
+    _IMG_EXTS = {".png", ".jpg", ".jpeg", ".webp"}
+    seen_doc_ids: set[str] = set()
+    for img_file in sorted(RAW_ROOT.rglob("*")):
+        if img_file.suffix.lower() not in _IMG_EXTS:
+            continue
+        parts = img_file.relative_to(RAW_ROOT).parts
+        # Must be at depth 2: raw/<uc_type>/<lang>/<file.png>
+        if len(parts) != 3:
+            continue
+        uc_type, lang, fname = parts
+        doc_id = img_file.stem  # e.g. "scan_ko_001"
+        key = f"{uc_type}/{lang}/{doc_id}"
+        if key in seen_doc_ids:
+            continue
+        seen_doc_ids.add(key)
+
+        gt_path = GT_ROOT / uc_type / lang / f"{doc_id}.json"
+        gt_saved = gt_path.exists()
+        gt_status = gt_reviewer = gt_updated = ""
+        if gt_saved:
+            try:
+                import json as _json
+                with open(gt_path, encoding="utf-8") as _f:
+                    _gt = _json.load(_f)
+                gt_status   = _gt.get("status", "")
+                gt_reviewer = _gt.get("reviewer", "")
+                gt_updated  = _gt.get("updated_at", "")
+            except Exception:
+                pass
+
+        yield {
+            "doc_id":     doc_id,
+            "uc_type":    uc_type,
+            "lang":       lang,
+            "split":      "image",
+            "draft_path": str(img_file.relative_to(PROJECT_ROOT)),
+            "pdf_exists": False,
+            "gt_saved":   gt_saved,
+            "gt_status":  gt_status,
+            "gt_reviewer": gt_reviewer,
+            "gt_updated": gt_updated,
+            "gt_path":    str(gt_path.relative_to(PROJECT_ROOT)) if gt_saved else None,
+        }
+
 
 # ── Models ────────────────────────────────────────────────────────────────────
 
