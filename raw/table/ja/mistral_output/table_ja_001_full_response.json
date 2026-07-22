@@ -1,0 +1,647 @@
+{
+  "pages": [
+    {
+      "index": 0,
+      "markdown": "配送日\n\n8年 2月 5日\n\n# 生鮮便 作業日報\n\n[tbl-0.html](tbl-0.html)\n\n[tbl-1.html](tbl-1.html)\n\n[tbl-2.html](tbl-2.html)",
+      "images": [],
+      "tables": [
+        {
+          "id": "tbl-0.html",
+          "content": "<table><tr><td>会社名</td><td colspan=\"2\">配送コース</td><td>車番</td><td>乗務員氏名</td></tr><tr><td>神栄運輸（株）</td><td>18コース</td><td>19コース</td><td>5101</td><td>永山広樹</td></tr></table>",
+          "format": "html",
+          "word_confidence_scores": null
+        },
+        {
+          "id": "tbl-1.html",
+          "content": "<table><tr><td>作業開始時間</td><td>4 : 15</td><td>1便開始メーター</td><td>71964 km</td><td>2便開始メーター</td><td>72044 km</td></tr><tr><td>作業終了時間</td><td>13 : 55</td><td>1便終了メーター</td><td>72044 km</td><td>2便終了メーター</td><td>72171 km</td></tr><tr><td>所要時間</td><td>9 : 40</td><td>走行距離</td><td>80 km</td><td>走行距離</td><td>127 km</td></tr></table>",
+          "format": "html",
+          "word_confidence_scores": null
+        },
+        {
+          "id": "tbl-2.html",
+          "content": "<table><tr><td rowspan=\"3\">店舗名</td><td rowspan=\"3\">到着時間</td><td rowspan=\"3\">出発時間</td><td rowspan=\"3\">到着温度</td><td colspan=\"7\">納品数量</td><td rowspan=\"2\">回収</td></tr><tr><td colspan=\"3\">ドーリー</td><td colspan=\"3\">カゴ</td><td rowspan=\"2\">長物</td><td rowspan=\"2\">チルド<br/>カゴ</td></tr><tr><td>精肉</td><td>鮮魚</td><td>混載</td><td>チルド</td><td>冷凍</td><td>デリカ</td></tr><tr><td>車庫</td><td>:</td><td>4 : 15</td><td>℃</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr><tr><td>市川生鮮センター</td><td>4 : 20</td><td>5 : 25</td><td>℃</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr><tr><td>新松戸 店</td><td>6 : 00</td><td>6 : 15</td><td>℃</td><td>3</td><td>1</td><td></td><td>2</td><td>1</td><td>2</td><td></td><td></td></tr><tr><td>南流山 店</td><td>6 : 20</td><td>6 : 35</td><td>℃</td><td>3</td><td></td><td>1</td><td>1</td><td>1</td><td>3</td><td></td><td></td></tr><tr><td>店</td><td>:</td><td>:</td><td>℃</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr><tr><td>桶川生鮮センター</td><td>8 : 10</td><td>10 : 10</td><td>℃</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr><tr><td>秋津 店</td><td>11 : 20</td><td>11 : 30</td><td>℃</td><td>1</td><td>1</td><td></td><td>2</td><td></td><td></td><td></td><td>1</td></tr><tr><td>ひばりが丘 店</td><td>11 : 50</td><td>12 : 05</td><td>℃</td><td>1</td><td>1</td><td></td><td>3</td><td></td><td></td><td></td><td>1</td></tr><tr><td>杉並井草 店</td><td>12 : 35</td><td>12 : 45</td><td>℃</td><td>1</td><td>1</td><td></td><td></td><td></td><td></td><td></td><td>1</td></tr><tr><td>車庫</td><td>13 : 55</td><td>:</td><td>℃</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr></table>",
+          "format": "html",
+          "word_confidence_scores": null
+        }
+      ],
+      "hyperlinks": [],
+      "header": "(株)岩崎運送 本社車庫営業所\n業務管理部 輸送課\n2023/11/1",
+      "footer": null,
+      "dimensions": {
+        "dpi": 87,
+        "height": 720,
+        "width": 1018
+      },
+      "confidence_scores": null,
+      "blocks": [
+        {
+          "top_left_x": 854,
+          "top_left_y": 27,
+          "bottom_right_x": 1000,
+          "bottom_right_y": 41,
+          "content": "(株)岩崎運送 本社車庫営業所",
+          "type": "header"
+        },
+        {
+          "top_left_x": 898,
+          "top_left_y": 47,
+          "bottom_right_x": 1000,
+          "bottom_right_y": 61,
+          "content": "業務管理部 輸送課",
+          "type": "header"
+        },
+        {
+          "top_left_x": 942,
+          "top_left_y": 66,
+          "bottom_right_x": 1000,
+          "bottom_right_y": 79,
+          "content": "2023/11/1",
+          "type": "header"
+        },
+        {
+          "top_left_x": 43,
+          "top_left_y": 61,
+          "bottom_right_x": 85,
+          "bottom_right_y": 79,
+          "content": "配送日",
+          "type": "text"
+        },
+        {
+          "top_left_x": 147,
+          "top_left_y": 45,
+          "bottom_right_x": 335,
+          "bottom_right_y": 79,
+          "content": "8年 2月 5日",
+          "type": "text"
+        },
+        {
+          "top_left_x": 435,
+          "top_left_y": 40,
+          "bottom_right_x": 683,
+          "bottom_right_y": 74,
+          "content": "# 生鮮便 作業日報",
+          "type": "title"
+        },
+        {
+          "top_left_x": 39,
+          "top_left_y": 107,
+          "bottom_right_x": 974,
+          "bottom_right_y": 173,
+          "content": "<table><tr><td>会社名</td><td colspan=\"2\">配送コース</td><td>車番</td><td>乗務員氏名</td></tr><tr><td>神栄運輸（株）</td><td>18コース</td><td>19コース</td><td>5101</td><td>永山広樹</td></tr></table>",
+          "type": "table",
+          "table_id": "tbl-0.html"
+        },
+        {
+          "top_left_x": 39,
+          "top_left_y": 182,
+          "bottom_right_x": 974,
+          "bottom_right_y": 264,
+          "content": "<table><tr><td>作業開始時間</td><td>4 : 15</td><td>1便開始メーター</td><td>71964 km</td><td>2便開始メーター</td><td>72044 km</td></tr><tr><td>作業終了時間</td><td>13 : 55</td><td>1便終了メーター</td><td>72044 km</td><td>2便終了メーター</td><td>72171 km</td></tr><tr><td>所要時間</td><td>9 : 40</td><td>走行距離</td><td>80 km</td><td>走行距離</td><td>127 km</td></tr></table>",
+          "type": "table",
+          "table_id": "tbl-1.html"
+        },
+        {
+          "top_left_x": 39,
+          "top_left_y": 272,
+          "bottom_right_x": 974,
+          "bottom_right_y": 687,
+          "content": "<table><tr><td rowspan=\"3\">店舗名</td><td rowspan=\"3\">到着時間</td><td rowspan=\"3\">出発時間</td><td rowspan=\"3\">到着温度</td><td colspan=\"7\">納品数量</td><td rowspan=\"2\">回収</td></tr><tr><td colspan=\"3\">ドーリー</td><td colspan=\"3\">カゴ</td><td rowspan=\"2\">長物</td><td rowspan=\"2\">チルド<br/>カゴ</td></tr><tr><td>精肉</td><td>鮮魚</td><td>混載</td><td>チルド</td><td>冷凍</td><td>デリカ</td></tr><tr><td>車庫</td><td>:</td><td>4 : 15</td><td>℃</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr><tr><td>市川生鮮センター</td><td>4 : 20</td><td>5 : 25</td><td>℃</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr><tr><td>新松戸 店</td><td>6 : 00</td><td>6 : 15</td><td>℃</td><td>3</td><td>1</td><td></td><td>2</td><td>1</td><td>2</td><td></td><td></td></tr><tr><td>南流山 店</td><td>6 : 20</td><td>6 : 35</td><td>℃</td><td>3</td><td></td><td>1</td><td>1</td><td>1</td><td>3</td><td></td><td></td></tr><tr><td>店</td><td>:</td><td>:</td><td>℃</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr><tr><td>桶川生鮮センター</td><td>8 : 10</td><td>10 : 10</td><td>℃</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr><tr><td>秋津 店</td><td>11 : 20</td><td>11 : 30</td><td>℃</td><td>1</td><td>1</td><td></td><td>2</td><td></td><td></td><td></td><td>1</td></tr><tr><td>ひばりが丘 店</td><td>11 : 50</td><td>12 : 05</td><td>℃</td><td>1</td><td>1</td><td></td><td>3</td><td></td><td></td><td></td><td>1</td></tr><tr><td>杉並井草 店</td><td>12 : 35</td><td>12 : 45</td><td>℃</td><td>1</td><td>1</td><td></td><td></td><td></td><td></td><td></td><td>1</td></tr><tr><td>車庫</td><td>13 : 55</td><td>:</td><td>℃</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr></table>",
+          "type": "table",
+          "table_id": "tbl-2.html"
+        }
+      ]
+    },
+    {
+      "index": 1,
+      "markdown": "配送日\n\n8年 2月 5日\n\n# 生鮮便 作業日報\n\n[tbl-3.html](tbl-3.html)\n\n[tbl-4.html](tbl-4.html)\n\n[tbl-5.html](tbl-5.html)",
+      "images": [],
+      "tables": [
+        {
+          "id": "tbl-3.html",
+          "content": "<table><tr><td>会社名</td><td colspan=\"2\">配送コース</td><td>車番</td><td>乗務員氏名</td></tr><tr><td>神栄運輸（株）</td><td>19コース</td><td>18コース</td><td>346</td><td>鈴木好和</td></tr></table>",
+          "format": "html",
+          "word_confidence_scores": null
+        },
+        {
+          "id": "tbl-4.html",
+          "content": "<table><tr><td>作業開始時間</td><td>4 : 00</td><td>1便開始メーター</td><td>359482 km</td><td>2便開始メーター</td><td>359597 km</td></tr><tr><td>作業終了時間</td><td>13 : 30</td><td>1便終了メーター</td><td>359597 km</td><td>2便終了メーター</td><td>359695 km</td></tr><tr><td>所要時間</td><td>9 : 30</td><td>走行距離</td><td>115 km</td><td>走行距離</td><td>98 km</td></tr></table>",
+          "format": "html",
+          "word_confidence_scores": null
+        },
+        {
+          "id": "tbl-5.html",
+          "content": "<table><tr><td rowspan=\"3\">店舗名</td><td rowspan=\"3\">到着時間</td><td rowspan=\"3\">出発時間</td><td rowspan=\"3\">到着温度</td><td colspan=\"7\">納品数量</td><td rowspan=\"2\">回収</td></tr><tr><td colspan=\"3\">ドーリー</td><td colspan=\"3\">カゴ</td><td rowspan=\"2\">長物</td><td rowspan=\"2\">チルド<br/>カゴ</td></tr><tr><td>精肉</td><td>鮮魚</td><td>混載</td><td>チルド</td><td>冷凍</td><td>デリカ</td></tr><tr><td>車庫</td><td>:</td><td>4 : 00</td><td>℃</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr><tr><td>市川生鮮センター</td><td>4 : 05</td><td>5 : 05</td><td>℃</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr><tr><td>鎌ヶ谷 店</td><td>5 : 35</td><td>5 : 55</td><td>0℃</td><td>5</td><td>1</td><td></td><td>2</td><td>1</td><td>3</td><td></td><td></td></tr><tr><td>薬円台 店</td><td>6 : 20</td><td>6 : 40</td><td>0℃</td><td>5</td><td>1</td><td></td><td>2</td><td>1</td><td>3</td><td></td><td></td></tr><tr><td>店</td><td>:</td><td>:</td><td>℃</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr><tr><td>桶川生鮮センター</td><td>8 : 15</td><td>10 : 30</td><td>℃</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr><tr><td>葛飾白鳥 店</td><td>11 : 25</td><td>11 : 40</td><td>0℃</td><td>1</td><td>1</td><td></td><td>8</td><td></td><td></td><td></td><td>2</td></tr><tr><td>亀有 店</td><td>11 : 45</td><td>11 : 55</td><td>0℃</td><td>1</td><td>1</td><td></td><td></td><td></td><td></td><td></td><td></td></tr><tr><td>花畑 店</td><td>12 : 15</td><td>12 : 30</td><td>0℃</td><td>1</td><td>1</td><td></td><td></td><td></td><td></td><td></td><td>1</td></tr><tr><td>車庫</td><td>13 : 30</td><td>:</td><td>℃</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr></table>",
+          "format": "html",
+          "word_confidence_scores": null
+        }
+      ],
+      "hyperlinks": [],
+      "header": "(株)岩崎運送 本社車庫営業所\n業務管理部 輸送課\n2023/11/1",
+      "footer": null,
+      "dimensions": {
+        "dpi": 87,
+        "height": 720,
+        "width": 1018
+      },
+      "confidence_scores": null,
+      "blocks": [
+        {
+          "top_left_x": 857,
+          "top_left_y": 27,
+          "bottom_right_x": 1002,
+          "bottom_right_y": 41,
+          "content": "(株)岩崎運送 本社車庫営業所",
+          "type": "header"
+        },
+        {
+          "top_left_x": 902,
+          "top_left_y": 46,
+          "bottom_right_x": 1002,
+          "bottom_right_y": 59,
+          "content": "業務管理部 輸送課",
+          "type": "header"
+        },
+        {
+          "top_left_x": 945,
+          "top_left_y": 64,
+          "bottom_right_x": 1002,
+          "bottom_right_y": 77,
+          "content": "2023/11/1",
+          "type": "header"
+        },
+        {
+          "top_left_x": 46,
+          "top_left_y": 66,
+          "bottom_right_x": 87,
+          "bottom_right_y": 83,
+          "content": "配送日",
+          "type": "text"
+        },
+        {
+          "top_left_x": 161,
+          "top_left_y": 63,
+          "bottom_right_x": 337,
+          "bottom_right_y": 83,
+          "content": "8年 2月 5日",
+          "type": "text"
+        },
+        {
+          "top_left_x": 438,
+          "top_left_y": 42,
+          "bottom_right_x": 684,
+          "bottom_right_y": 75,
+          "content": "# 生鮮便 作業日報",
+          "type": "title"
+        },
+        {
+          "top_left_x": 43,
+          "top_left_y": 107,
+          "bottom_right_x": 974,
+          "bottom_right_y": 174,
+          "content": "<table><tr><td>会社名</td><td colspan=\"2\">配送コース</td><td>車番</td><td>乗務員氏名</td></tr><tr><td>神栄運輸（株）</td><td>19コース</td><td>18コース</td><td>346</td><td>鈴木好和</td></tr></table>",
+          "type": "table",
+          "table_id": "tbl-3.html"
+        },
+        {
+          "top_left_x": 43,
+          "top_left_y": 183,
+          "bottom_right_x": 974,
+          "bottom_right_y": 266,
+          "content": "<table><tr><td>作業開始時間</td><td>4 : 00</td><td>1便開始メーター</td><td>359482 km</td><td>2便開始メーター</td><td>359597 km</td></tr><tr><td>作業終了時間</td><td>13 : 30</td><td>1便終了メーター</td><td>359597 km</td><td>2便終了メーター</td><td>359695 km</td></tr><tr><td>所要時間</td><td>9 : 30</td><td>走行距離</td><td>115 km</td><td>走行距離</td><td>98 km</td></tr></table>",
+          "type": "table",
+          "table_id": "tbl-4.html"
+        },
+        {
+          "top_left_x": 43,
+          "top_left_y": 272,
+          "bottom_right_x": 974,
+          "bottom_right_y": 686,
+          "content": "<table><tr><td rowspan=\"3\">店舗名</td><td rowspan=\"3\">到着時間</td><td rowspan=\"3\">出発時間</td><td rowspan=\"3\">到着温度</td><td colspan=\"7\">納品数量</td><td rowspan=\"2\">回収</td></tr><tr><td colspan=\"3\">ドーリー</td><td colspan=\"3\">カゴ</td><td rowspan=\"2\">長物</td><td rowspan=\"2\">チルド<br/>カゴ</td></tr><tr><td>精肉</td><td>鮮魚</td><td>混載</td><td>チルド</td><td>冷凍</td><td>デリカ</td></tr><tr><td>車庫</td><td>:</td><td>4 : 00</td><td>℃</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr><tr><td>市川生鮮センター</td><td>4 : 05</td><td>5 : 05</td><td>℃</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr><tr><td>鎌ヶ谷 店</td><td>5 : 35</td><td>5 : 55</td><td>0℃</td><td>5</td><td>1</td><td></td><td>2</td><td>1</td><td>3</td><td></td><td></td></tr><tr><td>薬円台 店</td><td>6 : 20</td><td>6 : 40</td><td>0℃</td><td>5</td><td>1</td><td></td><td>2</td><td>1</td><td>3</td><td></td><td></td></tr><tr><td>店</td><td>:</td><td>:</td><td>℃</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr><tr><td>桶川生鮮センター</td><td>8 : 15</td><td>10 : 30</td><td>℃</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr><tr><td>葛飾白鳥 店</td><td>11 : 25</td><td>11 : 40</td><td>0℃</td><td>1</td><td>1</td><td></td><td>8</td><td></td><td></td><td></td><td>2</td></tr><tr><td>亀有 店</td><td>11 : 45</td><td>11 : 55</td><td>0℃</td><td>1</td><td>1</td><td></td><td></td><td></td><td></td><td></td><td></td></tr><tr><td>花畑 店</td><td>12 : 15</td><td>12 : 30</td><td>0℃</td><td>1</td><td>1</td><td></td><td></td><td></td><td></td><td></td><td>1</td></tr><tr><td>車庫</td><td>13 : 30</td><td>:</td><td>℃</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr></table>",
+          "type": "table",
+          "table_id": "tbl-5.html"
+        }
+      ]
+    },
+    {
+      "index": 2,
+      "markdown": "配送日 令和 8 年 2 月 5 日(木)\n\n# 生鮮便 作業日報\n\n[tbl-6.html](tbl-6.html)\n\n[tbl-7.html](tbl-7.html)\n\n[tbl-8.html](tbl-8.html)",
+      "images": [],
+      "tables": [
+        {
+          "id": "tbl-6.html",
+          "content": "<table><tr><th>会社名</th><th colspan=\"2\">配送コース</th><th>車番</th><th>乗務員氏名</th></tr><tr><td>サンエイエコネット</td><td>20コース</td><td>20コース</td><td>85-67</td><td>齋藤浩一</td></tr></table>",
+          "format": "html",
+          "word_confidence_scores": null
+        },
+        {
+          "id": "tbl-7.html",
+          "content": "<table><tr><td>作業開始時間</td><td>3:25</td><td>1便開始メーター</td><td>510915 km</td><td>2便開始メーター</td><td>511057 km</td></tr><tr><td>作業終了時間</td><td>13:19</td><td>1便終了メーター</td><td>511057 km</td><td>2便終了メーター</td><td>511159 km</td></tr><tr><td>所要時間</td><td>9:45</td><td>走行距離</td><td>142 km</td><td>走行距離</td><td>102 km</td></tr></table>",
+          "format": "html",
+          "word_confidence_scores": null
+        },
+        {
+          "id": "tbl-8.html",
+          "content": "<table><tr><th rowspan=\"3\">店舗名</th><th rowspan=\"3\">到着時間</th><th rowspan=\"3\">出発時間</th><th rowspan=\"3\">到着<br/>温度</th><th colspan=\"7\">納品数量</th><th rowspan=\"3\">回収<br/>チルド<br/>カゴ</th></tr><tr><th colspan=\"3\">ドーリー</th><th colspan=\"3\">カゴ</th><th rowspan=\"2\">長物</th></tr><tr><th>精肉</th><th>鮮魚</th><th>混載</th><th>チルド</th><th>冷凍</th><th>デリカ</th></tr><tr><td>車庫</td><td>-</td><td>2:45</td><td>-℃</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr><tr><td>市川生鮮センター</td><td>3:25</td><td>4:45</td><td>0℃</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr><tr><td>東寺山店</td><td>5:20</td><td>5:40</td><td>0℃</td><td>4</td><td>1</td><td>1</td><td>1</td><td>0</td><td>2</td><td></td><td>0</td></tr><tr><td>幕張駅北口店</td><td>6:00</td><td>6:25</td><td>0℃</td><td>4</td><td>1</td><td>0</td><td>1</td><td>1</td><td>1</td><td>0</td><td>0</td></tr><tr><td></td><td>:</td><td>:</td><td>℃</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr><tr><td>桶川生鮮センター</td><td>8:20</td><td>10:10</td><td>0℃</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr><tr><td>幕張駅北口店</td><td>11:50</td><td>12:10</td><td>0℃</td><td>1</td><td>1</td><td>0</td><td>0</td><td>0</td><td>0</td><td>0</td><td>1</td></tr><tr><td>東寺山店</td><td>12:50</td><td>13:10</td><td>0℃</td><td>1</td><td>1</td><td>0</td><td>0</td><td>0</td><td>0</td><td>0</td><td>1</td></tr><tr><td>車庫</td><td>:</td><td>:</td><td>℃</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr><tr><td></td><td>13:40</td><td>-</td><td>-℃</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr></table>",
+          "format": "html",
+          "word_confidence_scores": null
+        }
+      ],
+      "hyperlinks": [],
+      "header": "(株)岩崎運送 本社車庫営業所\n業務管理部 輸送課\n2023/11/1",
+      "footer": null,
+      "dimensions": {
+        "dpi": 87,
+        "height": 720,
+        "width": 1018
+      },
+      "confidence_scores": null,
+      "blocks": [
+        {
+          "top_left_x": 855,
+          "top_left_y": 22,
+          "bottom_right_x": 1002,
+          "bottom_right_y": 37,
+          "content": "(株)岩崎運送 本社車庫営業所",
+          "type": "header"
+        },
+        {
+          "top_left_x": 900,
+          "top_left_y": 41,
+          "bottom_right_x": 1002,
+          "bottom_right_y": 55,
+          "content": "業務管理部 輸送課",
+          "type": "header"
+        },
+        {
+          "top_left_x": 944,
+          "top_left_y": 59,
+          "bottom_right_x": 1002,
+          "bottom_right_y": 72,
+          "content": "2023/11/1",
+          "type": "header"
+        },
+        {
+          "top_left_x": 23,
+          "top_left_y": 60,
+          "bottom_right_x": 304,
+          "bottom_right_y": 79,
+          "content": "配送日 令和 8 年 2 月 5 日(木)",
+          "type": "text"
+        },
+        {
+          "top_left_x": 435,
+          "top_left_y": 37,
+          "bottom_right_x": 691,
+          "bottom_right_y": 72,
+          "content": "# 生鮮便 作業日報",
+          "type": "title"
+        },
+        {
+          "top_left_x": 21,
+          "top_left_y": 102,
+          "bottom_right_x": 995,
+          "bottom_right_y": 169,
+          "content": "<table><tr><th>会社名</th><th colspan=\"2\">配送コース</th><th>車番</th><th>乗務員氏名</th></tr><tr><td>サンエイエコネット</td><td>20コース</td><td>20コース</td><td>85-67</td><td>齋藤浩一</td></tr></table>",
+          "type": "table",
+          "table_id": "tbl-6.html"
+        },
+        {
+          "top_left_x": 23,
+          "top_left_y": 177,
+          "bottom_right_x": 995,
+          "bottom_right_y": 261,
+          "content": "<table><tr><td>作業開始時間</td><td>3:25</td><td>1便開始メーター</td><td>510915 km</td><td>2便開始メーター</td><td>511057 km</td></tr><tr><td>作業終了時間</td><td>13:19</td><td>1便終了メーター</td><td>511057 km</td><td>2便終了メーター</td><td>511159 km</td></tr><tr><td>所要時間</td><td>9:45</td><td>走行距離</td><td>142 km</td><td>走行距離</td><td>102 km</td></tr></table>",
+          "type": "table",
+          "table_id": "tbl-7.html"
+        },
+        {
+          "top_left_x": 24,
+          "top_left_y": 268,
+          "bottom_right_x": 995,
+          "bottom_right_y": 683,
+          "content": "<table><tr><th rowspan=\"3\">店舗名</th><th rowspan=\"3\">到着時間</th><th rowspan=\"3\">出発時間</th><th rowspan=\"3\">到着<br/>温度</th><th colspan=\"7\">納品数量</th><th rowspan=\"3\">回収<br/>チルド<br/>カゴ</th></tr><tr><th colspan=\"3\">ドーリー</th><th colspan=\"3\">カゴ</th><th rowspan=\"2\">長物</th></tr><tr><th>精肉</th><th>鮮魚</th><th>混載</th><th>チルド</th><th>冷凍</th><th>デリカ</th></tr><tr><td>車庫</td><td>-</td><td>2:45</td><td>-℃</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr><tr><td>市川生鮮センター</td><td>3:25</td><td>4:45</td><td>0℃</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr><tr><td>東寺山店</td><td>5:20</td><td>5:40</td><td>0℃</td><td>4</td><td>1</td><td>1</td><td>1</td><td>0</td><td>2</td><td></td><td>0</td></tr><tr><td>幕張駅北口店</td><td>6:00</td><td>6:25</td><td>0℃</td><td>4</td><td>1</td><td>0</td><td>1</td><td>1</td><td>1</td><td>0</td><td>0</td></tr><tr><td></td><td>:</td><td>:</td><td>℃</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr><tr><td>桶川生鮮センター</td><td>8:20</td><td>10:10</td><td>0℃</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr><tr><td>幕張駅北口店</td><td>11:50</td><td>12:10</td><td>0℃</td><td>1</td><td>1</td><td>0</td><td>0</td><td>0</td><td>0</td><td>0</td><td>1</td></tr><tr><td>東寺山店</td><td>12:50</td><td>13:10</td><td>0℃</td><td>1</td><td>1</td><td>0</td><td>0</td><td>0</td><td>0</td><td>0</td><td>1</td></tr><tr><td>車庫</td><td>:</td><td>:</td><td>℃</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr><tr><td></td><td>13:40</td><td>-</td><td>-℃</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr></table>",
+          "type": "table",
+          "table_id": "tbl-8.html"
+        }
+      ]
+    },
+    {
+      "index": 3,
+      "markdown": "配送日 令和 8 年 2 月 5 日\n\n# 生鮮便 作業日報\n\n(株)岩崎運送 本社車庫営業所\n\n業務管理部 輸送課\n\n2023/11/1\n\n[tbl-9.html](tbl-9.html)\n\n[tbl-10.html](tbl-10.html)\n\n[tbl-11.html](tbl-11.html)",
+      "images": [],
+      "tables": [
+        {
+          "id": "tbl-9.html",
+          "content": "<table><tr><th>会社名</th><th colspan=\"2\">配送コース</th><th>車番</th><th>乗務員氏名</th></tr><tr><td>株式会社アザス</td><td>21 コース</td><td>21 コース</td><td>市川800あ311</td><td>松乙 信行</td></tr></table>",
+          "format": "html",
+          "word_confidence_scores": null
+        },
+        {
+          "id": "tbl-10.html",
+          "content": "<table><tr><td>作業開始時間</td><td>4:05</td><td>1便開始メーター</td><td>665 147 km</td><td>2便開始メーター</td><td>665 258 km</td></tr><tr><td>作業終了時間</td><td>13:10</td><td>1便終了メーター</td><td>665 258 km</td><td>2便終了メーター</td><td>665 336 km</td></tr><tr><td>所要時間</td><td>9:05</td><td>走行距離</td><td>111 km</td><td>走行距離</td><td>78 km</td></tr></table>",
+          "format": "html",
+          "word_confidence_scores": null
+        },
+        {
+          "id": "tbl-11.html",
+          "content": "<table><tr><th rowspan=\"3\">店舗名</th><th rowspan=\"3\">到着時間</th><th rowspan=\"3\">出発時間</th><th rowspan=\"3\">到着温度</th><th colspan=\"7\">納品数量</th><th rowspan=\"3\">回収<br/>チルド<br/>カゴ</th></tr><tr><th colspan=\"3\">ドーリー</th><th colspan=\"3\">カゴ</th><th rowspan=\"2\">長物</th></tr><tr><th>精肉</th><th>鮮魚</th><th>混載</th><th>チルド</th><th>冷凍</th><th>デリカ</th></tr><tr><td>車庫</td><td>:</td><td>3:55</td><td>℃</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr><tr><td>市川生鮮センター</td><td>4:00</td><td>5:05</td><td>℃</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr><tr><td>柴崎店</td><td>6:00</td><td>6:25</td><td>-5℃</td><td>3</td><td>2</td><td></td><td>1</td><td>1</td><td>2</td><td></td><td>1</td></tr><tr><td>牟礼店</td><td>6:35</td><td>7:05</td><td>-5℃</td><td>3</td><td>1</td><td>1</td><td>2</td><td>1</td><td>2</td><td></td><td></td></tr><tr><td>横川生鮮センター</td><td>8:25</td><td>10:30</td><td>℃</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr><tr><td>早稲田店</td><td>11:30</td><td>11:40</td><td>-5℃</td><td>1</td><td>1</td><td></td><td></td><td></td><td></td><td></td><td>1</td></tr><tr><td>新松戸店</td><td>12:00</td><td>12:15</td><td>-5℃</td><td>1</td><td>1</td><td></td><td></td><td>3</td><td></td><td></td><td>1</td></tr><tr><td>市川生鮮センター</td><td>:</td><td>:</td><td>℃</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr><tr><td></td><td>:</td><td>:</td><td>℃</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr><tr><td>車庫</td><td>13:10</td><td>:</td><td>℃</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr></table>",
+          "format": "html",
+          "word_confidence_scores": null
+        }
+      ],
+      "hyperlinks": [],
+      "header": null,
+      "footer": null,
+      "dimensions": {
+        "dpi": 87,
+        "height": 720,
+        "width": 1018
+      },
+      "confidence_scores": null,
+      "blocks": [
+        {
+          "top_left_x": 57,
+          "top_left_y": 69,
+          "bottom_right_x": 343,
+          "bottom_right_y": 92,
+          "content": "配送日 令和 8 年 2 月 5 日",
+          "type": "text"
+        },
+        {
+          "top_left_x": 440,
+          "top_left_y": 48,
+          "bottom_right_x": 672,
+          "bottom_right_y": 81,
+          "content": "# 生鮮便 作業日報",
+          "type": "title"
+        },
+        {
+          "top_left_x": 836,
+          "top_left_y": 31,
+          "bottom_right_x": 976,
+          "bottom_right_y": 46,
+          "content": "(株)岩崎運送 本社車庫営業所",
+          "type": "text"
+        },
+        {
+          "top_left_x": 879,
+          "top_left_y": 50,
+          "bottom_right_x": 976,
+          "bottom_right_y": 65,
+          "content": "業務管理部 輸送課",
+          "type": "text"
+        },
+        {
+          "top_left_x": 920,
+          "top_left_y": 68,
+          "bottom_right_x": 976,
+          "bottom_right_y": 82,
+          "content": "2023/11/1",
+          "type": "text"
+        },
+        {
+          "top_left_x": 57,
+          "top_left_y": 111,
+          "bottom_right_x": 949,
+          "bottom_right_y": 177,
+          "content": "<table><tr><th>会社名</th><th colspan=\"2\">配送コース</th><th>車番</th><th>乗務員氏名</th></tr><tr><td>株式会社アザス</td><td>21 コース</td><td>21 コース</td><td>市川800あ311</td><td>松乙 信行</td></tr></table>",
+          "type": "table",
+          "table_id": "tbl-9.html"
+        },
+        {
+          "top_left_x": 57,
+          "top_left_y": 183,
+          "bottom_right_x": 949,
+          "bottom_right_y": 264,
+          "content": "<table><tr><td>作業開始時間</td><td>4:05</td><td>1便開始メーター</td><td>665 147 km</td><td>2便開始メーター</td><td>665 258 km</td></tr><tr><td>作業終了時間</td><td>13:10</td><td>1便終了メーター</td><td>665 258 km</td><td>2便終了メーター</td><td>665 336 km</td></tr><tr><td>所要時間</td><td>9:05</td><td>走行距離</td><td>111 km</td><td>走行距離</td><td>78 km</td></tr></table>",
+          "type": "table",
+          "table_id": "tbl-10.html"
+        },
+        {
+          "top_left_x": 57,
+          "top_left_y": 270,
+          "bottom_right_x": 953,
+          "bottom_right_y": 674,
+          "content": "<table><tr><th rowspan=\"3\">店舗名</th><th rowspan=\"3\">到着時間</th><th rowspan=\"3\">出発時間</th><th rowspan=\"3\">到着温度</th><th colspan=\"7\">納品数量</th><th rowspan=\"3\">回収<br/>チルド<br/>カゴ</th></tr><tr><th colspan=\"3\">ドーリー</th><th colspan=\"3\">カゴ</th><th rowspan=\"2\">長物</th></tr><tr><th>精肉</th><th>鮮魚</th><th>混載</th><th>チルド</th><th>冷凍</th><th>デリカ</th></tr><tr><td>車庫</td><td>:</td><td>3:55</td><td>℃</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr><tr><td>市川生鮮センター</td><td>4:00</td><td>5:05</td><td>℃</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr><tr><td>柴崎店</td><td>6:00</td><td>6:25</td><td>-5℃</td><td>3</td><td>2</td><td></td><td>1</td><td>1</td><td>2</td><td></td><td>1</td></tr><tr><td>牟礼店</td><td>6:35</td><td>7:05</td><td>-5℃</td><td>3</td><td>1</td><td>1</td><td>2</td><td>1</td><td>2</td><td></td><td></td></tr><tr><td>横川生鮮センター</td><td>8:25</td><td>10:30</td><td>℃</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr><tr><td>早稲田店</td><td>11:30</td><td>11:40</td><td>-5℃</td><td>1</td><td>1</td><td></td><td></td><td></td><td></td><td></td><td>1</td></tr><tr><td>新松戸店</td><td>12:00</td><td>12:15</td><td>-5℃</td><td>1</td><td>1</td><td></td><td></td><td>3</td><td></td><td></td><td>1</td></tr><tr><td>市川生鮮センター</td><td>:</td><td>:</td><td>℃</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr><tr><td></td><td>:</td><td>:</td><td>℃</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr><tr><td>車庫</td><td>13:10</td><td>:</td><td>℃</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr></table>",
+          "type": "table",
+          "table_id": "tbl-11.html"
+        }
+      ]
+    },
+    {
+      "index": 4,
+      "markdown": "配送日 令和 8 年 2 月 5 日\n\n(株)岩崎運送 本社車庫営業所\n\n業務管理部 輸送課\n\n2023/11/1\n\n# 生鮮便 作業日報\n\n[tbl-12.html](tbl-12.html)\n\n[tbl-13.html](tbl-13.html)\n\n[tbl-14.html](tbl-14.html)",
+      "images": [],
+      "tables": [
+        {
+          "id": "tbl-12.html",
+          "content": "<table><tr><th>会社名</th><th colspan=\"2\">配送コース</th><th>車番</th><th>乗務員氏名</th></tr><tr><td>株式会社アザス</td><td>22 コース</td><td>22 コース</td><td>1028</td><td>高森 真二</td></tr></table>",
+          "format": "html",
+          "word_confidence_scores": null
+        },
+        {
+          "id": "tbl-13.html",
+          "content": "<table><tr><td>作業開始時間</td><td>4 : 00</td><td>1便開始メーター</td><td>761.743 km</td><td>2便開始メーター</td><td>761.852 km</td></tr><tr><td>作業終了時間</td><td>13 : 40</td><td>1便終了メーター</td><td>761.852 km</td><td>2便終了メーター</td><td>761.971 km</td></tr><tr><td>所要時間</td><td>9 : 40</td><td>走行距離</td><td>109 km</td><td>走行距離</td><td>119 km</td></tr></table>",
+          "format": "html",
+          "word_confidence_scores": null
+        },
+        {
+          "id": "tbl-14.html",
+          "content": "<table><tr><th rowspan=\"3\">店舗名</th><th rowspan=\"3\">到着時間</th><th rowspan=\"3\">出発時間</th><th rowspan=\"3\">到着温度</th><th colspan=\"7\">納品数量</th><th rowspan=\"3\">回収<br/>チルド<br/>カゴ</th></tr><tr><th colspan=\"3\">ドーリー</th><th colspan=\"3\">カゴ</th><th rowspan=\"2\">長物</th></tr><tr><th>精肉</th><th>鮮魚</th><th>混載</th><th>チルド</th><th>冷凍</th><th>デリカ</th></tr><tr><td>車庫</td><td>:</td><td>4 : 00</td><td>℃</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr><tr><td>市川生鮮センター</td><td>4 : 05</td><td>5 : 10</td><td>℃</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr><tr><td>八千代店</td><td>5 : 40</td><td>6 : 00</td><td>-5℃</td><td>4</td><td>1</td><td></td><td>1</td><td>1</td><td>2</td><td></td><td>0</td></tr><tr><td>花見川店</td><td>6 : 15</td><td>6 : 30</td><td>-5℃</td><td>4</td><td>1</td><td></td><td>1</td><td>1</td><td>2</td><td></td><td>0</td></tr><tr><td>桶川生鮮センター</td><td>8 : 00</td><td>10 : 10</td><td>℃</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr><tr><td>花小金井店</td><td>11 : 20</td><td>11 : 30</td><td>-5℃</td><td>1</td><td>1</td><td></td><td>1</td><td></td><td></td><td></td><td>1</td></tr><tr><td>回田店</td><td>11 : 45</td><td>11 : 55</td><td>-5℃</td><td>1</td><td>1</td><td></td><td></td><td></td><td></td><td></td><td>0</td></tr><tr><td>ぬくい坂下店</td><td>12 : 05</td><td>12 : 20</td><td>-5℃</td><td>1</td><td>1</td><td></td><td>3</td><td></td><td></td><td></td><td>1</td></tr><tr><td>市川生鮮センター</td><td>:</td><td>:</td><td>℃</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr><tr><td>車庫</td><td>13 : 40</td><td>:</td><td>℃</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr></table>",
+          "format": "html",
+          "word_confidence_scores": null
+        }
+      ],
+      "hyperlinks": [],
+      "header": null,
+      "footer": null,
+      "dimensions": {
+        "dpi": 87,
+        "height": 720,
+        "width": 1018
+      },
+      "confidence_scores": null,
+      "blocks": [
+        {
+          "top_left_x": 57,
+          "top_left_y": 68,
+          "bottom_right_x": 343,
+          "bottom_right_y": 86,
+          "content": "配送日 令和 8 年 2 月 5 日",
+          "type": "text"
+        },
+        {
+          "top_left_x": 835,
+          "top_left_y": 32,
+          "bottom_right_x": 976,
+          "bottom_right_y": 48,
+          "content": "(株)岩崎運送 本社車庫営業所",
+          "type": "text"
+        },
+        {
+          "top_left_x": 877,
+          "top_left_y": 52,
+          "bottom_right_x": 976,
+          "bottom_right_y": 66,
+          "content": "業務管理部 輸送課",
+          "type": "text"
+        },
+        {
+          "top_left_x": 920,
+          "top_left_y": 70,
+          "bottom_right_x": 976,
+          "bottom_right_y": 84,
+          "content": "2023/11/1",
+          "type": "text"
+        },
+        {
+          "top_left_x": 440,
+          "top_left_y": 48,
+          "bottom_right_x": 673,
+          "bottom_right_y": 81,
+          "content": "# 生鮮便 作業日報",
+          "type": "title"
+        },
+        {
+          "top_left_x": 57,
+          "top_left_y": 111,
+          "bottom_right_x": 949,
+          "bottom_right_y": 177,
+          "content": "<table><tr><th>会社名</th><th colspan=\"2\">配送コース</th><th>車番</th><th>乗務員氏名</th></tr><tr><td>株式会社アザス</td><td>22 コース</td><td>22 コース</td><td>1028</td><td>高森 真二</td></tr></table>",
+          "type": "table",
+          "table_id": "tbl-12.html"
+        },
+        {
+          "top_left_x": 57,
+          "top_left_y": 185,
+          "bottom_right_x": 949,
+          "bottom_right_y": 264,
+          "content": "<table><tr><td>作業開始時間</td><td>4 : 00</td><td>1便開始メーター</td><td>761.743 km</td><td>2便開始メーター</td><td>761.852 km</td></tr><tr><td>作業終了時間</td><td>13 : 40</td><td>1便終了メーター</td><td>761.852 km</td><td>2便終了メーター</td><td>761.971 km</td></tr><tr><td>所要時間</td><td>9 : 40</td><td>走行距離</td><td>109 km</td><td>走行距離</td><td>119 km</td></tr></table>",
+          "type": "table",
+          "table_id": "tbl-13.html"
+        },
+        {
+          "top_left_x": 56,
+          "top_left_y": 270,
+          "bottom_right_x": 951,
+          "bottom_right_y": 672,
+          "content": "<table><tr><th rowspan=\"3\">店舗名</th><th rowspan=\"3\">到着時間</th><th rowspan=\"3\">出発時間</th><th rowspan=\"3\">到着温度</th><th colspan=\"7\">納品数量</th><th rowspan=\"3\">回収<br/>チルド<br/>カゴ</th></tr><tr><th colspan=\"3\">ドーリー</th><th colspan=\"3\">カゴ</th><th rowspan=\"2\">長物</th></tr><tr><th>精肉</th><th>鮮魚</th><th>混載</th><th>チルド</th><th>冷凍</th><th>デリカ</th></tr><tr><td>車庫</td><td>:</td><td>4 : 00</td><td>℃</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr><tr><td>市川生鮮センター</td><td>4 : 05</td><td>5 : 10</td><td>℃</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr><tr><td>八千代店</td><td>5 : 40</td><td>6 : 00</td><td>-5℃</td><td>4</td><td>1</td><td></td><td>1</td><td>1</td><td>2</td><td></td><td>0</td></tr><tr><td>花見川店</td><td>6 : 15</td><td>6 : 30</td><td>-5℃</td><td>4</td><td>1</td><td></td><td>1</td><td>1</td><td>2</td><td></td><td>0</td></tr><tr><td>桶川生鮮センター</td><td>8 : 00</td><td>10 : 10</td><td>℃</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr><tr><td>花小金井店</td><td>11 : 20</td><td>11 : 30</td><td>-5℃</td><td>1</td><td>1</td><td></td><td>1</td><td></td><td></td><td></td><td>1</td></tr><tr><td>回田店</td><td>11 : 45</td><td>11 : 55</td><td>-5℃</td><td>1</td><td>1</td><td></td><td></td><td></td><td></td><td></td><td>0</td></tr><tr><td>ぬくい坂下店</td><td>12 : 05</td><td>12 : 20</td><td>-5℃</td><td>1</td><td>1</td><td></td><td>3</td><td></td><td></td><td></td><td>1</td></tr><tr><td>市川生鮮センター</td><td>:</td><td>:</td><td>℃</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr><tr><td>車庫</td><td>13 : 40</td><td>:</td><td>℃</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr></table>",
+          "type": "table",
+          "table_id": "tbl-14.html"
+        }
+      ]
+    },
+    {
+      "index": 5,
+      "markdown": "配送日　令和　8年　2月　5日\n\n# 生鮮便　作業日報\n\n[tbl-15.html](tbl-15.html)\n\n[tbl-16.html](tbl-16.html)\n\n[tbl-17.html](tbl-17.html)",
+      "images": [],
+      "tables": [
+        {
+          "id": "tbl-15.html",
+          "content": "<table><thead><tr><th>会社名</th><th>配送コース</th><th>車番</th><th>乗務員氏名</th></tr></thead><tr><td>岩崎運送</td><td>23　コース</td><td>12-03</td><td>吉成和浩</td></tr></table>",
+          "format": "html",
+          "word_confidence_scores": null
+        },
+        {
+          "id": "tbl-16.html",
+          "content": "<table><tr><td>作業開始時間</td><td>4：50</td><td>1便開始メーター</td><td>423657</td><td>km</td></tr><tr><td>作業終了時間</td><td>8：50</td><td>1便終了メーター</td><td>423743</td><td>km</td></tr><tr><td>所要時間</td><td>4：00</td><td>走行距離</td><td>86</td><td>km</td></tr></table>",
+          "format": "html",
+          "word_confidence_scores": null
+        },
+        {
+          "id": "tbl-17.html",
+          "content": "<table><thead><tr><th rowspan=\"3\">店舗名</th><th rowspan=\"3\">到着時間</th><th rowspan=\"3\">出発時間</th><th rowspan=\"3\">到着温度</th><th colspan=\"7\">納品数量</th><th rowspan=\"3\">回収<br/>チルド<br/>カゴ</th></tr><tr><th colspan=\"3\">ドーリー</th><th colspan=\"3\">カゴ</th><th rowspan=\"2\">長物</th></tr><tr><th>精肉</th><th>鮮魚</th><th>混載</th><th>チルド</th><th>冷凍</th><th>デリカ</th></tr></thead><tr><td>車庫</td><td>4：30</td><td>3：30</td><td>°C</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr><tr><td>市川生鮮センター</td><td>4：30</td><td>5：05</td><td>°C</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr><tr><td>東村山駅前</td><td>6：25</td><td>6：45</td><td>°C</td><td>7</td><td>1</td><td>0</td><td>1</td><td>1</td><td>3</td><td>0</td><td></td></tr><tr><td>小川西町</td><td>7：10</td><td>7：30</td><td>°C</td><td>4</td><td>1</td><td>0</td><td>1</td><td>1</td><td>2</td><td>0</td><td></td></tr><tr><td>車庫</td><td>8：50</td><td>:</td><td>°C</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr><tr><td></td><td>:</td><td>:</td><td>°C</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr><tr><td></td><td>:</td><td>:</td><td>°C</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr><tr><td></td><td>:</td><td>:</td><td>°C</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr><tr><td></td><td>:</td><td>:</td><td>°C</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr><tr><td></td><td>:</td><td>:</td><td>°C</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr></table>",
+          "format": "html",
+          "word_confidence_scores": null
+        }
+      ],
+      "hyperlinks": [],
+      "header": "㈱岩崎運送　本社車庫営業所\n業務管理部　輸送課\n2023/11/1",
+      "footer": null,
+      "dimensions": {
+        "dpi": 87,
+        "height": 720,
+        "width": 1018
+      },
+      "confidence_scores": null,
+      "blocks": [
+        {
+          "top_left_x": 855,
+          "top_left_y": 32,
+          "bottom_right_x": 996,
+          "bottom_right_y": 46,
+          "content": "㈱岩崎運送　本社車庫営業所",
+          "type": "header"
+        },
+        {
+          "top_left_x": 896,
+          "top_left_y": 48,
+          "bottom_right_x": 996,
+          "bottom_right_y": 63,
+          "content": "業務管理部　輸送課",
+          "type": "header"
+        },
+        {
+          "top_left_x": 935,
+          "top_left_y": 66,
+          "bottom_right_x": 996,
+          "bottom_right_y": 81,
+          "content": "2023/11/1",
+          "type": "header"
+        },
+        {
+          "top_left_x": 18,
+          "top_left_y": 64,
+          "bottom_right_x": 323,
+          "bottom_right_y": 87,
+          "content": "配送日　令和　8年　2月　5日",
+          "type": "text"
+        },
+        {
+          "top_left_x": 425,
+          "top_left_y": 44,
+          "bottom_right_x": 684,
+          "bottom_right_y": 79,
+          "content": "# 生鮮便　作業日報",
+          "type": "title"
+        },
+        {
+          "top_left_x": 16,
+          "top_left_y": 110,
+          "bottom_right_x": 980,
+          "bottom_right_y": 174,
+          "content": "<table><thead><tr><th>会社名</th><th>配送コース</th><th>車番</th><th>乗務員氏名</th></tr></thead><tr><td>岩崎運送</td><td>23　コース</td><td>12-03</td><td>吉成和浩</td></tr></table>",
+          "type": "table",
+          "table_id": "tbl-15.html"
+        },
+        {
+          "top_left_x": 16,
+          "top_left_y": 185,
+          "bottom_right_x": 980,
+          "bottom_right_y": 264,
+          "content": "<table><tr><td>作業開始時間</td><td>4：50</td><td>1便開始メーター</td><td>423657</td><td>km</td></tr><tr><td>作業終了時間</td><td>8：50</td><td>1便終了メーター</td><td>423743</td><td>km</td></tr><tr><td>所要時間</td><td>4：00</td><td>走行距離</td><td>86</td><td>km</td></tr></table>",
+          "type": "table",
+          "table_id": "tbl-16.html"
+        },
+        {
+          "top_left_x": 16,
+          "top_left_y": 275,
+          "bottom_right_x": 980,
+          "bottom_right_y": 683,
+          "content": "<table><thead><tr><th rowspan=\"3\">店舗名</th><th rowspan=\"3\">到着時間</th><th rowspan=\"3\">出発時間</th><th rowspan=\"3\">到着温度</th><th colspan=\"7\">納品数量</th><th rowspan=\"3\">回収<br/>チルド<br/>カゴ</th></tr><tr><th colspan=\"3\">ドーリー</th><th colspan=\"3\">カゴ</th><th rowspan=\"2\">長物</th></tr><tr><th>精肉</th><th>鮮魚</th><th>混載</th><th>チルド</th><th>冷凍</th><th>デリカ</th></tr></thead><tr><td>車庫</td><td>4：30</td><td>3：30</td><td>°C</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr><tr><td>市川生鮮センター</td><td>4：30</td><td>5：05</td><td>°C</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr><tr><td>東村山駅前</td><td>6：25</td><td>6：45</td><td>°C</td><td>7</td><td>1</td><td>0</td><td>1</td><td>1</td><td>3</td><td>0</td><td></td></tr><tr><td>小川西町</td><td>7：10</td><td>7：30</td><td>°C</td><td>4</td><td>1</td><td>0</td><td>1</td><td>1</td><td>2</td><td>0</td><td></td></tr><tr><td>車庫</td><td>8：50</td><td>:</td><td>°C</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr><tr><td></td><td>:</td><td>:</td><td>°C</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr><tr><td></td><td>:</td><td>:</td><td>°C</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr><tr><td></td><td>:</td><td>:</td><td>°C</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr><tr><td></td><td>:</td><td>:</td><td>°C</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr><tr><td></td><td>:</td><td>:</td><td>°C</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr></table>",
+          "type": "table",
+          "table_id": "tbl-17.html"
+        }
+      ]
+    }
+  ],
+  "model": "mistral-ocr-latest",
+  "document_annotation": null,
+  "usage_info": {
+    "pages_processed": 6,
+    "doc_size_bytes": 1258207
+  },
+  "status": "complete",
+  "success": true,
+  "markdown": "配送日\n\n8年 2月 5日\n\n# 生鮮便 作業日報\n\n[tbl-0.html](tbl-0.html)\n\n[tbl-1.html](tbl-1.html)\n\n[tbl-2.html](tbl-2.html)\n\n配送日\n\n8年 2月 5日\n\n# 生鮮便 作業日報\n\n[tbl-3.html](tbl-3.html)\n\n[tbl-4.html](tbl-4.html)\n\n[tbl-5.html](tbl-5.html)\n\n配送日 令和 8 年 2 月 5 日(木)\n\n# 生鮮便 作業日報\n\n[tbl-6.html](tbl-6.html)\n\n[tbl-7.html](tbl-7.html)\n\n[tbl-8.html](tbl-8.html)\n\n配送日 令和 8 年 2 月 5 日\n\n# 生鮮便 作業日報\n\n(株)岩崎運送 本社車庫営業所\n\n業務管理部 輸送課\n\n2023/11/1\n\n[tbl-9.html](tbl-9.html)\n\n[tbl-10.html](tbl-10.html)\n\n[tbl-11.html](tbl-11.html)\n\n配送日 令和 8 年 2 月 5 日\n\n(株)岩崎運送 本社車庫営業所\n\n業務管理部 輸送課\n\n2023/11/1\n\n# 生鮮便 作業日報\n\n[tbl-12.html](tbl-12.html)\n\n[tbl-13.html](tbl-13.html)\n\n[tbl-14.html](tbl-14.html)\n\n配送日　令和　8年　2月　5日\n\n# 生鮮便　作業日報\n\n[tbl-15.html](tbl-15.html)\n\n[tbl-16.html](tbl-16.html)\n\n[tbl-17.html](tbl-17.html)"
+}

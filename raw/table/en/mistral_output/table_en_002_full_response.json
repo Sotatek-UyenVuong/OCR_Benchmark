@@ -1,0 +1,291 @@
+{
+  "pages": [
+    {
+      "index": 0,
+      "markdown": "# **APPENDIX 2**\n\n# **STANDARD FORMAT OF THE ADVANCE NOTIFICATION FORM\nFOR WASTE DELIVERY TO PORT RECEPTION FACILITIES (MEPC.1/Circ.644)\nNotification of the Delivery of Waste to: ... (enter name of port or terminal)**\n\n*The master of a ship should forward the information below to the designated authority at least 24 hours in advance of arrival or upon departure of the previous port if the voyage is less than 24 hours*\n*This form shall be retained on board the vessel along with the appropriate Oil RB, Cargo RB or Garbage RB*\n\n# **DELIVERY FROM SHIPS (ANF)**\n\n# **1. SHIP PARTICULARS**\n\n[tbl-0.html](tbl-0.html)\n\n# **2. PORT AND VOYAGE PARTICULARS**\n\n[tbl-1.html](tbl-1.html)\n\n# **3. TYPE AND AMOUNT OF WASTE FOR DISCHARGE TO FACILITY**\n\n[tbl-2.html](tbl-2.html)\n\n[tbl-3.html](tbl-3.html)",
+      "images": [],
+      "tables": [
+        {
+          "id": "tbl-0.html",
+          "content": "<table><tr><td>1.1 Name of ship:</td><td>1.5 Owner or operator:</td></tr><tr><td>1.2 IMO number:</td><td>1.6 Distinctive number or letters:</td></tr><tr><td>1.3 Gross tonnage:</td><td>1.7 Flag State:</td></tr><tr><td>1.4 Type of ship: Oil tanker Chemical tanker Bulk carrier Container<br/>Other cargo ship Passenger ship Ro-ro Other (specify)</td><td></td></tr></table>",
+          "format": "html",
+          "word_confidence_scores": null
+        },
+        {
+          "id": "tbl-1.html",
+          "content": "<table><tr><td>2.1 Location/Terminal name and POC:</td><td>2.6 Last Port where waste was delivered:</td></tr><tr><td>2.2 Arrival Date and Time:</td><td>2.7 Date of Last Delivery:</td></tr><tr><td>2.3 Departure Date and Time:</td><td>2.8 Next Port of delivery (if known):</td></tr><tr><td>2.4 Last Port and Country:</td><td>2.9 Person submitting this form is (if other than the master):</td></tr><tr><td>2.5 Next Port and Country (if known):</td><td></td></tr></table>",
+          "format": "html",
+          "word_confidence_scores": null
+        },
+        {
+          "id": "tbl-2.html",
+          "content": "<table><thead><tr><th>MARPOL Annex I – Oil</th><th>Quantity (m³)</th></tr></thead><tr><td>Oily bilge water</td><td></td></tr><tr><td>Oily residues (sludge)</td><td></td></tr><tr><td>Oily tank washings</td><td></td></tr><tr><td>Dirty ballast water</td><td></td></tr><tr><td>Scale and sludge from tank cleaning</td><td></td></tr><tr><td>Other (please specify)</td><td></td></tr><tr><th>MARPOL Annex II – NLS</th><th>Quantity (m³)/Name¹</th></tr><tr><td>Category X substance</td><td></td></tr><tr><td>Category Y substance</td><td></td></tr><tr><td>Category Z substance</td><td></td></tr><tr><td>OS – other substances</td><td></td></tr><tr><th>MARPOL Annex IV – Sewage</th><th>Quantity (m³)</th></tr><tr><td></td><td></td></tr></table>",
+          "format": "html",
+          "word_confidence_scores": null
+        },
+        {
+          "id": "tbl-3.html",
+          "content": "<table><thead><tr><th>MARPOL Annex V – Garbage</th><th>Quantity (m³)</th></tr></thead><tr><td>Plastic</td><td></td></tr><tr><td>Floating dunnage, lining, or packing material</td><td></td></tr><tr><td>Ground-down paper products, rags, glass, metal, bottles, crockery etc.</td><td></td></tr><tr><td>Cargo residues², paper products, rags, glass, metal, bottles, crockery, etc.</td><td></td></tr><tr><td>Food waste</td><td></td></tr><tr><td>Incinerator ash</td><td></td></tr><tr><td>Other wastes (specify)</td><td></td></tr><tr><th>MARPOL Annex VI – Air pollution</th><th>Quantity (m³)</th></tr><tr><td>Ozone-depleting substances and equipment containing such substances</td><td></td></tr><tr><td>Exhaust gas-cleaning residues</td><td></td></tr></table>",
+          "format": "html",
+          "word_confidence_scores": null
+        }
+      ],
+      "hyperlinks": [],
+      "header": "MEPC.1/Circ.671\nANNEX\nPage 15",
+      "footer": "I:\\CIRC\\MEPC\\01\\671.doc",
+      "dimensions": {
+        "dpi": 87,
+        "height": 1018,
+        "width": 719
+      },
+      "confidence_scores": null,
+      "blocks": [
+        {
+          "top_left_x": 545,
+          "top_left_y": 32,
+          "bottom_right_x": 654,
+          "bottom_right_y": 83,
+          "content": "MEPC.1/Circ.671\nANNEX\nPage 15",
+          "type": "header"
+        },
+        {
+          "top_left_x": 313,
+          "top_left_y": 99,
+          "bottom_right_x": 402,
+          "bottom_right_y": 114,
+          "content": "# **APPENDIX 2**",
+          "type": "title"
+        },
+        {
+          "top_left_x": 84,
+          "top_left_y": 128,
+          "bottom_right_x": 632,
+          "bottom_right_y": 176,
+          "content": "# **STANDARD FORMAT OF THE ADVANCE NOTIFICATION FORM\nFOR WASTE DELIVERY TO PORT RECEPTION FACILITIES (MEPC.1/Circ.644)\nNotification of the Delivery of Waste to: ... (enter name of port or terminal)**",
+          "type": "title"
+        },
+        {
+          "top_left_x": 63,
+          "top_left_y": 187,
+          "bottom_right_x": 653,
+          "bottom_right_y": 226,
+          "content": "*The master of a ship should forward the information below to the designated authority at least 24 hours in advance of arrival or upon departure of the previous port if the voyage is less than 24 hours*\n*This form shall be retained on board the vessel along with the appropriate Oil RB, Cargo RB or Garbage RB*",
+          "type": "text"
+        },
+        {
+          "top_left_x": 258,
+          "top_left_y": 236,
+          "bottom_right_x": 458,
+          "bottom_right_y": 253,
+          "content": "# **DELIVERY FROM SHIPS (ANF)**",
+          "type": "title"
+        },
+        {
+          "top_left_x": 61,
+          "top_left_y": 254,
+          "bottom_right_x": 212,
+          "bottom_right_y": 269,
+          "content": "# **1. SHIP PARTICULARS**",
+          "type": "title"
+        },
+        {
+          "top_left_x": 57,
+          "top_left_y": 268,
+          "bottom_right_x": 656,
+          "bottom_right_y": 367,
+          "content": "<table><tr><td>1.1 Name of ship:</td><td>1.5 Owner or operator:</td></tr><tr><td>1.2 IMO number:</td><td>1.6 Distinctive number or letters:</td></tr><tr><td>1.3 Gross tonnage:</td><td>1.7 Flag State:</td></tr><tr><td>1.4 Type of ship: Oil tanker Chemical tanker Bulk carrier Container<br/>Other cargo ship Passenger ship Ro-ro Other (specify)</td><td></td></tr></table>",
+          "type": "table",
+          "table_id": "tbl-0.html"
+        },
+        {
+          "top_left_x": 61,
+          "top_left_y": 378,
+          "bottom_right_x": 311,
+          "bottom_right_y": 394,
+          "content": "# **2. PORT AND VOYAGE PARTICULARS**",
+          "type": "title"
+        },
+        {
+          "top_left_x": 57,
+          "top_left_y": 399,
+          "bottom_right_x": 656,
+          "bottom_right_y": 528,
+          "content": "<table><tr><td>2.1 Location/Terminal name and POC:</td><td>2.6 Last Port where waste was delivered:</td></tr><tr><td>2.2 Arrival Date and Time:</td><td>2.7 Date of Last Delivery:</td></tr><tr><td>2.3 Departure Date and Time:</td><td>2.8 Next Port of delivery (if known):</td></tr><tr><td>2.4 Last Port and Country:</td><td>2.9 Person submitting this form is (if other than the master):</td></tr><tr><td>2.5 Next Port and Country (if known):</td><td></td></tr></table>",
+          "type": "table",
+          "table_id": "tbl-1.html"
+        },
+        {
+          "top_left_x": 61,
+          "top_left_y": 537,
+          "bottom_right_x": 491,
+          "bottom_right_y": 553,
+          "content": "# **3. TYPE AND AMOUNT OF WASTE FOR DISCHARGE TO FACILITY**",
+          "type": "title"
+        },
+        {
+          "top_left_x": 54,
+          "top_left_y": 559,
+          "bottom_right_x": 343,
+          "bottom_right_y": 902,
+          "content": "<table><thead><tr><th>MARPOL Annex I – Oil</th><th>Quantity (m³)</th></tr></thead><tr><td>Oily bilge water</td><td></td></tr><tr><td>Oily residues (sludge)</td><td></td></tr><tr><td>Oily tank washings</td><td></td></tr><tr><td>Dirty ballast water</td><td></td></tr><tr><td>Scale and sludge from tank cleaning</td><td></td></tr><tr><td>Other (please specify)</td><td></td></tr><tr><th>MARPOL Annex II – NLS</th><th>Quantity (m³)/Name¹</th></tr><tr><td>Category X substance</td><td></td></tr><tr><td>Category Y substance</td><td></td></tr><tr><td>Category Z substance</td><td></td></tr><tr><td>OS – other substances</td><td></td></tr><tr><th>MARPOL Annex IV – Sewage</th><th>Quantity (m³)</th></tr><tr><td></td><td></td></tr></table>",
+          "type": "table",
+          "table_id": "tbl-2.html"
+        },
+        {
+          "top_left_x": 369,
+          "top_left_y": 559,
+          "bottom_right_x": 658,
+          "bottom_right_y": 877,
+          "content": "<table><thead><tr><th>MARPOL Annex V – Garbage</th><th>Quantity (m³)</th></tr></thead><tr><td>Plastic</td><td></td></tr><tr><td>Floating dunnage, lining, or packing material</td><td></td></tr><tr><td>Ground-down paper products, rags, glass, metal, bottles, crockery etc.</td><td></td></tr><tr><td>Cargo residues², paper products, rags, glass, metal, bottles, crockery, etc.</td><td></td></tr><tr><td>Food waste</td><td></td></tr><tr><td>Incinerator ash</td><td></td></tr><tr><td>Other wastes (specify)</td><td></td></tr><tr><th>MARPOL Annex VI – Air pollution</th><th>Quantity (m³)</th></tr><tr><td>Ozone-depleting substances and equipment containing such substances</td><td></td></tr><tr><td>Exhaust gas-cleaning residues</td><td></td></tr></table>",
+          "type": "table",
+          "table_id": "tbl-3.html"
+        },
+        {
+          "top_left_x": 61,
+          "top_left_y": 956,
+          "bottom_right_x": 199,
+          "bottom_right_y": 971,
+          "content": "I:\\CIRC\\MEPC\\01\\671.doc",
+          "type": "footer"
+        }
+      ]
+    },
+    {
+      "index": 1,
+      "markdown": "[tbl-4.html](tbl-4.html)\n\nPlease state below the approximate amount of waste and residues remaining on board and the percentage of maximum storage capacity. If delivering all waste on board at this port please strike through this table and tick the box below. If delivering some or no waste, please complete all columns.\n\nI confirm that I am delivering all the waste held on board this vessel (as shown on page 1) at this port ☐\n\n[tbl-5.html](tbl-5.html)\n\nDate: ...\n\nName and Position: ...\n\nTime: ...\n\nSignature: ...\n\n\\*\\*\\*",
+      "images": [],
+      "tables": [
+        {
+          "id": "tbl-4.html",
+          "content": "<table><tr><td>Name of ship:</td><td>IMO Number:</td></tr></table>",
+          "format": "html",
+          "word_confidence_scores": null
+        },
+        {
+          "id": "tbl-5.html",
+          "content": "<table><thead><tr><th>Type</th><th>Maximum dedicated storage capacity m³</th><th>Amount of waste retained on board m³</th><th>Port at which remaining waste will be delivered (if known)</th><th>Estimate amount of waste to be generated between notification and nextport of call m³</th></tr></thead><tr><td colspan=\"5\"><b>MARPOL Annex I – Oil</b></td></tr><tr><td>Oily bilge water</td><td></td><td></td><td></td><td></td></tr><tr><td>Oily residues (sludges)</td><td></td><td></td><td></td><td></td></tr><tr><td>Oily tank washings</td><td></td><td></td><td></td><td></td></tr><tr><td>Dirty ballast water</td><td></td><td></td><td></td><td></td></tr><tr><td>Scale and sludge from tank cleaning</td><td></td><td></td><td></td><td></td></tr><tr><td>Other (please specify)</td><td></td><td></td><td></td><td></td></tr><tr><td colspan=\"5\"><b>MARPOL Annex II – NLS</b></td></tr><tr><td>Category X substance</td><td></td><td></td><td></td><td></td></tr><tr><td>Category Y substance</td><td></td><td></td><td></td><td></td></tr><tr><td>Category Z substance</td><td></td><td></td><td></td><td></td></tr><tr><td>OS – other substances</td><td></td><td></td><td></td><td></td></tr><tr><td colspan=\"5\"><b>MARPOL Annex IV – Sewage</b></td></tr><tr><td>Sewage</td><td></td><td></td><td></td><td></td></tr><tr><td colspan=\"5\"><b>MARPOL Annex V – Garbage</b></td></tr><tr><td>Plastic</td><td></td><td></td><td></td><td></td></tr><tr><td>Floating dunnage, lining or packing material</td><td></td><td></td><td></td><td></td></tr><tr><td>Ground paper products, rags, glass, metal, bottles, crockery</td><td></td><td></td><td></td><td></td></tr><tr><td>Cargo residues, paper products, rags, glass, metal bottles, crockery</td><td></td><td></td><td></td><td></td></tr><tr><td>Food waste</td><td></td><td></td><td></td><td></td></tr><tr><td>Incinerator ash</td><td></td><td></td><td></td><td></td></tr><tr><td>Other wastes (specify)</td><td></td><td></td><td></td><td></td></tr></table>",
+          "format": "html",
+          "word_confidence_scores": null
+        }
+      ],
+      "hyperlinks": [],
+      "header": "MEPC.1/Circ.671  \n ANNEX  \n Page 17\nMEPC.1/Circ.671  \n ANNEX  \n Page 16",
+      "footer": "I:\\CIRC\\MEPC\\01\\671.doc",
+      "dimensions": {
+        "dpi": 87,
+        "height": 1018,
+        "width": 719
+      },
+      "confidence_scores": null,
+      "blocks": [
+        {
+          "top_left_x": 545,
+          "top_left_y": 32,
+          "bottom_right_x": 654,
+          "bottom_right_y": 83,
+          "content": "MEPC.1/Circ.671  \n ANNEX  \n Page 17",
+          "type": "header"
+        },
+        {
+          "top_left_x": 49,
+          "top_left_y": 70,
+          "bottom_right_x": 158,
+          "bottom_right_y": 120,
+          "content": "MEPC.1/Circ.671  \n ANNEX  \n Page 16",
+          "type": "header"
+        },
+        {
+          "top_left_x": 63,
+          "top_left_y": 137,
+          "bottom_right_x": 650,
+          "bottom_right_y": 158,
+          "content": "<table><tr><td>Name of ship:</td><td>IMO Number:</td></tr></table>",
+          "type": "table",
+          "table_id": "tbl-4.html"
+        },
+        {
+          "top_left_x": 49,
+          "top_left_y": 166,
+          "bottom_right_x": 668,
+          "bottom_right_y": 205,
+          "content": "Please state below the approximate amount of waste and residues remaining on board and the percentage of maximum storage capacity. If delivering all waste on board at this port please strike through this table and tick the box below. If delivering some or no waste, please complete all columns.",
+          "type": "text"
+        },
+        {
+          "top_left_x": 49,
+          "top_left_y": 205,
+          "bottom_right_x": 506,
+          "bottom_right_y": 219,
+          "content": "I confirm that I am delivering all the waste held on board this vessel (as shown on page 1) at this port ☐",
+          "type": "text"
+        },
+        {
+          "top_left_x": 49,
+          "top_left_y": 221,
+          "bottom_right_x": 639,
+          "bottom_right_y": 858,
+          "content": "<table><thead><tr><th>Type</th><th>Maximum dedicated storage capacity m³</th><th>Amount of waste retained on board m³</th><th>Port at which remaining waste will be delivered (if known)</th><th>Estimate amount of waste to be generated between notification and nextport of call m³</th></tr></thead><tr><td colspan=\"5\"><b>MARPOL Annex I – Oil</b></td></tr><tr><td>Oily bilge water</td><td></td><td></td><td></td><td></td></tr><tr><td>Oily residues (sludges)</td><td></td><td></td><td></td><td></td></tr><tr><td>Oily tank washings</td><td></td><td></td><td></td><td></td></tr><tr><td>Dirty ballast water</td><td></td><td></td><td></td><td></td></tr><tr><td>Scale and sludge from tank cleaning</td><td></td><td></td><td></td><td></td></tr><tr><td>Other (please specify)</td><td></td><td></td><td></td><td></td></tr><tr><td colspan=\"5\"><b>MARPOL Annex II – NLS</b></td></tr><tr><td>Category X substance</td><td></td><td></td><td></td><td></td></tr><tr><td>Category Y substance</td><td></td><td></td><td></td><td></td></tr><tr><td>Category Z substance</td><td></td><td></td><td></td><td></td></tr><tr><td>OS – other substances</td><td></td><td></td><td></td><td></td></tr><tr><td colspan=\"5\"><b>MARPOL Annex IV – Sewage</b></td></tr><tr><td>Sewage</td><td></td><td></td><td></td><td></td></tr><tr><td colspan=\"5\"><b>MARPOL Annex V – Garbage</b></td></tr><tr><td>Plastic</td><td></td><td></td><td></td><td></td></tr><tr><td>Floating dunnage, lining or packing material</td><td></td><td></td><td></td><td></td></tr><tr><td>Ground paper products, rags, glass, metal, bottles, crockery</td><td></td><td></td><td></td><td></td></tr><tr><td>Cargo residues, paper products, rags, glass, metal bottles, crockery</td><td></td><td></td><td></td><td></td></tr><tr><td>Food waste</td><td></td><td></td><td></td><td></td></tr><tr><td>Incinerator ash</td><td></td><td></td><td></td><td></td></tr><tr><td>Other wastes (specify)</td><td></td><td></td><td></td><td></td></tr></table>",
+          "type": "table",
+          "table_id": "tbl-5.html"
+        },
+        {
+          "top_left_x": 49,
+          "top_left_y": 866,
+          "bottom_right_x": 224,
+          "bottom_right_y": 879,
+          "content": "Date: ...",
+          "type": "text"
+        },
+        {
+          "top_left_x": 268,
+          "top_left_y": 866,
+          "bottom_right_x": 612,
+          "bottom_right_y": 879,
+          "content": "Name and Position: ...",
+          "type": "text"
+        },
+        {
+          "top_left_x": 49,
+          "top_left_y": 890,
+          "bottom_right_x": 224,
+          "bottom_right_y": 904,
+          "content": "Time: ...",
+          "type": "text"
+        },
+        {
+          "top_left_x": 268,
+          "top_left_y": 890,
+          "bottom_right_x": 612,
+          "bottom_right_y": 904,
+          "content": "Signature: ...",
+          "type": "text"
+        },
+        {
+          "top_left_x": 343,
+          "top_left_y": 937,
+          "bottom_right_x": 375,
+          "bottom_right_y": 949,
+          "content": "\\*\\*\\*",
+          "type": "text"
+        },
+        {
+          "top_left_x": 60,
+          "top_left_y": 956,
+          "bottom_right_x": 199,
+          "bottom_right_y": 971,
+          "content": "I:\\CIRC\\MEPC\\01\\671.doc",
+          "type": "footer"
+        }
+      ]
+    }
+  ],
+  "model": "mistral-ocr-latest",
+  "document_annotation": null,
+  "usage_info": {
+    "pages_processed": 2,
+    "doc_size_bytes": 144606
+  },
+  "status": "complete",
+  "success": true,
+  "markdown": "# **APPENDIX 2**\n\n# **STANDARD FORMAT OF THE ADVANCE NOTIFICATION FORM\nFOR WASTE DELIVERY TO PORT RECEPTION FACILITIES (MEPC.1/Circ.644)\nNotification of the Delivery of Waste to: ... (enter name of port or terminal)**\n\n*The master of a ship should forward the information below to the designated authority at least 24 hours in advance of arrival or upon departure of the previous port if the voyage is less than 24 hours*\n*This form shall be retained on board the vessel along with the appropriate Oil RB, Cargo RB or Garbage RB*\n\n# **DELIVERY FROM SHIPS (ANF)**\n\n# **1. SHIP PARTICULARS**\n\n[tbl-0.html](tbl-0.html)\n\n# **2. PORT AND VOYAGE PARTICULARS**\n\n[tbl-1.html](tbl-1.html)\n\n# **3. TYPE AND AMOUNT OF WASTE FOR DISCHARGE TO FACILITY**\n\n[tbl-2.html](tbl-2.html)\n\n[tbl-3.html](tbl-3.html)\n\n[tbl-4.html](tbl-4.html)\n\nPlease state below the approximate amount of waste and residues remaining on board and the percentage of maximum storage capacity. If delivering all waste on board at this port please strike through this table and tick the box below. If delivering some or no waste, please complete all columns.\n\nI confirm that I am delivering all the waste held on board this vessel (as shown on page 1) at this port ☐\n\n[tbl-5.html](tbl-5.html)\n\nDate: ...\n\nName and Position: ...\n\nTime: ...\n\nSignature: ...\n\n\\*\\*\\*"
+}

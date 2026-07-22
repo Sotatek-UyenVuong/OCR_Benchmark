@@ -1,0 +1,153 @@
+{
+  "pages": [
+    {
+      "index": 0,
+      "markdown": "# 目次\n\n[tbl-0.html](tbl-0.html)",
+      "images": [],
+      "tables": [
+        {
+          "id": "tbl-0.html",
+          "content": "<table><tr><td>本解説の趣旨・目的等</td><td>1</td></tr><tr><td>用語の定義</td><td>2</td></tr><tr><td>総論</td><td>3</td></tr><tr><td>(1) 一団地認定の概要</td><td>3</td></tr><tr><td>(2) 一団地認定の制度体系</td><td>5</td></tr><tr><td>(3) 一団地認定の変遷</td><td>7</td></tr><tr><td>(4) 一団地認定の活用ケース</td><td>9</td></tr><tr><td>第1章　一団地の総合的設計制度（法第86条第1項）の概要</td><td>13</td></tr><tr><td>(1) 一団地の総合的設計制度の概要</td><td>14</td></tr><tr><td>①制度の目的</td><td>14</td></tr><tr><td>②制度の概要</td><td>14</td></tr><tr><td>③近年の実績</td><td>14</td></tr><tr><td>(2) 制度の解説</td><td>15</td></tr><tr><td>①条文及び解説</td><td>15</td></tr><tr><td>②一団地の定義</td><td>16</td></tr><tr><td>(3) 認定準則・技術的基準</td><td>17</td></tr><tr><td>①認定準則</td><td>17</td></tr><tr><td>②技術的基準</td><td>18</td></tr><tr><td>ア　対象区域内に対する規制の適用</td><td></td></tr><tr><td>イ　対象区域外に対する規制の適用</td><td></td></tr><tr><td>ウ　標示</td><td></td></tr><tr><td>(4) 手続き</td><td>26</td></tr><tr><td>(5) 制度の活用イメージ</td><td>27</td></tr></table>",
+          "format": "html",
+          "word_confidence_scores": null
+        }
+      ],
+      "hyperlinks": [],
+      "header": null,
+      "footer": null,
+      "dimensions": {
+        "dpi": 87,
+        "height": 1018,
+        "width": 719
+      },
+      "confidence_scores": null,
+      "blocks": [
+        {
+          "top_left_x": 111,
+          "top_left_y": 125,
+          "bottom_right_x": 143,
+          "bottom_right_y": 143,
+          "content": "# 目次",
+          "type": "title"
+        },
+        {
+          "top_left_x": 111,
+          "top_left_y": 161,
+          "bottom_right_x": 583,
+          "bottom_right_y": 860,
+          "content": "<table><tr><td>本解説の趣旨・目的等</td><td>1</td></tr><tr><td>用語の定義</td><td>2</td></tr><tr><td>総論</td><td>3</td></tr><tr><td>(1) 一団地認定の概要</td><td>3</td></tr><tr><td>(2) 一団地認定の制度体系</td><td>5</td></tr><tr><td>(3) 一団地認定の変遷</td><td>7</td></tr><tr><td>(4) 一団地認定の活用ケース</td><td>9</td></tr><tr><td>第1章　一団地の総合的設計制度（法第86条第1項）の概要</td><td>13</td></tr><tr><td>(1) 一団地の総合的設計制度の概要</td><td>14</td></tr><tr><td>①制度の目的</td><td>14</td></tr><tr><td>②制度の概要</td><td>14</td></tr><tr><td>③近年の実績</td><td>14</td></tr><tr><td>(2) 制度の解説</td><td>15</td></tr><tr><td>①条文及び解説</td><td>15</td></tr><tr><td>②一団地の定義</td><td>16</td></tr><tr><td>(3) 認定準則・技術的基準</td><td>17</td></tr><tr><td>①認定準則</td><td>17</td></tr><tr><td>②技術的基準</td><td>18</td></tr><tr><td>ア　対象区域内に対する規制の適用</td><td></td></tr><tr><td>イ　対象区域外に対する規制の適用</td><td></td></tr><tr><td>ウ　標示</td><td></td></tr><tr><td>(4) 手続き</td><td>26</td></tr><tr><td>(5) 制度の活用イメージ</td><td>27</td></tr></table>",
+          "type": "table",
+          "table_id": "tbl-0.html"
+        }
+      ]
+    },
+    {
+      "index": 1,
+      "markdown": "[tbl-1.html](tbl-1.html)",
+      "images": [],
+      "tables": [
+        {
+          "id": "tbl-1.html",
+          "content": "<table><tr><td>第2章　連担建築物設計制度（法第86条第2項）の概要</td><td>29</td></tr><tr><td>(1)　連担建築物設計制度の概要</td><td>30</td></tr><tr><td>　　①制度の目的</td><td>30</td></tr><tr><td>　　②制度の概要</td><td>30</td></tr><tr><td>　　③近年の実績</td><td>30</td></tr><tr><td>(2)　制度の解説</td><td>31</td></tr><tr><td>　　①条文及び解説</td><td>31</td></tr><tr><td>　　②一団地の定義</td><td>32</td></tr><tr><td>(3)　認定準則・技術的基準</td><td>34</td></tr><tr><td>　　①認定準則</td><td>34</td></tr><tr><td>　　②技術的基準</td><td>35</td></tr><tr><td>　　　　ア　対象区域内に対する規制の適用</td><td></td></tr><tr><td>　　　　イ　対象区域外に対する規制の適用</td><td></td></tr><tr><td>　　　　ウ　標示</td><td></td></tr><tr><td>(4)　手続き</td><td>36</td></tr><tr><td>(5)　制度の活用イメージ</td><td>36</td></tr><tr><td>第3章　一団地認定の対象区域内における増築等（法第86条の2）の概要</td><td>39</td></tr><tr><td>(1)　一団地認定の対象区域内における増築等の概要</td><td>40</td></tr><tr><td>　　①制度の目的</td><td>40</td></tr><tr><td>　　②制度の概要</td><td>40</td></tr><tr><td>　　③近年の実績</td><td>41</td></tr><tr><td>(2)　制度の解説</td><td>42</td></tr><tr><td>　　①条文及び解説</td><td>42</td></tr><tr><td>(3)　認定準則・技術的基準</td><td>46</td></tr><tr><td>(4)　手続き</td><td>47</td></tr><tr><td>(5)　制度の活用イメージ</td><td>47</td></tr></table>",
+          "format": "html",
+          "word_confidence_scores": null
+        }
+      ],
+      "hyperlinks": [],
+      "header": null,
+      "footer": null,
+      "dimensions": {
+        "dpi": 87,
+        "height": 1018,
+        "width": 719
+      },
+      "confidence_scores": null,
+      "blocks": [
+        {
+          "top_left_x": 129,
+          "top_left_y": 124,
+          "bottom_right_x": 602,
+          "bottom_right_y": 879,
+          "content": "<table><tr><td>第2章　連担建築物設計制度（法第86条第2項）の概要</td><td>29</td></tr><tr><td>(1)　連担建築物設計制度の概要</td><td>30</td></tr><tr><td>　　①制度の目的</td><td>30</td></tr><tr><td>　　②制度の概要</td><td>30</td></tr><tr><td>　　③近年の実績</td><td>30</td></tr><tr><td>(2)　制度の解説</td><td>31</td></tr><tr><td>　　①条文及び解説</td><td>31</td></tr><tr><td>　　②一団地の定義</td><td>32</td></tr><tr><td>(3)　認定準則・技術的基準</td><td>34</td></tr><tr><td>　　①認定準則</td><td>34</td></tr><tr><td>　　②技術的基準</td><td>35</td></tr><tr><td>　　　　ア　対象区域内に対する規制の適用</td><td></td></tr><tr><td>　　　　イ　対象区域外に対する規制の適用</td><td></td></tr><tr><td>　　　　ウ　標示</td><td></td></tr><tr><td>(4)　手続き</td><td>36</td></tr><tr><td>(5)　制度の活用イメージ</td><td>36</td></tr><tr><td>第3章　一団地認定の対象区域内における増築等（法第86条の2）の概要</td><td>39</td></tr><tr><td>(1)　一団地認定の対象区域内における増築等の概要</td><td>40</td></tr><tr><td>　　①制度の目的</td><td>40</td></tr><tr><td>　　②制度の概要</td><td>40</td></tr><tr><td>　　③近年の実績</td><td>41</td></tr><tr><td>(2)　制度の解説</td><td>42</td></tr><tr><td>　　①条文及び解説</td><td>42</td></tr><tr><td>(3)　認定準則・技術的基準</td><td>46</td></tr><tr><td>(4)　手続き</td><td>47</td></tr><tr><td>(5)　制度の活用イメージ</td><td>47</td></tr></table>",
+          "type": "table",
+          "table_id": "tbl-1.html"
+        }
+      ]
+    },
+    {
+      "index": 2,
+      "markdown": "[tbl-2.html](tbl-2.html)",
+      "images": [],
+      "tables": [
+        {
+          "id": "tbl-2.html",
+          "content": "<table><tr><td>第4章　工区区分型一団地認定制度（法第86条第7項）の概要</td><td>49</td></tr><tr><td>(1) 工区区分型一団地認定制度の概要</td><td>50</td></tr><tr><td>①制度の目的</td><td>50</td></tr><tr><td>②制度の概要</td><td>50</td></tr><tr><td>③近年の実績</td><td>50</td></tr><tr><td>(2) 制度の解説</td><td>51</td></tr><tr><td>①条文及び解説</td><td>51</td></tr><tr><td>②工区区分型一団地認定制度の適用上の留意事項</td><td>52</td></tr><tr><td>(3) 認定準則・技術的基準</td><td>52</td></tr><tr><td>(4) 手続き</td><td>53</td></tr><tr><td>(5) 制度の活用イメージ</td><td>53</td></tr><tr><td>第5章　一団地認定の取消し（法第86条の5）の概要</td><td>55</td></tr><tr><td>(1) 一団地認定の取消しの概要</td><td>56</td></tr><tr><td>①制度の目的</td><td>56</td></tr><tr><td>②制度の概要</td><td>56</td></tr><tr><td>③近年の実績</td><td>56</td></tr><tr><td>(2) 制度の解説</td><td>57</td></tr><tr><td>①建替え、除却に伴い一団地認定の取消しをしたい場合の対応</td><td>57</td></tr><tr><td>②一団地認定の対象区域の変更をしたい場合の対応</td><td>58</td></tr><tr><td>(3) 手続き</td><td>60</td></tr><tr><td>(4) 制度の活用イメージ</td><td>60</td></tr></table>",
+          "format": "html",
+          "word_confidence_scores": null
+        }
+      ],
+      "hyperlinks": [],
+      "header": null,
+      "footer": null,
+      "dimensions": {
+        "dpi": 87,
+        "height": 1018,
+        "width": 719
+      },
+      "confidence_scores": null,
+      "blocks": [
+        {
+          "top_left_x": 110,
+          "top_left_y": 124,
+          "bottom_right_x": 583,
+          "bottom_right_y": 751,
+          "content": "<table><tr><td>第4章　工区区分型一団地認定制度（法第86条第7項）の概要</td><td>49</td></tr><tr><td>(1) 工区区分型一団地認定制度の概要</td><td>50</td></tr><tr><td>①制度の目的</td><td>50</td></tr><tr><td>②制度の概要</td><td>50</td></tr><tr><td>③近年の実績</td><td>50</td></tr><tr><td>(2) 制度の解説</td><td>51</td></tr><tr><td>①条文及び解説</td><td>51</td></tr><tr><td>②工区区分型一団地認定制度の適用上の留意事項</td><td>52</td></tr><tr><td>(3) 認定準則・技術的基準</td><td>52</td></tr><tr><td>(4) 手続き</td><td>53</td></tr><tr><td>(5) 制度の活用イメージ</td><td>53</td></tr><tr><td>第5章　一団地認定の取消し（法第86条の5）の概要</td><td>55</td></tr><tr><td>(1) 一団地認定の取消しの概要</td><td>56</td></tr><tr><td>①制度の目的</td><td>56</td></tr><tr><td>②制度の概要</td><td>56</td></tr><tr><td>③近年の実績</td><td>56</td></tr><tr><td>(2) 制度の解説</td><td>57</td></tr><tr><td>①建替え、除却に伴い一団地認定の取消しをしたい場合の対応</td><td>57</td></tr><tr><td>②一団地認定の対象区域の変更をしたい場合の対応</td><td>58</td></tr><tr><td>(3) 手続き</td><td>60</td></tr><tr><td>(4) 制度の活用イメージ</td><td>60</td></tr></table>",
+          "type": "table",
+          "table_id": "tbl-2.html"
+        }
+      ]
+    },
+    {
+      "index": 3,
+      "markdown": "[tbl-3.html](tbl-3.html)",
+      "images": [],
+      "tables": [
+        {
+          "id": "tbl-3.html",
+          "content": "<table><tr><td>第6章　特例対象規定の概要</td><td>63</td></tr><tr><td>(1)　法第86条第1項に定める特例対象規定</td><td>64</td></tr><tr><td>(2)　その他の特例</td><td>67</td></tr><tr><td>　　①外壁の開口部に対する制限の特例について（法第86条の4）</td><td>67</td></tr><tr><td>　　②採光規定の合理化について（令第20条）</td><td>69</td></tr><tr><td>　　③附属自動車庫の規制の合理化（令第130条の5等）</td><td>71</td></tr><tr><td>第7章　認定・許可等の手続き</td><td>79</td></tr><tr><td>(1)　認定・許可等に関わる手続き</td><td>80</td></tr><tr><td>　　①新規の認定・許可</td><td>80</td></tr><tr><td>　　②総合設計制度と併用する際の手続き（ワンストップ申請）</td><td>89</td></tr><tr><td>　　③対象区域内における増築等の認定・許可</td><td>90</td></tr><tr><td>　　④認定・許可の取消しに関わる手続き</td><td>94</td></tr><tr><td>(2)　公告区域の変更に関わる手続き</td><td>102</td></tr><tr><td>一団地認定にかかるQ &amp; A</td><td>109</td></tr></table>",
+          "format": "html",
+          "word_confidence_scores": null
+        }
+      ],
+      "hyperlinks": [],
+      "header": null,
+      "footer": null,
+      "dimensions": {
+        "dpi": 87,
+        "height": 1018,
+        "width": 719
+      },
+      "confidence_scores": null,
+      "blocks": [
+        {
+          "top_left_x": 129,
+          "top_left_y": 125,
+          "bottom_right_x": 602,
+          "bottom_right_y": 595,
+          "content": "<table><tr><td>第6章　特例対象規定の概要</td><td>63</td></tr><tr><td>(1)　法第86条第1項に定める特例対象規定</td><td>64</td></tr><tr><td>(2)　その他の特例</td><td>67</td></tr><tr><td>　　①外壁の開口部に対する制限の特例について（法第86条の4）</td><td>67</td></tr><tr><td>　　②採光規定の合理化について（令第20条）</td><td>69</td></tr><tr><td>　　③附属自動車庫の規制の合理化（令第130条の5等）</td><td>71</td></tr><tr><td>第7章　認定・許可等の手続き</td><td>79</td></tr><tr><td>(1)　認定・許可等に関わる手続き</td><td>80</td></tr><tr><td>　　①新規の認定・許可</td><td>80</td></tr><tr><td>　　②総合設計制度と併用する際の手続き（ワンストップ申請）</td><td>89</td></tr><tr><td>　　③対象区域内における増築等の認定・許可</td><td>90</td></tr><tr><td>　　④認定・許可の取消しに関わる手続き</td><td>94</td></tr><tr><td>(2)　公告区域の変更に関わる手続き</td><td>102</td></tr><tr><td>一団地認定にかかるQ &amp; A</td><td>109</td></tr></table>",
+          "type": "table",
+          "table_id": "tbl-3.html"
+        }
+      ]
+    }
+  ],
+  "model": "mistral-ocr-latest",
+  "document_annotation": null,
+  "usage_info": {
+    "pages_processed": 4,
+    "doc_size_bytes": 128847
+  },
+  "status": "complete",
+  "success": true,
+  "markdown": "# 目次\n\n[tbl-0.html](tbl-0.html)\n\n[tbl-1.html](tbl-1.html)\n\n[tbl-2.html](tbl-2.html)\n\n[tbl-3.html](tbl-3.html)"
+}

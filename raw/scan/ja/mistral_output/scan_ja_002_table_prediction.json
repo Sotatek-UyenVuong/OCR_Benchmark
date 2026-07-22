@@ -1,0 +1,1177 @@
+{
+  "doc_id": "scan_ja_002",
+  "pages": [
+    {
+      "page_num": 1,
+      "tables": [
+        {
+          "table_id": 1,
+          "html": "<table><tr><td colspan=\"3\">同 意 書 (あん摩マッサージ指圧療養費用)</td></tr><tr><td rowspan=\"3\">患 者</td><td>住 所</td><td>〒501-1106 岐阜県岐阜市石谷614-63</td></tr><tr><td>氏 名</td><td>松井 英美子</td></tr><tr><td>生 年 月 日</td><td>明・大・昭・平・令 06 年 03 月 15 日</td></tr><tr><td>傷 病 名</td><td colspan=\"2\">廃用症候群</td></tr><tr><td>発病年月日</td><td colspan=\"2\">昭・平・令 07 年 04 月 10 日 ・ 不 詳</td></tr><tr><td>同意区分</td><td colspan=\"2\">初回の同意 ・ 再 同 意 (○をつけて下さい)</td></tr><tr><td>診 察 日</td><td colspan=\"2\">2025 年 9 月 5 日</td></tr><tr><td rowspan=\"3\">症 状</td><td>筋麻雉<br/>筋萎縮</td><td>(筋麻雉又は筋萎縮のある部位について、○をつけて下さい)<br/>脈幹・右上肢・左上肢・右下肢・左下肢</td></tr><tr><td>関節拘縮</td><td>(関節拘縮のある部位について、○をつけて下さい)<br/>右肩・右肘・右手首・右股関節・右膝・右足首 その他<br/>左肩・左肘・左手首・左股関節・左膝・左足首 ( )</td></tr><tr><td>そ の 他</td><td>(筋麻雉、筋萎縮又は関節拘縮のある部位以外に施術を必要とする場合には記載下さい)</td></tr><tr><td rowspan=\"2\">施術の種類<br/>施術部位</td><td colspan=\"2\">マッサージ (脈幹 右上肢 左上肢 右下肢 左下肢 )</td></tr><tr><td colspan=\"2\">変形徒手矯正術 ( 右上肢 左上肢 右下肢 左下肢 )</td></tr><tr><td rowspan=\"2\">訪問又は<br/>往療</td><td colspan=\"2\">① 必要とする 2. 必要としない</td></tr><tr><td colspan=\"2\">訪問又は往療を必要とする理由 介護保険の要介護度 (5 ) 分かれば記載下さい<br/>① 独歩による公共交通機関を使っての外出が困難<br/>2. 認知症や視覚、内部、精神障害などにより単独での外出が困難<br/>3. その他<br/>( )</td></tr><tr><td>注意事項等</td><td colspan=\"2\">施術に当たって注意すべき事項等があれば記載して下さい (任意)</td></tr><tr><td colspan=\"3\">上記の者については、頭書の疾病により療養のための医療上の<br/>マッサージが必要と認め、マッサージの施術に同意する。<br/>2025 年 9 月 18 日<br/>保険医療機関名 白木内科医院<br/>所 在 地 白 木 尚<br/>保険医氏名 岐阜市長良1918-1<br/>電話(058)231-7215</td></tr></table>",
+          "cells": [
+            {
+              "row": 0,
+              "col": 0,
+              "rowspan": 1,
+              "colspan": 3,
+              "text": "同 意 書 (あん摩マッサージ指圧療養費用)",
+              "is_header": false
+            },
+            {
+              "row": 1,
+              "col": 0,
+              "rowspan": 3,
+              "colspan": 1,
+              "text": "患 者",
+              "is_header": false
+            },
+            {
+              "row": 1,
+              "col": 1,
+              "rowspan": 1,
+              "colspan": 1,
+              "text": "住 所",
+              "is_header": false
+            },
+            {
+              "row": 1,
+              "col": 2,
+              "rowspan": 1,
+              "colspan": 1,
+              "text": "〒501-1106 岐阜県岐阜市石谷614-63",
+              "is_header": false
+            },
+            {
+              "row": 2,
+              "col": 0,
+              "rowspan": 1,
+              "colspan": 1,
+              "text": "氏 名",
+              "is_header": false
+            },
+            {
+              "row": 2,
+              "col": 1,
+              "rowspan": 1,
+              "colspan": 1,
+              "text": "松井 英美子",
+              "is_header": false
+            },
+            {
+              "row": 3,
+              "col": 0,
+              "rowspan": 1,
+              "colspan": 1,
+              "text": "生 年 月 日",
+              "is_header": false
+            },
+            {
+              "row": 3,
+              "col": 1,
+              "rowspan": 1,
+              "colspan": 1,
+              "text": "明・大・昭・平・令 06 年 03 月 15 日",
+              "is_header": false
+            },
+            {
+              "row": 4,
+              "col": 0,
+              "rowspan": 1,
+              "colspan": 1,
+              "text": "傷 病 名",
+              "is_header": false
+            },
+            {
+              "row": 4,
+              "col": 1,
+              "rowspan": 1,
+              "colspan": 2,
+              "text": "廃用症候群",
+              "is_header": false
+            },
+            {
+              "row": 5,
+              "col": 0,
+              "rowspan": 1,
+              "colspan": 1,
+              "text": "発病年月日",
+              "is_header": false
+            },
+            {
+              "row": 5,
+              "col": 1,
+              "rowspan": 1,
+              "colspan": 2,
+              "text": "昭・平・令 07 年 04 月 10 日 ・ 不 詳",
+              "is_header": false
+            },
+            {
+              "row": 6,
+              "col": 0,
+              "rowspan": 1,
+              "colspan": 1,
+              "text": "同意区分",
+              "is_header": false
+            },
+            {
+              "row": 6,
+              "col": 1,
+              "rowspan": 1,
+              "colspan": 2,
+              "text": "初回の同意 ・ 再 同 意 (○をつけて下さい)",
+              "is_header": false
+            },
+            {
+              "row": 7,
+              "col": 0,
+              "rowspan": 1,
+              "colspan": 1,
+              "text": "診 察 日",
+              "is_header": false
+            },
+            {
+              "row": 7,
+              "col": 1,
+              "rowspan": 1,
+              "colspan": 2,
+              "text": "2025 年 9 月 5 日",
+              "is_header": false
+            },
+            {
+              "row": 8,
+              "col": 0,
+              "rowspan": 3,
+              "colspan": 1,
+              "text": "症 状",
+              "is_header": false
+            },
+            {
+              "row": 8,
+              "col": 1,
+              "rowspan": 1,
+              "colspan": 1,
+              "text": "筋麻雉 筋萎縮",
+              "is_header": false
+            },
+            {
+              "row": 8,
+              "col": 2,
+              "rowspan": 1,
+              "colspan": 1,
+              "text": "(筋麻雉又は筋萎縮のある部位について、○をつけて下さい) 脈幹・右上肢・左上肢・右下肢・左下肢",
+              "is_header": false
+            },
+            {
+              "row": 9,
+              "col": 0,
+              "rowspan": 1,
+              "colspan": 1,
+              "text": "関節拘縮",
+              "is_header": false
+            },
+            {
+              "row": 9,
+              "col": 1,
+              "rowspan": 1,
+              "colspan": 1,
+              "text": "(関節拘縮のある部位について、○をつけて下さい) 右肩・右肘・右手首・右股関節・右膝・右足首 その他 左肩・左肘・左手首・左股関節・左膝・左足首 ( )",
+              "is_header": false
+            },
+            {
+              "row": 10,
+              "col": 0,
+              "rowspan": 1,
+              "colspan": 1,
+              "text": "そ の 他",
+              "is_header": false
+            },
+            {
+              "row": 10,
+              "col": 1,
+              "rowspan": 1,
+              "colspan": 1,
+              "text": "(筋麻雉、筋萎縮又は関節拘縮のある部位以外に施術を必要とする場合には記載下さい)",
+              "is_header": false
+            },
+            {
+              "row": 11,
+              "col": 0,
+              "rowspan": 2,
+              "colspan": 1,
+              "text": "施術の種類 施術部位",
+              "is_header": false
+            },
+            {
+              "row": 11,
+              "col": 1,
+              "rowspan": 1,
+              "colspan": 2,
+              "text": "マッサージ (脈幹 右上肢 左上肢 右下肢 左下肢 )",
+              "is_header": false
+            },
+            {
+              "row": 12,
+              "col": 0,
+              "rowspan": 1,
+              "colspan": 2,
+              "text": "変形徒手矯正術 ( 右上肢 左上肢 右下肢 左下肢 )",
+              "is_header": false
+            },
+            {
+              "row": 13,
+              "col": 0,
+              "rowspan": 2,
+              "colspan": 1,
+              "text": "訪問又は 往療",
+              "is_header": false
+            },
+            {
+              "row": 13,
+              "col": 1,
+              "rowspan": 1,
+              "colspan": 2,
+              "text": "① 必要とする 2. 必要としない",
+              "is_header": false
+            },
+            {
+              "row": 14,
+              "col": 0,
+              "rowspan": 1,
+              "colspan": 2,
+              "text": "訪問又は往療を必要とする理由 介護保険の要介護度 (5 ) 分かれば記載下さい ① 独歩による公共交通機関を使っての外出が困難 2. 認知症や視覚、内部、精神障害などにより単独での外出が困難 3. その他 ( )",
+              "is_header": false
+            },
+            {
+              "row": 15,
+              "col": 0,
+              "rowspan": 1,
+              "colspan": 1,
+              "text": "注意事項等",
+              "is_header": false
+            },
+            {
+              "row": 15,
+              "col": 1,
+              "rowspan": 1,
+              "colspan": 2,
+              "text": "施術に当たって注意すべき事項等があれば記載して下さい (任意)",
+              "is_header": false
+            },
+            {
+              "row": 16,
+              "col": 0,
+              "rowspan": 1,
+              "colspan": 3,
+              "text": "上記の者については、頭書の疾病により療養のための医療上の マッサージが必要と認め、マッサージの施術に同意する。 2025 年 9 月 18 日 保険医療機関名 白木内科医院 所 在 地 白 木 尚 保険医氏名 岐阜市長良1918-1 電話(058)231-7215",
+              "is_header": false
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "page_num": 2,
+      "tables": [
+        {
+          "table_id": 1,
+          "html": "<table><thead><tr><th colspan=\"3\">同 意 書</th></tr><tr><th colspan=\"3\">（あん摩マッサージ指圧療養費用）</th></tr></thead><tr><td rowspan=\"3\">患　者</td><td>住　所</td><td>京都市北区衣笠馬場町１７番地の４</td></tr><tr><td>氏　名</td><td>長谷川　キヨ枝</td></tr><tr><td>生年月日</td><td>明・大・昭・平・令　１０年　８月　２６日</td></tr><tr><td>傷　病　名</td><td colspan=\"2\">気管支拡張症・高血圧症・狭心症・血管性認知症</td></tr><tr><td>発病年月日</td><td>昭・平・令</td><td>年　月　日　不詳</td></tr><tr><td>同意区分</td><td colspan=\"2\">初回の同意 ・ 再 同 意 （○をつけて下さい）</td></tr><tr><td>診　察　日</td><td colspan=\"2\">令和　１年　４月　２５日</td></tr><tr><td rowspan=\"3\">症　状</td><td>筋　麻　痺<br/>筋　萎縮</td><td>（筋麻痺又は筋萎縮のある部位について、○をつけて下さい）<br/>（脛幹・右上肢・左上肢・左下肢・左下肢）</td></tr><tr><td>関節拘縮</td><td>（関節拘縮のある部位について、○をつけて下さい）<br/>右肩・右肘・右手首・右股関節・右膝・左足首　その他<br/>左肩・左肘・左手首・左股関節・左膝・左足首　（　）</td></tr><tr><td>そ　の　他</td><td>（筋麻痺、筋萎縮又は関節拘縮のある部位以外に施術を必要とする場合には記載下さい）</td></tr><tr><td rowspan=\"2\">施術の種類<br/>施術部位</td><td>マッサージ</td><td>（　）　（　）　（　）　（　）　（　）　（　）　（　）　（　）　（　）　（　）　（　）　（　）　（　）　（　）　（　）　（　）　（　）　（　）　（　）　（　）　（　）　（　）　（　）　（　）　（　）　（　）　（　）</td></tr><tr><td>変形徒手矯正術</td><td>（　）　（　）　（　）　（　）　（　）　（　）　（　）　（　）　（　）　（　）　（　）　（　）　（　）　（　）　（　）　（　）　（　）　（　）　（　）　（　）　（　）　（　）　（　）　（　）　（　）　（　）</td></tr><tr><td rowspan=\"2\">訪問又は<br/>往　療</td><td colspan=\"2\">①．必要とする　　2．必要としない</td></tr><tr><td colspan=\"2\">訪問又は往療を必要とする理由　　介護保険の要介護度　（　）　分かれば記載下さい<br/>①．独歩による公共交通機関を使っての外出が困難<br/>2．認知症や視覚、内部、精神障害などにより単独での外出が困難<br/>3．その他<br/>（　）</td></tr><tr><td>注意事項等</td><td colspan=\"2\">施術に当たって注意すべき事項等があれば記載して下さい（任意）</td></tr><tr><td colspan=\"3\">上記の者については、頭書の疾病により療養のための医療上の<br/>マッサージが必要と認め、マッサージの施術に同意する。<br/><br/>令和　１年　５月　１日<br/>保険医療機関名　医療法人昭岡　　<br/>所在地　京都市北区衣笠馬場町１７番地の４<br/>保険医氏名　　松　平　崇　</td></tr></table>",
+          "cells": [
+            {
+              "row": 0,
+              "col": 0,
+              "rowspan": 1,
+              "colspan": 3,
+              "text": "同 意 書",
+              "is_header": true
+            },
+            {
+              "row": 1,
+              "col": 0,
+              "rowspan": 1,
+              "colspan": 3,
+              "text": "（あん摩マッサージ指圧療養費用）",
+              "is_header": true
+            },
+            {
+              "row": 2,
+              "col": 0,
+              "rowspan": 3,
+              "colspan": 1,
+              "text": "患　者",
+              "is_header": false
+            },
+            {
+              "row": 2,
+              "col": 1,
+              "rowspan": 1,
+              "colspan": 1,
+              "text": "住　所",
+              "is_header": false
+            },
+            {
+              "row": 2,
+              "col": 2,
+              "rowspan": 1,
+              "colspan": 1,
+              "text": "京都市北区衣笠馬場町１７番地の４",
+              "is_header": false
+            },
+            {
+              "row": 3,
+              "col": 0,
+              "rowspan": 1,
+              "colspan": 1,
+              "text": "氏　名",
+              "is_header": false
+            },
+            {
+              "row": 3,
+              "col": 1,
+              "rowspan": 1,
+              "colspan": 1,
+              "text": "長谷川　キヨ枝",
+              "is_header": false
+            },
+            {
+              "row": 4,
+              "col": 0,
+              "rowspan": 1,
+              "colspan": 1,
+              "text": "生年月日",
+              "is_header": false
+            },
+            {
+              "row": 4,
+              "col": 1,
+              "rowspan": 1,
+              "colspan": 1,
+              "text": "明・大・昭・平・令　１０年　８月　２６日",
+              "is_header": false
+            },
+            {
+              "row": 5,
+              "col": 0,
+              "rowspan": 1,
+              "colspan": 1,
+              "text": "傷　病　名",
+              "is_header": false
+            },
+            {
+              "row": 5,
+              "col": 1,
+              "rowspan": 1,
+              "colspan": 2,
+              "text": "気管支拡張症・高血圧症・狭心症・血管性認知症",
+              "is_header": false
+            },
+            {
+              "row": 6,
+              "col": 0,
+              "rowspan": 1,
+              "colspan": 1,
+              "text": "発病年月日",
+              "is_header": false
+            },
+            {
+              "row": 6,
+              "col": 1,
+              "rowspan": 1,
+              "colspan": 1,
+              "text": "昭・平・令",
+              "is_header": false
+            },
+            {
+              "row": 6,
+              "col": 2,
+              "rowspan": 1,
+              "colspan": 1,
+              "text": "年　月　日　不詳",
+              "is_header": false
+            },
+            {
+              "row": 7,
+              "col": 0,
+              "rowspan": 1,
+              "colspan": 1,
+              "text": "同意区分",
+              "is_header": false
+            },
+            {
+              "row": 7,
+              "col": 1,
+              "rowspan": 1,
+              "colspan": 2,
+              "text": "初回の同意 ・ 再 同 意 （○をつけて下さい）",
+              "is_header": false
+            },
+            {
+              "row": 8,
+              "col": 0,
+              "rowspan": 1,
+              "colspan": 1,
+              "text": "診　察　日",
+              "is_header": false
+            },
+            {
+              "row": 8,
+              "col": 1,
+              "rowspan": 1,
+              "colspan": 2,
+              "text": "令和　１年　４月　２５日",
+              "is_header": false
+            },
+            {
+              "row": 9,
+              "col": 0,
+              "rowspan": 3,
+              "colspan": 1,
+              "text": "症　状",
+              "is_header": false
+            },
+            {
+              "row": 9,
+              "col": 1,
+              "rowspan": 1,
+              "colspan": 1,
+              "text": "筋　麻　痺 筋　萎縮",
+              "is_header": false
+            },
+            {
+              "row": 9,
+              "col": 2,
+              "rowspan": 1,
+              "colspan": 1,
+              "text": "（筋麻痺又は筋萎縮のある部位について、○をつけて下さい） （脛幹・右上肢・左上肢・左下肢・左下肢）",
+              "is_header": false
+            },
+            {
+              "row": 10,
+              "col": 0,
+              "rowspan": 1,
+              "colspan": 1,
+              "text": "関節拘縮",
+              "is_header": false
+            },
+            {
+              "row": 10,
+              "col": 1,
+              "rowspan": 1,
+              "colspan": 1,
+              "text": "（関節拘縮のある部位について、○をつけて下さい） 右肩・右肘・右手首・右股関節・右膝・左足首　その他 左肩・左肘・左手首・左股関節・左膝・左足首　（　）",
+              "is_header": false
+            },
+            {
+              "row": 11,
+              "col": 0,
+              "rowspan": 1,
+              "colspan": 1,
+              "text": "そ　の　他",
+              "is_header": false
+            },
+            {
+              "row": 11,
+              "col": 1,
+              "rowspan": 1,
+              "colspan": 1,
+              "text": "（筋麻痺、筋萎縮又は関節拘縮のある部位以外に施術を必要とする場合には記載下さい）",
+              "is_header": false
+            },
+            {
+              "row": 12,
+              "col": 0,
+              "rowspan": 2,
+              "colspan": 1,
+              "text": "施術の種類 施術部位",
+              "is_header": false
+            },
+            {
+              "row": 12,
+              "col": 1,
+              "rowspan": 1,
+              "colspan": 1,
+              "text": "マッサージ",
+              "is_header": false
+            },
+            {
+              "row": 12,
+              "col": 2,
+              "rowspan": 1,
+              "colspan": 1,
+              "text": "（　）　（　）　（　）　（　）　（　）　（　）　（　）　（　）　（　）　（　）　（　）　（　）　（　）　（　）　（　）　（　）　（　）　（　）　（　）　（　）　（　）　（　）　（　）　（　）　（　）　（　）　（　）",
+              "is_header": false
+            },
+            {
+              "row": 13,
+              "col": 0,
+              "rowspan": 1,
+              "colspan": 1,
+              "text": "変形徒手矯正術",
+              "is_header": false
+            },
+            {
+              "row": 13,
+              "col": 1,
+              "rowspan": 1,
+              "colspan": 1,
+              "text": "（　）　（　）　（　）　（　）　（　）　（　）　（　）　（　）　（　）　（　）　（　）　（　）　（　）　（　）　（　）　（　）　（　）　（　）　（　）　（　）　（　）　（　）　（　）　（　）　（　）　（　）",
+              "is_header": false
+            },
+            {
+              "row": 14,
+              "col": 0,
+              "rowspan": 2,
+              "colspan": 1,
+              "text": "訪問又は 往　療",
+              "is_header": false
+            },
+            {
+              "row": 14,
+              "col": 1,
+              "rowspan": 1,
+              "colspan": 2,
+              "text": "①．必要とする　　2．必要としない",
+              "is_header": false
+            },
+            {
+              "row": 15,
+              "col": 0,
+              "rowspan": 1,
+              "colspan": 2,
+              "text": "訪問又は往療を必要とする理由　　介護保険の要介護度　（　）　分かれば記載下さい ①．独歩による公共交通機関を使っての外出が困難 2．認知症や視覚、内部、精神障害などにより単独での外出が困難 3．その他 （　）",
+              "is_header": false
+            },
+            {
+              "row": 16,
+              "col": 0,
+              "rowspan": 1,
+              "colspan": 1,
+              "text": "注意事項等",
+              "is_header": false
+            },
+            {
+              "row": 16,
+              "col": 1,
+              "rowspan": 1,
+              "colspan": 2,
+              "text": "施術に当たって注意すべき事項等があれば記載して下さい（任意）",
+              "is_header": false
+            },
+            {
+              "row": 17,
+              "col": 0,
+              "rowspan": 1,
+              "colspan": 3,
+              "text": "上記の者については、頭書の疾病により療養のための医療上の マッサージが必要と認め、マッサージの施術に同意する。 令和　１年　５月　１日 保険医療機関名　医療法人昭岡 所在地　京都市北区衣笠馬場町１７番地の４ 保険医氏名　　松　平　崇",
+              "is_header": false
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "page_num": 3,
+      "tables": [
+        {
+          "table_id": 1,
+          "html": "<table><tr><td colspan=\"3\">同意書</td><td>(あん摩マッサージ指圧療養費用)</td></tr><tr><td rowspan=\"3\">患者</td><td>住所</td><td colspan=\"2\">埼玉県和光市本町31-14-512</td></tr><tr><td>氏名</td><td colspan=\"2\">新里 愛子</td></tr><tr><td>生年月日</td><td colspan=\"2\">昭和 10年 7月 12日</td></tr><tr><td>傷病名</td><td colspan=\"3\">頚肩腕症候群 腰痛 狭心症</td></tr><tr><td>発病年月日</td><td colspan=\"3\">不詳</td></tr><tr><td>同意区分</td><td colspan=\"3\">初回の同意 (再同意) (○をつけて下さい)</td></tr><tr><td>診察日</td><td colspan=\"3\">令和 7年 9月 28日</td></tr><tr><td rowspan=\"3\">症状</td><td>筋麻痺<br/>筋萎縮</td><td colspan=\"2\">(筋麻痺又は筋萎縮のある部位について、○をつけて下さい)<br/>一般脊・右上肢・左上肢・右下肢・左下肢</td></tr><tr><td>関節拘縮</td><td colspan=\"2\">(関節拘縮のある部位について、○をつけて下さい)<br/>右肩・右肘・右手首・右股関節・右膝・右足首 その他<br/>左肩・左肘・左手首・左股関節・左膝・左足首 ( )</td></tr><tr><td>その他</td><td colspan=\"2\">(筋麻痺、筋萎縮又は関節拘縮のある部位以外に施術を必要とする場合には記載下さい)<br/>深野・岡股和之江</td></tr><tr><td rowspan=\"2\">施術の種類<br/>施術部位</td><td colspan=\"3\">マッサージ (一般脊・右上肢・左上肢・右下肢・左下肢)</td></tr><tr><td colspan=\"3\">変形徒手矯正術 (右上肢・左上肢・右下肢・左下肢)</td></tr><tr><td rowspan=\"2\">往療</td><td colspan=\"3\">1. 必要とする 2. 必要としない</td></tr><tr><td colspan=\"3\">往療を必要とする理由 介護保険の要介護度 ( ) 分かれば記載下さい<br/>1. 独歩による公共交通機関を使っての外出が困難<br/>2. 認知症や視覚、内部、精神障害などにより単独での外出が困難<br/>3. その他<br/>( )</td></tr><tr><td>注意事項等</td><td colspan=\"3\">施術にあたって注意すべき事項等があれば記載して下さい (任意)</td></tr><tr><td colspan=\"4\">上記の者については、頭書の疾病により療養のための医療上の<br/>マッサージが必要と認め、マッサージの施術に同意する。<br/>令和 7年 9月 28日<br/>保険医療機関名 東京都板橋区成増4-13-2<br/>所在地 多比良医院<br/>保険医氏名 電話(03)3975-8139<br/>多比良 清</td></tr></table>",
+          "cells": [
+            {
+              "row": 0,
+              "col": 0,
+              "rowspan": 1,
+              "colspan": 3,
+              "text": "同意書",
+              "is_header": false
+            },
+            {
+              "row": 0,
+              "col": 3,
+              "rowspan": 1,
+              "colspan": 1,
+              "text": "(あん摩マッサージ指圧療養費用)",
+              "is_header": false
+            },
+            {
+              "row": 1,
+              "col": 0,
+              "rowspan": 3,
+              "colspan": 1,
+              "text": "患者",
+              "is_header": false
+            },
+            {
+              "row": 1,
+              "col": 1,
+              "rowspan": 1,
+              "colspan": 1,
+              "text": "住所",
+              "is_header": false
+            },
+            {
+              "row": 1,
+              "col": 2,
+              "rowspan": 1,
+              "colspan": 2,
+              "text": "埼玉県和光市本町31-14-512",
+              "is_header": false
+            },
+            {
+              "row": 2,
+              "col": 0,
+              "rowspan": 1,
+              "colspan": 1,
+              "text": "氏名",
+              "is_header": false
+            },
+            {
+              "row": 2,
+              "col": 1,
+              "rowspan": 1,
+              "colspan": 2,
+              "text": "新里 愛子",
+              "is_header": false
+            },
+            {
+              "row": 3,
+              "col": 0,
+              "rowspan": 1,
+              "colspan": 1,
+              "text": "生年月日",
+              "is_header": false
+            },
+            {
+              "row": 3,
+              "col": 1,
+              "rowspan": 1,
+              "colspan": 2,
+              "text": "昭和 10年 7月 12日",
+              "is_header": false
+            },
+            {
+              "row": 4,
+              "col": 0,
+              "rowspan": 1,
+              "colspan": 1,
+              "text": "傷病名",
+              "is_header": false
+            },
+            {
+              "row": 4,
+              "col": 1,
+              "rowspan": 1,
+              "colspan": 3,
+              "text": "頚肩腕症候群 腰痛 狭心症",
+              "is_header": false
+            },
+            {
+              "row": 5,
+              "col": 0,
+              "rowspan": 1,
+              "colspan": 1,
+              "text": "発病年月日",
+              "is_header": false
+            },
+            {
+              "row": 5,
+              "col": 1,
+              "rowspan": 1,
+              "colspan": 3,
+              "text": "不詳",
+              "is_header": false
+            },
+            {
+              "row": 6,
+              "col": 0,
+              "rowspan": 1,
+              "colspan": 1,
+              "text": "同意区分",
+              "is_header": false
+            },
+            {
+              "row": 6,
+              "col": 1,
+              "rowspan": 1,
+              "colspan": 3,
+              "text": "初回の同意 (再同意) (○をつけて下さい)",
+              "is_header": false
+            },
+            {
+              "row": 7,
+              "col": 0,
+              "rowspan": 1,
+              "colspan": 1,
+              "text": "診察日",
+              "is_header": false
+            },
+            {
+              "row": 7,
+              "col": 1,
+              "rowspan": 1,
+              "colspan": 3,
+              "text": "令和 7年 9月 28日",
+              "is_header": false
+            },
+            {
+              "row": 8,
+              "col": 0,
+              "rowspan": 3,
+              "colspan": 1,
+              "text": "症状",
+              "is_header": false
+            },
+            {
+              "row": 8,
+              "col": 1,
+              "rowspan": 1,
+              "colspan": 1,
+              "text": "筋麻痺 筋萎縮",
+              "is_header": false
+            },
+            {
+              "row": 8,
+              "col": 2,
+              "rowspan": 1,
+              "colspan": 2,
+              "text": "(筋麻痺又は筋萎縮のある部位について、○をつけて下さい) 一般脊・右上肢・左上肢・右下肢・左下肢",
+              "is_header": false
+            },
+            {
+              "row": 9,
+              "col": 0,
+              "rowspan": 1,
+              "colspan": 1,
+              "text": "関節拘縮",
+              "is_header": false
+            },
+            {
+              "row": 9,
+              "col": 1,
+              "rowspan": 1,
+              "colspan": 2,
+              "text": "(関節拘縮のある部位について、○をつけて下さい) 右肩・右肘・右手首・右股関節・右膝・右足首 その他 左肩・左肘・左手首・左股関節・左膝・左足首 ( )",
+              "is_header": false
+            },
+            {
+              "row": 10,
+              "col": 0,
+              "rowspan": 1,
+              "colspan": 1,
+              "text": "その他",
+              "is_header": false
+            },
+            {
+              "row": 10,
+              "col": 1,
+              "rowspan": 1,
+              "colspan": 2,
+              "text": "(筋麻痺、筋萎縮又は関節拘縮のある部位以外に施術を必要とする場合には記載下さい) 深野・岡股和之江",
+              "is_header": false
+            },
+            {
+              "row": 11,
+              "col": 0,
+              "rowspan": 2,
+              "colspan": 1,
+              "text": "施術の種類 施術部位",
+              "is_header": false
+            },
+            {
+              "row": 11,
+              "col": 1,
+              "rowspan": 1,
+              "colspan": 3,
+              "text": "マッサージ (一般脊・右上肢・左上肢・右下肢・左下肢)",
+              "is_header": false
+            },
+            {
+              "row": 12,
+              "col": 0,
+              "rowspan": 1,
+              "colspan": 3,
+              "text": "変形徒手矯正術 (右上肢・左上肢・右下肢・左下肢)",
+              "is_header": false
+            },
+            {
+              "row": 13,
+              "col": 0,
+              "rowspan": 2,
+              "colspan": 1,
+              "text": "往療",
+              "is_header": false
+            },
+            {
+              "row": 13,
+              "col": 1,
+              "rowspan": 1,
+              "colspan": 3,
+              "text": "1. 必要とする 2. 必要としない",
+              "is_header": false
+            },
+            {
+              "row": 14,
+              "col": 0,
+              "rowspan": 1,
+              "colspan": 3,
+              "text": "往療を必要とする理由 介護保険の要介護度 ( ) 分かれば記載下さい 1. 独歩による公共交通機関を使っての外出が困難 2. 認知症や視覚、内部、精神障害などにより単独での外出が困難 3. その他 ( )",
+              "is_header": false
+            },
+            {
+              "row": 15,
+              "col": 0,
+              "rowspan": 1,
+              "colspan": 1,
+              "text": "注意事項等",
+              "is_header": false
+            },
+            {
+              "row": 15,
+              "col": 1,
+              "rowspan": 1,
+              "colspan": 3,
+              "text": "施術にあたって注意すべき事項等があれば記載して下さい (任意)",
+              "is_header": false
+            },
+            {
+              "row": 16,
+              "col": 0,
+              "rowspan": 1,
+              "colspan": 4,
+              "text": "上記の者については、頭書の疾病により療養のための医療上の マッサージが必要と認め、マッサージの施術に同意する。 令和 7年 9月 28日 保険医療機関名 東京都板橋区成増4-13-2 所在地 多比良医院 保険医氏名 電話(03)3975-8139 多比良 清",
+              "is_header": false
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "page_num": 4,
+      "tables": [
+        {
+          "table_id": 1,
+          "html": "<table><tr><td rowspan=\"3\">患者</td><td>住所</td><td>〒368-0062 埼玉県秩父市蒔田1912-11</td></tr><tr><td>氏名</td><td>逸見 辰也</td></tr><tr><td>生年月日</td><td>明・大・昭・平・令 44 年 02 月 19 日</td></tr><tr><td>傷病名</td><td colspan=\"2\">脳は丘後進症</td></tr><tr><td>発病年月日</td><td colspan=\"2\">昭・平・令 2015 年 12 月 12 日 ・ 不詳</td></tr><tr><td>同意区分</td><td colspan=\"2\">○（新回の同意） ・ 再（同意） （○をつけて下さい）</td></tr><tr><td>診察日</td><td colspan=\"2\">2025 年 9 月 24 日</td></tr><tr><td rowspan=\"3\">症状</td><td>筋麻痺<br/>筋萎縮</td><td>（筋麻痺又は筋萎縮のある部位について、○をつけて下さい）<br/>躯幹 ・ 右上肢 ・ 左上肢 ・ 右下肢 ・ 左下肢</td></tr><tr><td>関節拘縮</td><td>（関節拘縮のある部位について、○をつけて下さい）<br/>右肩・右肘・右手首・右股関節・右膝・左足首 その他<br/>左肩・左肘・左手首・左股関節・左膝・左足首 （ ）</td></tr><tr><td>その他</td><td>（筋麻痺、筋萎縮又は関節拘縮のある部位以外に施術を必要とする場合には記載下さい）</td></tr><tr><td rowspan=\"2\">施術の種類<br/>施術部位</td><td>マッサージ</td><td>（ 躯幹 右上肢 左上肢 右下肢 左下肢 ）</td></tr><tr><td>変形徒手矯正術</td><td>（ 右上肢 左上肢 右下肢 左下肢 ）</td></tr><tr><td rowspan=\"2\">訪問又は<br/>往療</td><td colspan=\"2\">① 必要とする 2. 必要としない</td></tr><tr><td colspan=\"2\">訪問又は往療を必要とする理由 介護保険の要介護度（ ） 分かれば記載下さい<br/>① 独歩による公共交通機関を使っての外出が困難<br/>2. 認知症や視覚、内部、精神障害などにより単独での外出が困難<br/>3. その他<br/>（ ）</td></tr><tr><td>注意事項等</td><td colspan=\"2\">施術に当たって注意すべき事項等があれば記載して下さい（任意）</td></tr><tr><td colspan=\"3\">上記の者については、頭書の疾病により療養のための医療上の<br/>マッサージが必要と認め、マッサージの施術に同意する。</td></tr><tr><td colspan=\"3\">令和 7 年 9 月 24 日</td></tr><tr><td>保険医療機関名</td><td colspan=\"2\">〒368-0015 埼玉県秩父市阿保町1-11</td></tr><tr><td>所在地</td><td colspan=\"2\">秩父生協病院</td></tr><tr><td>保険医氏名</td><td colspan=\"2\">TEL 0494-23-1300 FAX 0494-22-1721</td></tr></table>",
+          "cells": [
+            {
+              "row": 0,
+              "col": 0,
+              "rowspan": 3,
+              "colspan": 1,
+              "text": "患者",
+              "is_header": false
+            },
+            {
+              "row": 0,
+              "col": 1,
+              "rowspan": 1,
+              "colspan": 1,
+              "text": "住所",
+              "is_header": false
+            },
+            {
+              "row": 0,
+              "col": 2,
+              "rowspan": 1,
+              "colspan": 1,
+              "text": "〒368-0062 埼玉県秩父市蒔田1912-11",
+              "is_header": false
+            },
+            {
+              "row": 1,
+              "col": 0,
+              "rowspan": 1,
+              "colspan": 1,
+              "text": "氏名",
+              "is_header": false
+            },
+            {
+              "row": 1,
+              "col": 1,
+              "rowspan": 1,
+              "colspan": 1,
+              "text": "逸見 辰也",
+              "is_header": false
+            },
+            {
+              "row": 2,
+              "col": 0,
+              "rowspan": 1,
+              "colspan": 1,
+              "text": "生年月日",
+              "is_header": false
+            },
+            {
+              "row": 2,
+              "col": 1,
+              "rowspan": 1,
+              "colspan": 1,
+              "text": "明・大・昭・平・令 44 年 02 月 19 日",
+              "is_header": false
+            },
+            {
+              "row": 3,
+              "col": 0,
+              "rowspan": 1,
+              "colspan": 1,
+              "text": "傷病名",
+              "is_header": false
+            },
+            {
+              "row": 3,
+              "col": 1,
+              "rowspan": 1,
+              "colspan": 2,
+              "text": "脳は丘後進症",
+              "is_header": false
+            },
+            {
+              "row": 4,
+              "col": 0,
+              "rowspan": 1,
+              "colspan": 1,
+              "text": "発病年月日",
+              "is_header": false
+            },
+            {
+              "row": 4,
+              "col": 1,
+              "rowspan": 1,
+              "colspan": 2,
+              "text": "昭・平・令 2015 年 12 月 12 日 ・ 不詳",
+              "is_header": false
+            },
+            {
+              "row": 5,
+              "col": 0,
+              "rowspan": 1,
+              "colspan": 1,
+              "text": "同意区分",
+              "is_header": false
+            },
+            {
+              "row": 5,
+              "col": 1,
+              "rowspan": 1,
+              "colspan": 2,
+              "text": "○（新回の同意） ・ 再（同意） （○をつけて下さい）",
+              "is_header": false
+            },
+            {
+              "row": 6,
+              "col": 0,
+              "rowspan": 1,
+              "colspan": 1,
+              "text": "診察日",
+              "is_header": false
+            },
+            {
+              "row": 6,
+              "col": 1,
+              "rowspan": 1,
+              "colspan": 2,
+              "text": "2025 年 9 月 24 日",
+              "is_header": false
+            },
+            {
+              "row": 7,
+              "col": 0,
+              "rowspan": 3,
+              "colspan": 1,
+              "text": "症状",
+              "is_header": false
+            },
+            {
+              "row": 7,
+              "col": 1,
+              "rowspan": 1,
+              "colspan": 1,
+              "text": "筋麻痺 筋萎縮",
+              "is_header": false
+            },
+            {
+              "row": 7,
+              "col": 2,
+              "rowspan": 1,
+              "colspan": 1,
+              "text": "（筋麻痺又は筋萎縮のある部位について、○をつけて下さい） 躯幹 ・ 右上肢 ・ 左上肢 ・ 右下肢 ・ 左下肢",
+              "is_header": false
+            },
+            {
+              "row": 8,
+              "col": 0,
+              "rowspan": 1,
+              "colspan": 1,
+              "text": "関節拘縮",
+              "is_header": false
+            },
+            {
+              "row": 8,
+              "col": 1,
+              "rowspan": 1,
+              "colspan": 1,
+              "text": "（関節拘縮のある部位について、○をつけて下さい） 右肩・右肘・右手首・右股関節・右膝・左足首 その他 左肩・左肘・左手首・左股関節・左膝・左足首 （ ）",
+              "is_header": false
+            },
+            {
+              "row": 9,
+              "col": 0,
+              "rowspan": 1,
+              "colspan": 1,
+              "text": "その他",
+              "is_header": false
+            },
+            {
+              "row": 9,
+              "col": 1,
+              "rowspan": 1,
+              "colspan": 1,
+              "text": "（筋麻痺、筋萎縮又は関節拘縮のある部位以外に施術を必要とする場合には記載下さい）",
+              "is_header": false
+            },
+            {
+              "row": 10,
+              "col": 0,
+              "rowspan": 2,
+              "colspan": 1,
+              "text": "施術の種類 施術部位",
+              "is_header": false
+            },
+            {
+              "row": 10,
+              "col": 1,
+              "rowspan": 1,
+              "colspan": 1,
+              "text": "マッサージ",
+              "is_header": false
+            },
+            {
+              "row": 10,
+              "col": 2,
+              "rowspan": 1,
+              "colspan": 1,
+              "text": "（ 躯幹 右上肢 左上肢 右下肢 左下肢 ）",
+              "is_header": false
+            },
+            {
+              "row": 11,
+              "col": 0,
+              "rowspan": 1,
+              "colspan": 1,
+              "text": "変形徒手矯正術",
+              "is_header": false
+            },
+            {
+              "row": 11,
+              "col": 1,
+              "rowspan": 1,
+              "colspan": 1,
+              "text": "（ 右上肢 左上肢 右下肢 左下肢 ）",
+              "is_header": false
+            },
+            {
+              "row": 12,
+              "col": 0,
+              "rowspan": 2,
+              "colspan": 1,
+              "text": "訪問又は 往療",
+              "is_header": false
+            },
+            {
+              "row": 12,
+              "col": 1,
+              "rowspan": 1,
+              "colspan": 2,
+              "text": "① 必要とする 2. 必要としない",
+              "is_header": false
+            },
+            {
+              "row": 13,
+              "col": 0,
+              "rowspan": 1,
+              "colspan": 2,
+              "text": "訪問又は往療を必要とする理由 介護保険の要介護度（ ） 分かれば記載下さい ① 独歩による公共交通機関を使っての外出が困難 2. 認知症や視覚、内部、精神障害などにより単独での外出が困難 3. その他 （ ）",
+              "is_header": false
+            },
+            {
+              "row": 14,
+              "col": 0,
+              "rowspan": 1,
+              "colspan": 1,
+              "text": "注意事項等",
+              "is_header": false
+            },
+            {
+              "row": 14,
+              "col": 1,
+              "rowspan": 1,
+              "colspan": 2,
+              "text": "施術に当たって注意すべき事項等があれば記載して下さい（任意）",
+              "is_header": false
+            },
+            {
+              "row": 15,
+              "col": 0,
+              "rowspan": 1,
+              "colspan": 3,
+              "text": "上記の者については、頭書の疾病により療養のための医療上の マッサージが必要と認め、マッサージの施術に同意する。",
+              "is_header": false
+            },
+            {
+              "row": 16,
+              "col": 0,
+              "rowspan": 1,
+              "colspan": 3,
+              "text": "令和 7 年 9 月 24 日",
+              "is_header": false
+            },
+            {
+              "row": 17,
+              "col": 0,
+              "rowspan": 1,
+              "colspan": 1,
+              "text": "保険医療機関名",
+              "is_header": false
+            },
+            {
+              "row": 17,
+              "col": 1,
+              "rowspan": 1,
+              "colspan": 2,
+              "text": "〒368-0015 埼玉県秩父市阿保町1-11",
+              "is_header": false
+            },
+            {
+              "row": 18,
+              "col": 0,
+              "rowspan": 1,
+              "colspan": 1,
+              "text": "所在地",
+              "is_header": false
+            },
+            {
+              "row": 18,
+              "col": 1,
+              "rowspan": 1,
+              "colspan": 2,
+              "text": "秩父生協病院",
+              "is_header": false
+            },
+            {
+              "row": 19,
+              "col": 0,
+              "rowspan": 1,
+              "colspan": 1,
+              "text": "保険医氏名",
+              "is_header": false
+            },
+            {
+              "row": 19,
+              "col": 1,
+              "rowspan": 1,
+              "colspan": 2,
+              "text": "TEL 0494-23-1300 FAX 0494-22-1721",
+              "is_header": false
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

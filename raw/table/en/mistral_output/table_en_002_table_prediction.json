@@ -1,0 +1,1403 @@
+{
+  "doc_id": "table_en_002",
+  "pages": [
+    {
+      "page_num": 1,
+      "tables": [
+        {
+          "table_id": 1,
+          "html": "<table><tr><td>1.1 Name of ship:</td><td>1.5 Owner or operator:</td></tr><tr><td>1.2 IMO number:</td><td>1.6 Distinctive number or letters:</td></tr><tr><td>1.3 Gross tonnage:</td><td>1.7 Flag State:</td></tr><tr><td>1.4 Type of ship: Oil tanker Chemical tanker Bulk carrier Container<br/>Other cargo ship Passenger ship Ro-ro Other (specify)</td><td></td></tr></table>",
+          "cells": [
+            {
+              "row": 0,
+              "col": 0,
+              "rowspan": 1,
+              "colspan": 1,
+              "text": "1.1 Name of ship:",
+              "is_header": false
+            },
+            {
+              "row": 0,
+              "col": 1,
+              "rowspan": 1,
+              "colspan": 1,
+              "text": "1.5 Owner or operator:",
+              "is_header": false
+            },
+            {
+              "row": 1,
+              "col": 0,
+              "rowspan": 1,
+              "colspan": 1,
+              "text": "1.2 IMO number:",
+              "is_header": false
+            },
+            {
+              "row": 1,
+              "col": 1,
+              "rowspan": 1,
+              "colspan": 1,
+              "text": "1.6 Distinctive number or letters:",
+              "is_header": false
+            },
+            {
+              "row": 2,
+              "col": 0,
+              "rowspan": 1,
+              "colspan": 1,
+              "text": "1.3 Gross tonnage:",
+              "is_header": false
+            },
+            {
+              "row": 2,
+              "col": 1,
+              "rowspan": 1,
+              "colspan": 1,
+              "text": "1.7 Flag State:",
+              "is_header": false
+            },
+            {
+              "row": 3,
+              "col": 0,
+              "rowspan": 1,
+              "colspan": 1,
+              "text": "1.4 Type of ship: Oil tanker Chemical tanker Bulk carrier Container Other cargo ship Passenger ship Ro-ro Other (specify)",
+              "is_header": false
+            },
+            {
+              "row": 3,
+              "col": 1,
+              "rowspan": 1,
+              "colspan": 1,
+              "text": "",
+              "is_header": false
+            }
+          ]
+        },
+        {
+          "table_id": 2,
+          "html": "<table><tr><td>2.1 Location/Terminal name and POC:</td><td>2.6 Last Port where waste was delivered:</td></tr><tr><td>2.2 Arrival Date and Time:</td><td>2.7 Date of Last Delivery:</td></tr><tr><td>2.3 Departure Date and Time:</td><td>2.8 Next Port of delivery (if known):</td></tr><tr><td>2.4 Last Port and Country:</td><td>2.9 Person submitting this form is (if other than the master):</td></tr><tr><td>2.5 Next Port and Country (if known):</td><td></td></tr></table>",
+          "cells": [
+            {
+              "row": 0,
+              "col": 0,
+              "rowspan": 1,
+              "colspan": 1,
+              "text": "2.1 Location/Terminal name and POC:",
+              "is_header": false
+            },
+            {
+              "row": 0,
+              "col": 1,
+              "rowspan": 1,
+              "colspan": 1,
+              "text": "2.6 Last Port where waste was delivered:",
+              "is_header": false
+            },
+            {
+              "row": 1,
+              "col": 0,
+              "rowspan": 1,
+              "colspan": 1,
+              "text": "2.2 Arrival Date and Time:",
+              "is_header": false
+            },
+            {
+              "row": 1,
+              "col": 1,
+              "rowspan": 1,
+              "colspan": 1,
+              "text": "2.7 Date of Last Delivery:",
+              "is_header": false
+            },
+            {
+              "row": 2,
+              "col": 0,
+              "rowspan": 1,
+              "colspan": 1,
+              "text": "2.3 Departure Date and Time:",
+              "is_header": false
+            },
+            {
+              "row": 2,
+              "col": 1,
+              "rowspan": 1,
+              "colspan": 1,
+              "text": "2.8 Next Port of delivery (if known):",
+              "is_header": false
+            },
+            {
+              "row": 3,
+              "col": 0,
+              "rowspan": 1,
+              "colspan": 1,
+              "text": "2.4 Last Port and Country:",
+              "is_header": false
+            },
+            {
+              "row": 3,
+              "col": 1,
+              "rowspan": 1,
+              "colspan": 1,
+              "text": "2.9 Person submitting this form is (if other than the master):",
+              "is_header": false
+            },
+            {
+              "row": 4,
+              "col": 0,
+              "rowspan": 1,
+              "colspan": 1,
+              "text": "2.5 Next Port and Country (if known):",
+              "is_header": false
+            },
+            {
+              "row": 4,
+              "col": 1,
+              "rowspan": 1,
+              "colspan": 1,
+              "text": "",
+              "is_header": false
+            }
+          ]
+        },
+        {
+          "table_id": 3,
+          "html": "<table><thead><tr><th>MARPOL Annex I – Oil</th><th>Quantity (m³)</th></tr></thead><tr><td>Oily bilge water</td><td></td></tr><tr><td>Oily residues (sludge)</td><td></td></tr><tr><td>Oily tank washings</td><td></td></tr><tr><td>Dirty ballast water</td><td></td></tr><tr><td>Scale and sludge from tank cleaning</td><td></td></tr><tr><td>Other (please specify)</td><td></td></tr><tr><th>MARPOL Annex II – NLS</th><th>Quantity (m³)/Name¹</th></tr><tr><td>Category X substance</td><td></td></tr><tr><td>Category Y substance</td><td></td></tr><tr><td>Category Z substance</td><td></td></tr><tr><td>OS – other substances</td><td></td></tr><tr><th>MARPOL Annex IV – Sewage</th><th>Quantity (m³)</th></tr><tr><td></td><td></td></tr></table>",
+          "cells": [
+            {
+              "row": 0,
+              "col": 0,
+              "rowspan": 1,
+              "colspan": 1,
+              "text": "MARPOL Annex I – Oil",
+              "is_header": true
+            },
+            {
+              "row": 0,
+              "col": 1,
+              "rowspan": 1,
+              "colspan": 1,
+              "text": "Quantity (m³)",
+              "is_header": true
+            },
+            {
+              "row": 1,
+              "col": 0,
+              "rowspan": 1,
+              "colspan": 1,
+              "text": "Oily bilge water",
+              "is_header": false
+            },
+            {
+              "row": 1,
+              "col": 1,
+              "rowspan": 1,
+              "colspan": 1,
+              "text": "",
+              "is_header": false
+            },
+            {
+              "row": 2,
+              "col": 0,
+              "rowspan": 1,
+              "colspan": 1,
+              "text": "Oily residues (sludge)",
+              "is_header": false
+            },
+            {
+              "row": 2,
+              "col": 1,
+              "rowspan": 1,
+              "colspan": 1,
+              "text": "",
+              "is_header": false
+            },
+            {
+              "row": 3,
+              "col": 0,
+              "rowspan": 1,
+              "colspan": 1,
+              "text": "Oily tank washings",
+              "is_header": false
+            },
+            {
+              "row": 3,
+              "col": 1,
+              "rowspan": 1,
+              "colspan": 1,
+              "text": "",
+              "is_header": false
+            },
+            {
+              "row": 4,
+              "col": 0,
+              "rowspan": 1,
+              "colspan": 1,
+              "text": "Dirty ballast water",
+              "is_header": false
+            },
+            {
+              "row": 4,
+              "col": 1,
+              "rowspan": 1,
+              "colspan": 1,
+              "text": "",
+              "is_header": false
+            },
+            {
+              "row": 5,
+              "col": 0,
+              "rowspan": 1,
+              "colspan": 1,
+              "text": "Scale and sludge from tank cleaning",
+              "is_header": false
+            },
+            {
+              "row": 5,
+              "col": 1,
+              "rowspan": 1,
+              "colspan": 1,
+              "text": "",
+              "is_header": false
+            },
+            {
+              "row": 6,
+              "col": 0,
+              "rowspan": 1,
+              "colspan": 1,
+              "text": "Other (please specify)",
+              "is_header": false
+            },
+            {
+              "row": 6,
+              "col": 1,
+              "rowspan": 1,
+              "colspan": 1,
+              "text": "",
+              "is_header": false
+            },
+            {
+              "row": 7,
+              "col": 0,
+              "rowspan": 1,
+              "colspan": 1,
+              "text": "MARPOL Annex II – NLS",
+              "is_header": true
+            },
+            {
+              "row": 7,
+              "col": 1,
+              "rowspan": 1,
+              "colspan": 1,
+              "text": "Quantity (m³)/Name¹",
+              "is_header": true
+            },
+            {
+              "row": 8,
+              "col": 0,
+              "rowspan": 1,
+              "colspan": 1,
+              "text": "Category X substance",
+              "is_header": false
+            },
+            {
+              "row": 8,
+              "col": 1,
+              "rowspan": 1,
+              "colspan": 1,
+              "text": "",
+              "is_header": false
+            },
+            {
+              "row": 9,
+              "col": 0,
+              "rowspan": 1,
+              "colspan": 1,
+              "text": "Category Y substance",
+              "is_header": false
+            },
+            {
+              "row": 9,
+              "col": 1,
+              "rowspan": 1,
+              "colspan": 1,
+              "text": "",
+              "is_header": false
+            },
+            {
+              "row": 10,
+              "col": 0,
+              "rowspan": 1,
+              "colspan": 1,
+              "text": "Category Z substance",
+              "is_header": false
+            },
+            {
+              "row": 10,
+              "col": 1,
+              "rowspan": 1,
+              "colspan": 1,
+              "text": "",
+              "is_header": false
+            },
+            {
+              "row": 11,
+              "col": 0,
+              "rowspan": 1,
+              "colspan": 1,
+              "text": "OS – other substances",
+              "is_header": false
+            },
+            {
+              "row": 11,
+              "col": 1,
+              "rowspan": 1,
+              "colspan": 1,
+              "text": "",
+              "is_header": false
+            },
+            {
+              "row": 12,
+              "col": 0,
+              "rowspan": 1,
+              "colspan": 1,
+              "text": "MARPOL Annex IV – Sewage",
+              "is_header": true
+            },
+            {
+              "row": 12,
+              "col": 1,
+              "rowspan": 1,
+              "colspan": 1,
+              "text": "Quantity (m³)",
+              "is_header": true
+            },
+            {
+              "row": 13,
+              "col": 0,
+              "rowspan": 1,
+              "colspan": 1,
+              "text": "",
+              "is_header": false
+            },
+            {
+              "row": 13,
+              "col": 1,
+              "rowspan": 1,
+              "colspan": 1,
+              "text": "",
+              "is_header": false
+            }
+          ]
+        },
+        {
+          "table_id": 4,
+          "html": "<table><thead><tr><th>MARPOL Annex V – Garbage</th><th>Quantity (m³)</th></tr></thead><tr><td>Plastic</td><td></td></tr><tr><td>Floating dunnage, lining, or packing material</td><td></td></tr><tr><td>Ground-down paper products, rags, glass, metal, bottles, crockery etc.</td><td></td></tr><tr><td>Cargo residues², paper products, rags, glass, metal, bottles, crockery, etc.</td><td></td></tr><tr><td>Food waste</td><td></td></tr><tr><td>Incinerator ash</td><td></td></tr><tr><td>Other wastes (specify)</td><td></td></tr><tr><th>MARPOL Annex VI – Air pollution</th><th>Quantity (m³)</th></tr><tr><td>Ozone-depleting substances and equipment containing such substances</td><td></td></tr><tr><td>Exhaust gas-cleaning residues</td><td></td></tr></table>",
+          "cells": [
+            {
+              "row": 0,
+              "col": 0,
+              "rowspan": 1,
+              "colspan": 1,
+              "text": "MARPOL Annex V – Garbage",
+              "is_header": true
+            },
+            {
+              "row": 0,
+              "col": 1,
+              "rowspan": 1,
+              "colspan": 1,
+              "text": "Quantity (m³)",
+              "is_header": true
+            },
+            {
+              "row": 1,
+              "col": 0,
+              "rowspan": 1,
+              "colspan": 1,
+              "text": "Plastic",
+              "is_header": false
+            },
+            {
+              "row": 1,
+              "col": 1,
+              "rowspan": 1,
+              "colspan": 1,
+              "text": "",
+              "is_header": false
+            },
+            {
+              "row": 2,
+              "col": 0,
+              "rowspan": 1,
+              "colspan": 1,
+              "text": "Floating dunnage, lining, or packing material",
+              "is_header": false
+            },
+            {
+              "row": 2,
+              "col": 1,
+              "rowspan": 1,
+              "colspan": 1,
+              "text": "",
+              "is_header": false
+            },
+            {
+              "row": 3,
+              "col": 0,
+              "rowspan": 1,
+              "colspan": 1,
+              "text": "Ground-down paper products, rags, glass, metal, bottles, crockery etc.",
+              "is_header": false
+            },
+            {
+              "row": 3,
+              "col": 1,
+              "rowspan": 1,
+              "colspan": 1,
+              "text": "",
+              "is_header": false
+            },
+            {
+              "row": 4,
+              "col": 0,
+              "rowspan": 1,
+              "colspan": 1,
+              "text": "Cargo residues², paper products, rags, glass, metal, bottles, crockery, etc.",
+              "is_header": false
+            },
+            {
+              "row": 4,
+              "col": 1,
+              "rowspan": 1,
+              "colspan": 1,
+              "text": "",
+              "is_header": false
+            },
+            {
+              "row": 5,
+              "col": 0,
+              "rowspan": 1,
+              "colspan": 1,
+              "text": "Food waste",
+              "is_header": false
+            },
+            {
+              "row": 5,
+              "col": 1,
+              "rowspan": 1,
+              "colspan": 1,
+              "text": "",
+              "is_header": false
+            },
+            {
+              "row": 6,
+              "col": 0,
+              "rowspan": 1,
+              "colspan": 1,
+              "text": "Incinerator ash",
+              "is_header": false
+            },
+            {
+              "row": 6,
+              "col": 1,
+              "rowspan": 1,
+              "colspan": 1,
+              "text": "",
+              "is_header": false
+            },
+            {
+              "row": 7,
+              "col": 0,
+              "rowspan": 1,
+              "colspan": 1,
+              "text": "Other wastes (specify)",
+              "is_header": false
+            },
+            {
+              "row": 7,
+              "col": 1,
+              "rowspan": 1,
+              "colspan": 1,
+              "text": "",
+              "is_header": false
+            },
+            {
+              "row": 8,
+              "col": 0,
+              "rowspan": 1,
+              "colspan": 1,
+              "text": "MARPOL Annex VI – Air pollution",
+              "is_header": true
+            },
+            {
+              "row": 8,
+              "col": 1,
+              "rowspan": 1,
+              "colspan": 1,
+              "text": "Quantity (m³)",
+              "is_header": true
+            },
+            {
+              "row": 9,
+              "col": 0,
+              "rowspan": 1,
+              "colspan": 1,
+              "text": "Ozone-depleting substances and equipment containing such substances",
+              "is_header": false
+            },
+            {
+              "row": 9,
+              "col": 1,
+              "rowspan": 1,
+              "colspan": 1,
+              "text": "",
+              "is_header": false
+            },
+            {
+              "row": 10,
+              "col": 0,
+              "rowspan": 1,
+              "colspan": 1,
+              "text": "Exhaust gas-cleaning residues",
+              "is_header": false
+            },
+            {
+              "row": 10,
+              "col": 1,
+              "rowspan": 1,
+              "colspan": 1,
+              "text": "",
+              "is_header": false
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "page_num": 2,
+      "tables": [
+        {
+          "table_id": 1,
+          "html": "<table><tr><td>Name of ship:</td><td>IMO Number:</td></tr></table>",
+          "cells": [
+            {
+              "row": 0,
+              "col": 0,
+              "rowspan": 1,
+              "colspan": 1,
+              "text": "Name of ship:",
+              "is_header": false
+            },
+            {
+              "row": 0,
+              "col": 1,
+              "rowspan": 1,
+              "colspan": 1,
+              "text": "IMO Number:",
+              "is_header": false
+            }
+          ]
+        },
+        {
+          "table_id": 2,
+          "html": "<table><thead><tr><th>Type</th><th>Maximum dedicated storage capacity m³</th><th>Amount of waste retained on board m³</th><th>Port at which remaining waste will be delivered (if known)</th><th>Estimate amount of waste to be generated between notification and nextport of call m³</th></tr></thead><tr><td colspan=\"5\"><b>MARPOL Annex I – Oil</b></td></tr><tr><td>Oily bilge water</td><td></td><td></td><td></td><td></td></tr><tr><td>Oily residues (sludges)</td><td></td><td></td><td></td><td></td></tr><tr><td>Oily tank washings</td><td></td><td></td><td></td><td></td></tr><tr><td>Dirty ballast water</td><td></td><td></td><td></td><td></td></tr><tr><td>Scale and sludge from tank cleaning</td><td></td><td></td><td></td><td></td></tr><tr><td>Other (please specify)</td><td></td><td></td><td></td><td></td></tr><tr><td colspan=\"5\"><b>MARPOL Annex II – NLS</b></td></tr><tr><td>Category X substance</td><td></td><td></td><td></td><td></td></tr><tr><td>Category Y substance</td><td></td><td></td><td></td><td></td></tr><tr><td>Category Z substance</td><td></td><td></td><td></td><td></td></tr><tr><td>OS – other substances</td><td></td><td></td><td></td><td></td></tr><tr><td colspan=\"5\"><b>MARPOL Annex IV – Sewage</b></td></tr><tr><td>Sewage</td><td></td><td></td><td></td><td></td></tr><tr><td colspan=\"5\"><b>MARPOL Annex V – Garbage</b></td></tr><tr><td>Plastic</td><td></td><td></td><td></td><td></td></tr><tr><td>Floating dunnage, lining or packing material</td><td></td><td></td><td></td><td></td></tr><tr><td>Ground paper products, rags, glass, metal, bottles, crockery</td><td></td><td></td><td></td><td></td></tr><tr><td>Cargo residues, paper products, rags, glass, metal bottles, crockery</td><td></td><td></td><td></td><td></td></tr><tr><td>Food waste</td><td></td><td></td><td></td><td></td></tr><tr><td>Incinerator ash</td><td></td><td></td><td></td><td></td></tr><tr><td>Other wastes (specify)</td><td></td><td></td><td></td><td></td></tr></table>",
+          "cells": [
+            {
+              "row": 0,
+              "col": 0,
+              "rowspan": 1,
+              "colspan": 1,
+              "text": "Type",
+              "is_header": true
+            },
+            {
+              "row": 0,
+              "col": 1,
+              "rowspan": 1,
+              "colspan": 1,
+              "text": "Maximum dedicated storage capacity m³",
+              "is_header": true
+            },
+            {
+              "row": 0,
+              "col": 2,
+              "rowspan": 1,
+              "colspan": 1,
+              "text": "Amount of waste retained on board m³",
+              "is_header": true
+            },
+            {
+              "row": 0,
+              "col": 3,
+              "rowspan": 1,
+              "colspan": 1,
+              "text": "Port at which remaining waste will be delivered (if known)",
+              "is_header": true
+            },
+            {
+              "row": 0,
+              "col": 4,
+              "rowspan": 1,
+              "colspan": 1,
+              "text": "Estimate amount of waste to be generated between notification and nextport of call m³",
+              "is_header": true
+            },
+            {
+              "row": 1,
+              "col": 0,
+              "rowspan": 1,
+              "colspan": 5,
+              "text": "MARPOL Annex I – Oil",
+              "is_header": false
+            },
+            {
+              "row": 2,
+              "col": 0,
+              "rowspan": 1,
+              "colspan": 1,
+              "text": "Oily bilge water",
+              "is_header": false
+            },
+            {
+              "row": 2,
+              "col": 1,
+              "rowspan": 1,
+              "colspan": 1,
+              "text": "",
+              "is_header": false
+            },
+            {
+              "row": 2,
+              "col": 2,
+              "rowspan": 1,
+              "colspan": 1,
+              "text": "",
+              "is_header": false
+            },
+            {
+              "row": 2,
+              "col": 3,
+              "rowspan": 1,
+              "colspan": 1,
+              "text": "",
+              "is_header": false
+            },
+            {
+              "row": 2,
+              "col": 4,
+              "rowspan": 1,
+              "colspan": 1,
+              "text": "",
+              "is_header": false
+            },
+            {
+              "row": 3,
+              "col": 0,
+              "rowspan": 1,
+              "colspan": 1,
+              "text": "Oily residues (sludges)",
+              "is_header": false
+            },
+            {
+              "row": 3,
+              "col": 1,
+              "rowspan": 1,
+              "colspan": 1,
+              "text": "",
+              "is_header": false
+            },
+            {
+              "row": 3,
+              "col": 2,
+              "rowspan": 1,
+              "colspan": 1,
+              "text": "",
+              "is_header": false
+            },
+            {
+              "row": 3,
+              "col": 3,
+              "rowspan": 1,
+              "colspan": 1,
+              "text": "",
+              "is_header": false
+            },
+            {
+              "row": 3,
+              "col": 4,
+              "rowspan": 1,
+              "colspan": 1,
+              "text": "",
+              "is_header": false
+            },
+            {
+              "row": 4,
+              "col": 0,
+              "rowspan": 1,
+              "colspan": 1,
+              "text": "Oily tank washings",
+              "is_header": false
+            },
+            {
+              "row": 4,
+              "col": 1,
+              "rowspan": 1,
+              "colspan": 1,
+              "text": "",
+              "is_header": false
+            },
+            {
+              "row": 4,
+              "col": 2,
+              "rowspan": 1,
+              "colspan": 1,
+              "text": "",
+              "is_header": false
+            },
+            {
+              "row": 4,
+              "col": 3,
+              "rowspan": 1,
+              "colspan": 1,
+              "text": "",
+              "is_header": false
+            },
+            {
+              "row": 4,
+              "col": 4,
+              "rowspan": 1,
+              "colspan": 1,
+              "text": "",
+              "is_header": false
+            },
+            {
+              "row": 5,
+              "col": 0,
+              "rowspan": 1,
+              "colspan": 1,
+              "text": "Dirty ballast water",
+              "is_header": false
+            },
+            {
+              "row": 5,
+              "col": 1,
+              "rowspan": 1,
+              "colspan": 1,
+              "text": "",
+              "is_header": false
+            },
+            {
+              "row": 5,
+              "col": 2,
+              "rowspan": 1,
+              "colspan": 1,
+              "text": "",
+              "is_header": false
+            },
+            {
+              "row": 5,
+              "col": 3,
+              "rowspan": 1,
+              "colspan": 1,
+              "text": "",
+              "is_header": false
+            },
+            {
+              "row": 5,
+              "col": 4,
+              "rowspan": 1,
+              "colspan": 1,
+              "text": "",
+              "is_header": false
+            },
+            {
+              "row": 6,
+              "col": 0,
+              "rowspan": 1,
+              "colspan": 1,
+              "text": "Scale and sludge from tank cleaning",
+              "is_header": false
+            },
+            {
+              "row": 6,
+              "col": 1,
+              "rowspan": 1,
+              "colspan": 1,
+              "text": "",
+              "is_header": false
+            },
+            {
+              "row": 6,
+              "col": 2,
+              "rowspan": 1,
+              "colspan": 1,
+              "text": "",
+              "is_header": false
+            },
+            {
+              "row": 6,
+              "col": 3,
+              "rowspan": 1,
+              "colspan": 1,
+              "text": "",
+              "is_header": false
+            },
+            {
+              "row": 6,
+              "col": 4,
+              "rowspan": 1,
+              "colspan": 1,
+              "text": "",
+              "is_header": false
+            },
+            {
+              "row": 7,
+              "col": 0,
+              "rowspan": 1,
+              "colspan": 1,
+              "text": "Other (please specify)",
+              "is_header": false
+            },
+            {
+              "row": 7,
+              "col": 1,
+              "rowspan": 1,
+              "colspan": 1,
+              "text": "",
+              "is_header": false
+            },
+            {
+              "row": 7,
+              "col": 2,
+              "rowspan": 1,
+              "colspan": 1,
+              "text": "",
+              "is_header": false
+            },
+            {
+              "row": 7,
+              "col": 3,
+              "rowspan": 1,
+              "colspan": 1,
+              "text": "",
+              "is_header": false
+            },
+            {
+              "row": 7,
+              "col": 4,
+              "rowspan": 1,
+              "colspan": 1,
+              "text": "",
+              "is_header": false
+            },
+            {
+              "row": 8,
+              "col": 0,
+              "rowspan": 1,
+              "colspan": 5,
+              "text": "MARPOL Annex II – NLS",
+              "is_header": false
+            },
+            {
+              "row": 9,
+              "col": 0,
+              "rowspan": 1,
+              "colspan": 1,
+              "text": "Category X substance",
+              "is_header": false
+            },
+            {
+              "row": 9,
+              "col": 1,
+              "rowspan": 1,
+              "colspan": 1,
+              "text": "",
+              "is_header": false
+            },
+            {
+              "row": 9,
+              "col": 2,
+              "rowspan": 1,
+              "colspan": 1,
+              "text": "",
+              "is_header": false
+            },
+            {
+              "row": 9,
+              "col": 3,
+              "rowspan": 1,
+              "colspan": 1,
+              "text": "",
+              "is_header": false
+            },
+            {
+              "row": 9,
+              "col": 4,
+              "rowspan": 1,
+              "colspan": 1,
+              "text": "",
+              "is_header": false
+            },
+            {
+              "row": 10,
+              "col": 0,
+              "rowspan": 1,
+              "colspan": 1,
+              "text": "Category Y substance",
+              "is_header": false
+            },
+            {
+              "row": 10,
+              "col": 1,
+              "rowspan": 1,
+              "colspan": 1,
+              "text": "",
+              "is_header": false
+            },
+            {
+              "row": 10,
+              "col": 2,
+              "rowspan": 1,
+              "colspan": 1,
+              "text": "",
+              "is_header": false
+            },
+            {
+              "row": 10,
+              "col": 3,
+              "rowspan": 1,
+              "colspan": 1,
+              "text": "",
+              "is_header": false
+            },
+            {
+              "row": 10,
+              "col": 4,
+              "rowspan": 1,
+              "colspan": 1,
+              "text": "",
+              "is_header": false
+            },
+            {
+              "row": 11,
+              "col": 0,
+              "rowspan": 1,
+              "colspan": 1,
+              "text": "Category Z substance",
+              "is_header": false
+            },
+            {
+              "row": 11,
+              "col": 1,
+              "rowspan": 1,
+              "colspan": 1,
+              "text": "",
+              "is_header": false
+            },
+            {
+              "row": 11,
+              "col": 2,
+              "rowspan": 1,
+              "colspan": 1,
+              "text": "",
+              "is_header": false
+            },
+            {
+              "row": 11,
+              "col": 3,
+              "rowspan": 1,
+              "colspan": 1,
+              "text": "",
+              "is_header": false
+            },
+            {
+              "row": 11,
+              "col": 4,
+              "rowspan": 1,
+              "colspan": 1,
+              "text": "",
+              "is_header": false
+            },
+            {
+              "row": 12,
+              "col": 0,
+              "rowspan": 1,
+              "colspan": 1,
+              "text": "OS – other substances",
+              "is_header": false
+            },
+            {
+              "row": 12,
+              "col": 1,
+              "rowspan": 1,
+              "colspan": 1,
+              "text": "",
+              "is_header": false
+            },
+            {
+              "row": 12,
+              "col": 2,
+              "rowspan": 1,
+              "colspan": 1,
+              "text": "",
+              "is_header": false
+            },
+            {
+              "row": 12,
+              "col": 3,
+              "rowspan": 1,
+              "colspan": 1,
+              "text": "",
+              "is_header": false
+            },
+            {
+              "row": 12,
+              "col": 4,
+              "rowspan": 1,
+              "colspan": 1,
+              "text": "",
+              "is_header": false
+            },
+            {
+              "row": 13,
+              "col": 0,
+              "rowspan": 1,
+              "colspan": 5,
+              "text": "MARPOL Annex IV – Sewage",
+              "is_header": false
+            },
+            {
+              "row": 14,
+              "col": 0,
+              "rowspan": 1,
+              "colspan": 1,
+              "text": "Sewage",
+              "is_header": false
+            },
+            {
+              "row": 14,
+              "col": 1,
+              "rowspan": 1,
+              "colspan": 1,
+              "text": "",
+              "is_header": false
+            },
+            {
+              "row": 14,
+              "col": 2,
+              "rowspan": 1,
+              "colspan": 1,
+              "text": "",
+              "is_header": false
+            },
+            {
+              "row": 14,
+              "col": 3,
+              "rowspan": 1,
+              "colspan": 1,
+              "text": "",
+              "is_header": false
+            },
+            {
+              "row": 14,
+              "col": 4,
+              "rowspan": 1,
+              "colspan": 1,
+              "text": "",
+              "is_header": false
+            },
+            {
+              "row": 15,
+              "col": 0,
+              "rowspan": 1,
+              "colspan": 5,
+              "text": "MARPOL Annex V – Garbage",
+              "is_header": false
+            },
+            {
+              "row": 16,
+              "col": 0,
+              "rowspan": 1,
+              "colspan": 1,
+              "text": "Plastic",
+              "is_header": false
+            },
+            {
+              "row": 16,
+              "col": 1,
+              "rowspan": 1,
+              "colspan": 1,
+              "text": "",
+              "is_header": false
+            },
+            {
+              "row": 16,
+              "col": 2,
+              "rowspan": 1,
+              "colspan": 1,
+              "text": "",
+              "is_header": false
+            },
+            {
+              "row": 16,
+              "col": 3,
+              "rowspan": 1,
+              "colspan": 1,
+              "text": "",
+              "is_header": false
+            },
+            {
+              "row": 16,
+              "col": 4,
+              "rowspan": 1,
+              "colspan": 1,
+              "text": "",
+              "is_header": false
+            },
+            {
+              "row": 17,
+              "col": 0,
+              "rowspan": 1,
+              "colspan": 1,
+              "text": "Floating dunnage, lining or packing material",
+              "is_header": false
+            },
+            {
+              "row": 17,
+              "col": 1,
+              "rowspan": 1,
+              "colspan": 1,
+              "text": "",
+              "is_header": false
+            },
+            {
+              "row": 17,
+              "col": 2,
+              "rowspan": 1,
+              "colspan": 1,
+              "text": "",
+              "is_header": false
+            },
+            {
+              "row": 17,
+              "col": 3,
+              "rowspan": 1,
+              "colspan": 1,
+              "text": "",
+              "is_header": false
+            },
+            {
+              "row": 17,
+              "col": 4,
+              "rowspan": 1,
+              "colspan": 1,
+              "text": "",
+              "is_header": false
+            },
+            {
+              "row": 18,
+              "col": 0,
+              "rowspan": 1,
+              "colspan": 1,
+              "text": "Ground paper products, rags, glass, metal, bottles, crockery",
+              "is_header": false
+            },
+            {
+              "row": 18,
+              "col": 1,
+              "rowspan": 1,
+              "colspan": 1,
+              "text": "",
+              "is_header": false
+            },
+            {
+              "row": 18,
+              "col": 2,
+              "rowspan": 1,
+              "colspan": 1,
+              "text": "",
+              "is_header": false
+            },
+            {
+              "row": 18,
+              "col": 3,
+              "rowspan": 1,
+              "colspan": 1,
+              "text": "",
+              "is_header": false
+            },
+            {
+              "row": 18,
+              "col": 4,
+              "rowspan": 1,
+              "colspan": 1,
+              "text": "",
+              "is_header": false
+            },
+            {
+              "row": 19,
+              "col": 0,
+              "rowspan": 1,
+              "colspan": 1,
+              "text": "Cargo residues, paper products, rags, glass, metal bottles, crockery",
+              "is_header": false
+            },
+            {
+              "row": 19,
+              "col": 1,
+              "rowspan": 1,
+              "colspan": 1,
+              "text": "",
+              "is_header": false
+            },
+            {
+              "row": 19,
+              "col": 2,
+              "rowspan": 1,
+              "colspan": 1,
+              "text": "",
+              "is_header": false
+            },
+            {
+              "row": 19,
+              "col": 3,
+              "rowspan": 1,
+              "colspan": 1,
+              "text": "",
+              "is_header": false
+            },
+            {
+              "row": 19,
+              "col": 4,
+              "rowspan": 1,
+              "colspan": 1,
+              "text": "",
+              "is_header": false
+            },
+            {
+              "row": 20,
+              "col": 0,
+              "rowspan": 1,
+              "colspan": 1,
+              "text": "Food waste",
+              "is_header": false
+            },
+            {
+              "row": 20,
+              "col": 1,
+              "rowspan": 1,
+              "colspan": 1,
+              "text": "",
+              "is_header": false
+            },
+            {
+              "row": 20,
+              "col": 2,
+              "rowspan": 1,
+              "colspan": 1,
+              "text": "",
+              "is_header": false
+            },
+            {
+              "row": 20,
+              "col": 3,
+              "rowspan": 1,
+              "colspan": 1,
+              "text": "",
+              "is_header": false
+            },
+            {
+              "row": 20,
+              "col": 4,
+              "rowspan": 1,
+              "colspan": 1,
+              "text": "",
+              "is_header": false
+            },
+            {
+              "row": 21,
+              "col": 0,
+              "rowspan": 1,
+              "colspan": 1,
+              "text": "Incinerator ash",
+              "is_header": false
+            },
+            {
+              "row": 21,
+              "col": 1,
+              "rowspan": 1,
+              "colspan": 1,
+              "text": "",
+              "is_header": false
+            },
+            {
+              "row": 21,
+              "col": 2,
+              "rowspan": 1,
+              "colspan": 1,
+              "text": "",
+              "is_header": false
+            },
+            {
+              "row": 21,
+              "col": 3,
+              "rowspan": 1,
+              "colspan": 1,
+              "text": "",
+              "is_header": false
+            },
+            {
+              "row": 21,
+              "col": 4,
+              "rowspan": 1,
+              "colspan": 1,
+              "text": "",
+              "is_header": false
+            },
+            {
+              "row": 22,
+              "col": 0,
+              "rowspan": 1,
+              "colspan": 1,
+              "text": "Other wastes (specify)",
+              "is_header": false
+            },
+            {
+              "row": 22,
+              "col": 1,
+              "rowspan": 1,
+              "colspan": 1,
+              "text": "",
+              "is_header": false
+            },
+            {
+              "row": 22,
+              "col": 2,
+              "rowspan": 1,
+              "colspan": 1,
+              "text": "",
+              "is_header": false
+            },
+            {
+              "row": 22,
+              "col": 3,
+              "rowspan": 1,
+              "colspan": 1,
+              "text": "",
+              "is_header": false
+            },
+            {
+              "row": 22,
+              "col": 4,
+              "rowspan": 1,
+              "colspan": 1,
+              "text": "",
+              "is_header": false
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

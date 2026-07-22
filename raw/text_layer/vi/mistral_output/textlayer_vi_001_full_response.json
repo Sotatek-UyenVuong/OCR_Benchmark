@@ -1,0 +1,671 @@
+{
+  "pages": [
+    {
+      "index": 0,
+      "markdown": "- Chia thực nghiệm thành nhiều bước, mỗi bước chỉ đưa ra một mục tiêu thực nghiệm.\n- Phát hiện thêm các điều kiện phụ cho mỗi bước thực nghiệm. Như vậy, công việc thực nghiệm trở nên sáng tỏ hơn, giảm bớt mờ mẫm.\n\n### 3.5. PHƯƠNG PHÁP TRẮC NGHIỆM\n\nTrắc nghiệm là một phương pháp bán thực nghiệm.\n\nNói trắc nghiệm là một phương pháp bán thực nghiệm là vì, sự vật không bị bất cứ tác động nào làm biến đổi trạng thái, mà chỉ có các tình huống của môi trường hoạt động của sự vật bị thay đổi. Qua trắc nghiệm, người nghiên cứu nhận biết được chất lượng của đối tượng khảo sát. Trắc nghiệm được sử dụng trong nhiều lĩnh vực nghiên cứu. Chẳng hạn:\n\n- Trong lĩnh vực công nghệ, người ta có thể làm những trắc nghiệm như thử nghiệm đánh hỏng vật liệu; thử nghiệm độ bền cơ học của vật liệu; thử nghiệm các điều kiện làm việc: thời gian ngắn, cường độ lao động cao; tải trọng thường xuyên biến đổi; điều kiện vật lý bất ổn định, v.v..\n- Với những trắc nghiệm tâm lý, cần tác động trên con người, người ta có thể đặt những câu hỏi như: trắc nghiệm \"có-không\"; trắc nghiệm với câu hỏi trả lời sẵn; trắc nghiệm với câu hỏi mở.\n\n### 3.6. PHƯƠNG PHÁP XỬ LÝ THÔNG TIN\n\nKết quả thu thập thông tin từ công việc nghiên cứu tài liệu, số liệu thống kê, quan sát hoặc thực nghiệm tồn tại dưới hai dạng: Thông tin định tính và Thông tin định lượng.\n\nCác thông tin định tính và định lượng cần được xử lý để xây dựng các luận cứ, phục vụ cho việc chứng minh hoặc bác bỏ các giả thuyết khoa học. Có hai phương hướng xử lý thông tin:\n\n- Xử lý toán học đối với các thông tin định lượng. Đây là việc sử dụng phương pháp thống kê toán để xác định xu hướng diễn biến của tập hợp số liệu thu thập được.\n- Xử lý logic đối với các thông tin định tính. Đây là việc đưa ra những phán đoán về bản chất các sự kiện, đồng thời thể hiện những liên hệ logic của các sự kiện.",
+      "images": [],
+      "tables": [],
+      "hyperlinks": [],
+      "header": null,
+      "footer": "- 26 -",
+      "dimensions": {
+        "dpi": 87,
+        "height": 1018,
+        "width": 719
+      },
+      "confidence_scores": null,
+      "blocks": [
+        {
+          "top_left_x": 155,
+          "top_left_y": 108,
+          "bottom_right_x": 625,
+          "bottom_right_y": 193,
+          "content": "- Chia thực nghiệm thành nhiều bước, mỗi bước chỉ đưa ra một mục tiêu thực nghiệm.\n- Phát hiện thêm các điều kiện phụ cho mỗi bước thực nghiệm. Như vậy, công việc thực nghiệm trở nên sáng tỏ hơn, giảm bớt mờ mẫm.",
+          "type": "list"
+        },
+        {
+          "top_left_x": 124,
+          "top_left_y": 215,
+          "bottom_right_x": 348,
+          "bottom_right_y": 231,
+          "content": "### 3.5. PHƯƠNG PHÁP TRẮC NGHIỆM",
+          "type": "title"
+        },
+        {
+          "top_left_x": 155,
+          "top_left_y": 254,
+          "bottom_right_x": 451,
+          "bottom_right_y": 271,
+          "content": "Trắc nghiệm là một phương pháp bán thực nghiệm.",
+          "type": "text"
+        },
+        {
+          "top_left_x": 124,
+          "top_left_y": 282,
+          "bottom_right_x": 625,
+          "bottom_right_y": 381,
+          "content": "Nói trắc nghiệm là một phương pháp bán thực nghiệm là vì, sự vật không bị bất cứ tác động nào làm biến đổi trạng thái, mà chỉ có các tình huống của môi trường hoạt động của sự vật bị thay đổi. Qua trắc nghiệm, người nghiên cứu nhận biết được chất lượng của đối tượng khảo sát. Trắc nghiệm được sử dụng trong nhiều lĩnh vực nghiên cứu. Chẳng hạn:",
+          "type": "text"
+        },
+        {
+          "top_left_x": 155,
+          "top_left_y": 394,
+          "bottom_right_x": 625,
+          "bottom_right_y": 539,
+          "content": "- Trong lĩnh vực công nghệ, người ta có thể làm những trắc nghiệm như thử nghiệm đánh hỏng vật liệu; thử nghiệm độ bền cơ học của vật liệu; thử nghiệm các điều kiện làm việc: thời gian ngắn, cường độ lao động cao; tải trọng thường xuyên biến đổi; điều kiện vật lý bất ổn định, v.v..\n- Với những trắc nghiệm tâm lý, cần tác động trên con người, người ta có thể đặt những câu hỏi như: trắc nghiệm \"có-không\"; trắc nghiệm với câu hỏi trả lời sẵn; trắc nghiệm với câu hỏi mở.",
+          "type": "list"
+        },
+        {
+          "top_left_x": 124,
+          "top_left_y": 569,
+          "bottom_right_x": 371,
+          "bottom_right_y": 585,
+          "content": "### 3.6. PHƯƠNG PHÁP XỬ LÝ THÔNG TIN",
+          "type": "title"
+        },
+        {
+          "top_left_x": 124,
+          "top_left_y": 605,
+          "bottom_right_x": 625,
+          "bottom_right_y": 663,
+          "content": "Kết quả thu thập thông tin từ công việc nghiên cứu tài liệu, số liệu thống kê, quan sát hoặc thực nghiệm tồn tại dưới hai dạng: Thông tin định tính và Thông tin định lượng.",
+          "type": "text"
+        },
+        {
+          "top_left_x": 124,
+          "top_left_y": 677,
+          "bottom_right_x": 625,
+          "bottom_right_y": 735,
+          "content": "Các thông tin định tính và định lượng cần được xử lý để xây dựng các luận cứ, phục vụ cho việc chứng minh hoặc bác bỏ các giả thuyết khoa học. Có hai phương hướng xử lý thông tin:",
+          "type": "text"
+        },
+        {
+          "top_left_x": 155,
+          "top_left_y": 747,
+          "bottom_right_x": 625,
+          "bottom_right_y": 875,
+          "content": "- Xử lý toán học đối với các thông tin định lượng. Đây là việc sử dụng phương pháp thống kê toán để xác định xu hướng diễn biến của tập hợp số liệu thu thập được.\n- Xử lý logic đối với các thông tin định tính. Đây là việc đưa ra những phán đoán về bản chất các sự kiện, đồng thời thể hiện những liên hệ logic của các sự kiện.",
+          "type": "list"
+        },
+        {
+          "top_left_x": 356,
+          "top_left_y": 915,
+          "bottom_right_x": 389,
+          "bottom_right_y": 931,
+          "content": "- 26 -",
+          "type": "footer"
+        }
+      ]
+    },
+    {
+      "index": 1,
+      "markdown": "# 1. Xử lý thông tin định lượng\n\nNgười nghiên cứu không thể ghi chép các số liệu dưới dạng nguyên thủy vào tài liệu khoa học, mà phải sắp xếp chúng để làm bộc lộ ra các mối liên hệ và xu thế của sự vật. Tuỳ thuộc tính hệ thống và khả năng thu thập thông tin, số liệu có thể được trình bày dưới nhiều dạng, từ thấp đến cao gồm: Con số rời rạc; Bảng số liệu; Biểu đồ; Đồ thị.\n\n## *Con số rời rạc*\n\nNhững con số rời rạc là hình thức thông dụng trong các tài liệu khoa học. Nó cung cấp cho người đọc những thông tin định lượng để có thể so sánh được các sự kiện với nhau. Con số rời rạc được sử dụng trong trường hợp số liệu thuộc các sự vật riêng lẻ, không mang tính hệ thống, không thành chuỗi theo thời gian. Ví dụ, 'Đến tháng 9-1994 Chính phủ Việt Nam đã cấp 1000 giấy phép đầu tư với tổng vốn pháp định khoảng 10 tỷ đô-la Mỹ, trong đó công nghiệp chiếm 57,4%...'\n\n## *Bảng số liệu*\n\nBảng số liệu được sử dụng khi số liệu mang tính hệ thống, thể hiện một cấu trúc hoặc một xu thế. Ví dụ, đoạn sau đây hoàn toàn có thể thay thế bằng một bảng số liệu như trình bày trên Bảng 3: 'Trong cơ cấu công nghiệp năm 1992 thì xí nghiệp quốc doanh chiếm 70,6% giá trị tổng sản lượng, 32,5% lao động, 78,9% vốn sản xuất; tỷ trọng tương ứng của tập thể là 2,8%, 10,1%, 2,0%; của xí nghiệp tư doanh là 2,8%, 2,3%, 3,1% và của hộ cả thể là 23,8%, 55,1%, 16,0%'.\n\nBảng 3: Cơ cấu công nghiệp năm 1992 (%)\n\n[tbl-0.html](tbl-0.html)\n\n## *Biểu đồ*\n\nĐối với những số liệu so sánh, người nghiên cứu có thể chuyển từ bảng số liệu sang biểu đồ (Hình 1) để cung cấp cho người đọc một hình ảnh trực quan về tương quan giữa hai hoặc nhiều sự vật cần so sánh.\n\nChẳng hạn, biểu đồ hình cột, cho phép so sánh các sự vật diễn biến theo thời gian; biểu đồ hình quạt, cho phép quan sát tỷ lệ các phần của một thể thống nhất; biểu đồ tuyến tính – quan sát động thái của sự vật theo thời gian; biểu đồ không gian, cho phép hình dung sự biến động của những hệ thống số liệu có tọa độ không gian; biểu đồ bậc thang, cho phép quan sát tương quan giữa các nhóm có đẳng cấp.",
+      "images": [],
+      "tables": [
+        {
+          "id": "tbl-0.html",
+          "content": "<table><thead><tr><th>TT</th><th></th><th>Quốc doanh</th><th>Tập thể</th><th>Tư doanh</th><th>Cá thể</th></tr></thead><tr><td>1</td><td>Giá trị tổng sản lượng</td><td>70,6</td><td>2,8</td><td>2,8</td><td>23,8</td></tr><tr><td>2</td><td>Lao động</td><td>32,5</td><td>10,1</td><td>2,3</td><td>55,1</td></tr><tr><td>3</td><td>Vốn sản xuất</td><td>78,9</td><td>2,0</td><td>3,1</td><td>16,0</td></tr></table>",
+          "format": "html",
+          "word_confidence_scores": null
+        }
+      ],
+      "hyperlinks": [],
+      "header": null,
+      "footer": "- 27 -",
+      "dimensions": {
+        "dpi": 87,
+        "height": 1018,
+        "width": 719
+      },
+      "confidence_scores": null,
+      "blocks": [
+        {
+          "top_left_x": 124,
+          "top_left_y": 107,
+          "bottom_right_x": 304,
+          "bottom_right_y": 125,
+          "content": "# 1. Xử lý thông tin định lượng",
+          "type": "title"
+        },
+        {
+          "top_left_x": 124,
+          "top_left_y": 139,
+          "bottom_right_x": 625,
+          "bottom_right_y": 230,
+          "content": "Người nghiên cứu không thể ghi chép các số liệu dưới dạng nguyên thủy vào tài liệu khoa học, mà phải sắp xếp chúng để làm bộc lộ ra các mối liên hệ và xu thế của sự vật. Tuỳ thuộc tính hệ thống và khả năng thu thập thông tin, số liệu có thể được trình bày dưới nhiều dạng, từ thấp đến cao gồm: Con số rời rạc; Bảng số liệu; Biểu đồ; Đồ thị.",
+          "type": "text"
+        },
+        {
+          "top_left_x": 155,
+          "top_left_y": 245,
+          "bottom_right_x": 243,
+          "bottom_right_y": 262,
+          "content": "## *Con số rời rạc*",
+          "type": "title"
+        },
+        {
+          "top_left_x": 124,
+          "top_left_y": 268,
+          "bottom_right_x": 625,
+          "bottom_right_y": 378,
+          "content": "Những con số rời rạc là hình thức thông dụng trong các tài liệu khoa học. Nó cung cấp cho người đọc những thông tin định lượng để có thể so sánh được các sự kiện với nhau. Con số rời rạc được sử dụng trong trường hợp số liệu thuộc các sự vật riêng lẻ, không mang tính hệ thống, không thành chuỗi theo thời gian. Ví dụ, 'Đến tháng 9-1994 Chính phủ Việt Nam đã cấp 1000 giấy phép đầu tư với tổng vốn pháp định khoảng 10 tỷ đô-la Mỹ, trong đó công nghiệp chiếm 57,4%...'",
+          "type": "text"
+        },
+        {
+          "top_left_x": 155,
+          "top_left_y": 391,
+          "bottom_right_x": 232,
+          "bottom_right_y": 409,
+          "content": "## *Bảng số liệu*",
+          "type": "title"
+        },
+        {
+          "top_left_x": 124,
+          "top_left_y": 414,
+          "bottom_right_x": 625,
+          "bottom_right_y": 525,
+          "content": "Bảng số liệu được sử dụng khi số liệu mang tính hệ thống, thể hiện một cấu trúc hoặc một xu thế. Ví dụ, đoạn sau đây hoàn toàn có thể thay thế bằng một bảng số liệu như trình bày trên Bảng 3: 'Trong cơ cấu công nghiệp năm 1992 thì xí nghiệp quốc doanh chiếm 70,6% giá trị tổng sản lượng, 32,5% lao động, 78,9% vốn sản xuất; tỷ trọng tương ứng của tập thể là 2,8%, 10,1%, 2,0%; của xí nghiệp tư doanh là 2,8%, 2,3%, 3,1% và của hộ cả thể là 23,8%, 55,1%, 16,0%'.",
+          "type": "text"
+        },
+        {
+          "top_left_x": 124,
+          "top_left_y": 538,
+          "bottom_right_x": 374,
+          "bottom_right_y": 556,
+          "content": "Bảng 3: Cơ cấu công nghiệp năm 1992 (%)",
+          "type": "caption"
+        },
+        {
+          "top_left_x": 117,
+          "top_left_y": 554,
+          "bottom_right_x": 602,
+          "bottom_right_y": 697,
+          "content": "<table><thead><tr><th>TT</th><th></th><th>Quốc doanh</th><th>Tập thể</th><th>Tư doanh</th><th>Cá thể</th></tr></thead><tr><td>1</td><td>Giá trị tổng sản lượng</td><td>70,6</td><td>2,8</td><td>2,8</td><td>23,8</td></tr><tr><td>2</td><td>Lao động</td><td>32,5</td><td>10,1</td><td>2,3</td><td>55,1</td></tr><tr><td>3</td><td>Vốn sản xuất</td><td>78,9</td><td>2,0</td><td>3,1</td><td>16,0</td></tr></table>",
+          "type": "table",
+          "table_id": "tbl-0.html"
+        },
+        {
+          "top_left_x": 155,
+          "top_left_y": 706,
+          "bottom_right_x": 205,
+          "bottom_right_y": 724,
+          "content": "## *Biểu đồ*",
+          "type": "title"
+        },
+        {
+          "top_left_x": 124,
+          "top_left_y": 730,
+          "bottom_right_x": 612,
+          "bottom_right_y": 784,
+          "content": "Đối với những số liệu so sánh, người nghiên cứu có thể chuyển từ bảng số liệu sang biểu đồ (Hình 1) để cung cấp cho người đọc một hình ảnh trực quan về tương quan giữa hai hoặc nhiều sự vật cần so sánh.",
+          "type": "text"
+        },
+        {
+          "top_left_x": 124,
+          "top_left_y": 794,
+          "bottom_right_x": 622,
+          "bottom_right_y": 887,
+          "content": "Chẳng hạn, biểu đồ hình cột, cho phép so sánh các sự vật diễn biến theo thời gian; biểu đồ hình quạt, cho phép quan sát tỷ lệ các phần của một thể thống nhất; biểu đồ tuyến tính – quan sát động thái của sự vật theo thời gian; biểu đồ không gian, cho phép hình dung sự biến động của những hệ thống số liệu có tọa độ không gian; biểu đồ bậc thang, cho phép quan sát tương quan giữa các nhóm có đẳng cấp.",
+          "type": "text"
+        },
+        {
+          "top_left_x": 356,
+          "top_left_y": 915,
+          "bottom_right_x": 389,
+          "bottom_right_y": 931,
+          "content": "- 27 -",
+          "type": "footer"
+        }
+      ]
+    },
+    {
+      "index": 2,
+      "markdown": "![img-0.jpeg](img-0.jpeg)\n\nBiểu đồ hình cột\n\n![img-1.jpeg](img-1.jpeg)\n\nBiểu đồ hình quạt\n\n![img-2.jpeg](img-2.jpeg)\n\nBiểu đồ tuyến tính\n\n![img-3.jpeg](img-3.jpeg)\n\nBiểu đồ phối hợp\n\n![img-4.jpeg](img-4.jpeg)\n\nBiểu đồ không gian\n\n![img-5.jpeg](img-5.jpeg)\n\nBiểu đồ bậc thang\n\nHình 1: Một số dạng biểu đồ có thể xây dựng từ số liệu đã thu thập\n\n### Đồ thị\n\nĐồ thị được sử dụng khi quy mô của tập hợp số liệu đủ lớn, để có thể từ các số liệu ngẫu nhiên, nhận ra những liên hệ tất yếu.\n\n## 2. Xử lý các thông tin định tính\n\nMục đích của xử lý định tính, nói cho cùng, là nhận dạng bản chất và mối liên hệ bản chất giữa các sự kiện. Kết quả sẽ giúp người nghiên cứu mô tả được dưới dạng các sơ đồ hoặc biểu thức toán học (xem phần Lý thuyết khoa học).",
+      "images": [
+        {
+          "id": "img-0.jpeg",
+          "top_left_x": 127,
+          "top_left_y": 122,
+          "bottom_right_x": 348,
+          "bottom_right_y": 274,
+          "image_base64": null,
+          "image_annotation": null
+        },
+        {
+          "id": "img-1.jpeg",
+          "top_left_x": 420,
+          "top_left_y": 122,
+          "bottom_right_x": 564,
+          "bottom_right_y": 262,
+          "image_base64": null,
+          "image_annotation": null
+        },
+        {
+          "id": "img-2.jpeg",
+          "top_left_x": 132,
+          "top_left_y": 316,
+          "bottom_right_x": 343,
+          "bottom_right_y": 458,
+          "image_base64": null,
+          "image_annotation": null
+        },
+        {
+          "id": "img-3.jpeg",
+          "top_left_x": 363,
+          "top_left_y": 316,
+          "bottom_right_x": 584,
+          "bottom_right_y": 458,
+          "image_base64": null,
+          "image_annotation": null
+        },
+        {
+          "id": "img-4.jpeg",
+          "top_left_x": 137,
+          "top_left_y": 496,
+          "bottom_right_x": 340,
+          "bottom_right_y": 621,
+          "image_base64": null,
+          "image_annotation": null
+        },
+        {
+          "id": "img-5.jpeg",
+          "top_left_x": 363,
+          "top_left_y": 496,
+          "bottom_right_x": 582,
+          "bottom_right_y": 642,
+          "image_base64": null,
+          "image_annotation": null
+        }
+      ],
+      "tables": [],
+      "hyperlinks": [],
+      "header": null,
+      "footer": "- 28 -",
+      "dimensions": {
+        "dpi": 87,
+        "height": 1018,
+        "width": 719
+      },
+      "confidence_scores": null,
+      "blocks": [
+        {
+          "top_left_x": 127,
+          "top_left_y": 122,
+          "bottom_right_x": 348,
+          "bottom_right_y": 274,
+          "content": "![img-0.jpeg](img-0.jpeg)",
+          "type": "image",
+          "image_id": "img-0.jpeg"
+        },
+        {
+          "top_left_x": 194,
+          "top_left_y": 287,
+          "bottom_right_x": 286,
+          "bottom_right_y": 306,
+          "content": "Biểu đồ hình cột",
+          "type": "caption"
+        },
+        {
+          "top_left_x": 420,
+          "top_left_y": 122,
+          "bottom_right_x": 564,
+          "bottom_right_y": 262,
+          "content": "![img-1.jpeg](img-1.jpeg)",
+          "type": "image",
+          "image_id": "img-1.jpeg"
+        },
+        {
+          "top_left_x": 432,
+          "top_left_y": 287,
+          "bottom_right_x": 531,
+          "bottom_right_y": 306,
+          "content": "Biểu đồ hình quạt",
+          "type": "caption"
+        },
+        {
+          "top_left_x": 132,
+          "top_left_y": 316,
+          "bottom_right_x": 343,
+          "bottom_right_y": 458,
+          "content": "![img-2.jpeg](img-2.jpeg)",
+          "type": "image",
+          "image_id": "img-2.jpeg"
+        },
+        {
+          "top_left_x": 188,
+          "top_left_y": 472,
+          "bottom_right_x": 289,
+          "bottom_right_y": 489,
+          "content": "Biểu đồ tuyến tính",
+          "type": "caption"
+        },
+        {
+          "top_left_x": 363,
+          "top_left_y": 316,
+          "bottom_right_x": 584,
+          "bottom_right_y": 458,
+          "content": "![img-3.jpeg](img-3.jpeg)",
+          "type": "image",
+          "image_id": "img-3.jpeg"
+        },
+        {
+          "top_left_x": 428,
+          "top_left_y": 472,
+          "bottom_right_x": 523,
+          "bottom_right_y": 489,
+          "content": "Biểu đồ phối hợp",
+          "type": "caption"
+        },
+        {
+          "top_left_x": 137,
+          "top_left_y": 496,
+          "bottom_right_x": 340,
+          "bottom_right_y": 621,
+          "content": "![img-4.jpeg](img-4.jpeg)",
+          "type": "image",
+          "image_id": "img-4.jpeg"
+        },
+        {
+          "top_left_x": 185,
+          "top_left_y": 656,
+          "bottom_right_x": 291,
+          "bottom_right_y": 675,
+          "content": "Biểu đồ không gian",
+          "type": "caption"
+        },
+        {
+          "top_left_x": 363,
+          "top_left_y": 496,
+          "bottom_right_x": 582,
+          "bottom_right_y": 642,
+          "content": "![img-5.jpeg](img-5.jpeg)",
+          "type": "image",
+          "image_id": "img-5.jpeg"
+        },
+        {
+          "top_left_x": 425,
+          "top_left_y": 656,
+          "bottom_right_x": 526,
+          "bottom_right_y": 675,
+          "content": "Biểu đồ bậc thang",
+          "type": "caption"
+        },
+        {
+          "top_left_x": 181,
+          "top_left_y": 682,
+          "bottom_right_x": 565,
+          "bottom_right_y": 700,
+          "content": "Hình 1: Một số dạng biểu đồ có thể xây dựng từ số liệu đã thu thập",
+          "type": "caption"
+        },
+        {
+          "top_left_x": 162,
+          "top_left_y": 704,
+          "bottom_right_x": 204,
+          "bottom_right_y": 722,
+          "content": "### Đồ thị",
+          "type": "title"
+        },
+        {
+          "top_left_x": 122,
+          "top_left_y": 732,
+          "bottom_right_x": 612,
+          "bottom_right_y": 770,
+          "content": "Đồ thị được sử dụng khi quy mô của tập hợp số liệu đủ lớn, để có thể từ các số liệu ngẫu nhiên, nhận ra những liên hệ tất yếu.",
+          "type": "text"
+        },
+        {
+          "top_left_x": 122,
+          "top_left_y": 787,
+          "bottom_right_x": 316,
+          "bottom_right_y": 805,
+          "content": "## 2. Xử lý các thông tin định tính",
+          "type": "title"
+        },
+        {
+          "top_left_x": 122,
+          "top_left_y": 817,
+          "bottom_right_x": 624,
+          "bottom_right_y": 873,
+          "content": "Mục đích của xử lý định tính, nói cho cùng, là nhận dạng bản chất và mối liên hệ bản chất giữa các sự kiện. Kết quả sẽ giúp người nghiên cứu mô tả được dưới dạng các sơ đồ hoặc biểu thức toán học (xem phần Lý thuyết khoa học).",
+          "type": "text"
+        },
+        {
+          "top_left_x": 356,
+          "top_left_y": 914,
+          "bottom_right_x": 389,
+          "bottom_right_y": 931,
+          "content": "- 28 -",
+          "type": "footer"
+        }
+      ]
+    },
+    {
+      "index": 3,
+      "markdown": "Sơ đồ cho phép hình dung một cách trực quan các mối liên hệ giữa các yếu tố trong cấu trúc của một sự vật mà không quan tâm đến kích thước thực hoặc tỷ lệ thực của chúng.\n\nMô hình toán cho phép khái quát hóa các liên hệ của sự vật, tính toán được các quan hệ định lượng giữa chúng.\n\n### 3. Sai số quan sát\n\nBất cứ phép đo nào cũng phạm những sai số. Vận dụng khái niệm sai số trong kỹ thuật đo lường, ta có thể xem xét ba cấp độ sai số sau đây:\n\n#### 1) Sai số ngẫu nhiên.\n\nĐây là loại sai số do sự cảm nhận chủ quan của người quan sát. Trong trường hợp quan sát bằng các phương tiện đo lường thì đây là sai số phép đo, là sai số xuất hiện do năng lực quan sát của mỗi người.\n\n#### 2) Sai số kỹ thuật.\n\nĐây là loại sai số xuất hiện do các yếu tố kỹ thuật gây ra một cách khách quan, không do năng lực cảm nhận chủ quan của người quan sát.\n\n#### 3) Sai số hệ thống.\n\nĐây là loại sai số do hệ thống quyết định. Hệ thống càng lớn thì sai số quan sát càng lớn.\n\n### 4. Phương pháp trình bày độ chính xác của số liệu\n\nKhông phải mọi số liệu đều được biểu diễn với một yêu cầu về độ chính xác như nhau, cũng không phải một số liệu được trình bày với nhiều con số sau dấu phẩy mới là khoa học.\n\nĐộ chính xác của số liệu được trình bày khác nhau tuỳ thuộc một số yếu tố:\n\n#### 1) Độ chính xác phụ thuộc kích thước của hệ thống\n\nKhông phải khi một số liệu càng chi tiết và càng nhiều số lẻ sau dấu phẩy mới là một số liệu chính xác. Ngược lại, có khi càng làm như vậy, càng chứng tỏ người nghiên cứu không hiểu đầy đủ khái niệm về độ chính xác. Chẳng hạn,\n\n- Các nhà khảo cổ học chỉ cần công bố, chẳng hạn tuổi trống khoảng 4800 năm, nghĩa là độ chính xác tới hàng trăm năm.\n- Tính tuổi của một đứa trẻ đang còn được bế trên tay mẹ, thì độ chính xác lại phải đến ngày, ví dụ, \"cháu được ba tháng ba ngày\".\n\nĐó cũng là nguyên tắc biểu diễn số lẻ trong khi xử lý các số liệu thu thập được qua quan sát, thực nghiệm.",
+      "images": [],
+      "tables": [],
+      "hyperlinks": [],
+      "header": null,
+      "footer": "- 29 -",
+      "dimensions": {
+        "dpi": 87,
+        "height": 1018,
+        "width": 719
+      },
+      "confidence_scores": null,
+      "blocks": [
+        {
+          "top_left_x": 122,
+          "top_left_y": 107,
+          "bottom_right_x": 625,
+          "bottom_right_y": 163,
+          "content": "Sơ đồ cho phép hình dung một cách trực quan các mối liên hệ giữa các yếu tố trong cấu trúc của một sự vật mà không quan tâm đến kích thước thực hoặc tỷ lệ thực của chúng.",
+          "type": "text"
+        },
+        {
+          "top_left_x": 122,
+          "top_left_y": 172,
+          "bottom_right_x": 625,
+          "bottom_right_y": 209,
+          "content": "Mô hình toán cho phép khái quát hóa các liên hệ của sự vật, tính toán được các quan hệ định lượng giữa chúng.",
+          "type": "text"
+        },
+        {
+          "top_left_x": 122,
+          "top_left_y": 226,
+          "bottom_right_x": 233,
+          "bottom_right_y": 245,
+          "content": "### 3. Sai số quan sát",
+          "type": "title"
+        },
+        {
+          "top_left_x": 122,
+          "top_left_y": 257,
+          "bottom_right_x": 625,
+          "bottom_right_y": 293,
+          "content": "Bất cứ phép đo nào cũng phạm những sai số. Vận dụng khái niệm sai số trong kỹ thuật đo lường, ta có thể xem xét ba cấp độ sai số sau đây:",
+          "type": "text"
+        },
+        {
+          "top_left_x": 154,
+          "top_left_y": 303,
+          "bottom_right_x": 283,
+          "bottom_right_y": 321,
+          "content": "#### 1) Sai số ngẫu nhiên.",
+          "type": "title"
+        },
+        {
+          "top_left_x": 122,
+          "top_left_y": 331,
+          "bottom_right_x": 625,
+          "bottom_right_y": 387,
+          "content": "Đây là loại sai số do sự cảm nhận chủ quan của người quan sát. Trong trường hợp quan sát bằng các phương tiện đo lường thì đây là sai số phép đo, là sai số xuất hiện do năng lực quan sát của mỗi người.",
+          "type": "text"
+        },
+        {
+          "top_left_x": 154,
+          "top_left_y": 397,
+          "bottom_right_x": 263,
+          "bottom_right_y": 416,
+          "content": "#### 2) Sai số kỹ thuật.",
+          "type": "title"
+        },
+        {
+          "top_left_x": 122,
+          "top_left_y": 425,
+          "bottom_right_x": 625,
+          "bottom_right_y": 463,
+          "content": "Đây là loại sai số xuất hiện do các yếu tố kỹ thuật gây ra một cách khách quan, không do năng lực cảm nhận chủ quan của người quan sát.",
+          "type": "text"
+        },
+        {
+          "top_left_x": 154,
+          "top_left_y": 472,
+          "bottom_right_x": 267,
+          "bottom_right_y": 490,
+          "content": "#### 3) Sai số hệ thống.",
+          "type": "title"
+        },
+        {
+          "top_left_x": 122,
+          "top_left_y": 499,
+          "bottom_right_x": 625,
+          "bottom_right_y": 537,
+          "content": "Đây là loại sai số do hệ thống quyết định. Hệ thống càng lớn thì sai số quan sát càng lớn.",
+          "type": "text"
+        },
+        {
+          "top_left_x": 122,
+          "top_left_y": 554,
+          "bottom_right_x": 431,
+          "bottom_right_y": 573,
+          "content": "### 4. Phương pháp trình bày độ chính xác của số liệu",
+          "type": "title"
+        },
+        {
+          "top_left_x": 122,
+          "top_left_y": 585,
+          "bottom_right_x": 625,
+          "bottom_right_y": 640,
+          "content": "Không phải mọi số liệu đều được biểu diễn với một yêu cầu về độ chính xác như nhau, cũng không phải một số liệu được trình bày với nhiều con số sau dấu phẩy mới là khoa học.",
+          "type": "text"
+        },
+        {
+          "top_left_x": 154,
+          "top_left_y": 650,
+          "bottom_right_x": 589,
+          "bottom_right_y": 668,
+          "content": "Độ chính xác của số liệu được trình bày khác nhau tuỳ thuộc một số yếu tố:",
+          "type": "text"
+        },
+        {
+          "top_left_x": 154,
+          "top_left_y": 679,
+          "bottom_right_x": 463,
+          "bottom_right_y": 698,
+          "content": "#### 1) Độ chính xác phụ thuộc kích thước của hệ thống",
+          "type": "title"
+        },
+        {
+          "top_left_x": 122,
+          "top_left_y": 706,
+          "bottom_right_x": 625,
+          "bottom_right_y": 763,
+          "content": "Không phải khi một số liệu càng chi tiết và càng nhiều số lẻ sau dấu phẩy mới là một số liệu chính xác. Ngược lại, có khi càng làm như vậy, càng chứng tỏ người nghiên cứu không hiểu đầy đủ khái niệm về độ chính xác. Chẳng hạn,",
+          "type": "text"
+        },
+        {
+          "top_left_x": 154,
+          "top_left_y": 774,
+          "bottom_right_x": 625,
+          "bottom_right_y": 860,
+          "content": "- Các nhà khảo cổ học chỉ cần công bố, chẳng hạn tuổi trống khoảng 4800 năm, nghĩa là độ chính xác tới hàng trăm năm.\n- Tính tuổi của một đứa trẻ đang còn được bế trên tay mẹ, thì độ chính xác lại phải đến ngày, ví dụ, \"cháu được ba tháng ba ngày\".",
+          "type": "list"
+        },
+        {
+          "top_left_x": 122,
+          "top_left_y": 864,
+          "bottom_right_x": 625,
+          "bottom_right_y": 901,
+          "content": "Đó cũng là nguyên tắc biểu diễn số lẻ trong khi xử lý các số liệu thu thập được qua quan sát, thực nghiệm.",
+          "type": "text"
+        },
+        {
+          "top_left_x": 356,
+          "top_left_y": 914,
+          "bottom_right_x": 389,
+          "bottom_right_y": 930,
+          "content": "- 29 -",
+          "type": "footer"
+        }
+      ]
+    },
+    {
+      "index": 4,
+      "markdown": "## **2) Độ chính xác phụ thuộc phương tiện quan sát**\n\nKhi đặt bao xi măng loại 50 kilôgam lên bàn cân, ta chỉ quan tâm độ chính xác tới vài trăm gam. Sẽ là hài hước khi ta đòi cân chính xác tới gam, bởi vì dù ta có muốn như vậy, thì phương tiện kỹ thuật cũng không thể thỏa mãn. Nhưng khi cân vàng thì người ta đòi độ chính xác tới phần trăm gam, có khi còn cao hơn nữa.\n\n## **3) Tính nhất quán trong khi trình bày độ chính xác của số liệu**\n\nĐộ chính xác phải nhất quán trong cùng một hệ thống và trong các hệ thống tương đương. Trong một công trình khoa học xuất bản ở Hà Nội, các tác giả viết: 'Tỷ lệ nhập siêu giảm đáng kể: năm 1985 giảm 2,6 lần; năm 1991 giảm 1,12 lần; năm 1992 giảm 1,012 lần'. Viết như trên là không nhất quán về độ chính xác của phép đo, vì năm 1985 số đo chỉ tính chính xác tới phần mười đơn vị, nhưng năm 1991 lại tính đến phần trăm, và đến 1992 lại tính đến phần nghìn. Đúng ra phải đưa về cùng một độ chính xác, giả dụ, tính chính xác đến phần trăm. Khi đó sẽ phải sửa thành: '... năm 1985 giảm 2,60 lần; năm 1991 giảm 1,12 lần; năm 1992 giảm 1,01 lần'.",
+      "images": [],
+      "tables": [],
+      "hyperlinks": [],
+      "header": null,
+      "footer": "- 30 -",
+      "dimensions": {
+        "dpi": 87,
+        "height": 1018,
+        "width": 719
+      },
+      "confidence_scores": null,
+      "blocks": [
+        {
+          "top_left_x": 154,
+          "top_left_y": 107,
+          "bottom_right_x": 446,
+          "bottom_right_y": 126,
+          "content": "## **2) Độ chính xác phụ thuộc phương tiện quan sát**",
+          "type": "title"
+        },
+        {
+          "top_left_x": 122,
+          "top_left_y": 137,
+          "bottom_right_x": 625,
+          "bottom_right_y": 209,
+          "content": "Khi đặt bao xi măng loại 50 kilôgam lên bàn cân, ta chỉ quan tâm độ chính xác tới vài trăm gam. Sẽ là hài hước khi ta đòi cân chính xác tới gam, bởi vì dù ta có muốn như vậy, thì phương tiện kỹ thuật cũng không thể thỏa mãn. Nhưng khi cân vàng thì người ta đòi độ chính xác tới phần trăm gam, có khi còn cao hơn nữa.",
+          "type": "text"
+        },
+        {
+          "top_left_x": 154,
+          "top_left_y": 219,
+          "bottom_right_x": 526,
+          "bottom_right_y": 237,
+          "content": "## **3) Tính nhất quán trong khi trình bày độ chính xác của số liệu**",
+          "type": "title"
+        },
+        {
+          "top_left_x": 122,
+          "top_left_y": 247,
+          "bottom_right_x": 625,
+          "bottom_right_y": 394,
+          "content": "Độ chính xác phải nhất quán trong cùng một hệ thống và trong các hệ thống tương đương. Trong một công trình khoa học xuất bản ở Hà Nội, các tác giả viết: 'Tỷ lệ nhập siêu giảm đáng kể: năm 1985 giảm 2,6 lần; năm 1991 giảm 1,12 lần; năm 1992 giảm 1,012 lần'. Viết như trên là không nhất quán về độ chính xác của phép đo, vì năm 1985 số đo chỉ tính chính xác tới phần mười đơn vị, nhưng năm 1991 lại tính đến phần trăm, và đến 1992 lại tính đến phần nghìn. Đúng ra phải đưa về cùng một độ chính xác, giả dụ, tính chính xác đến phần trăm. Khi đó sẽ phải sửa thành: '... năm 1985 giảm 2,60 lần; năm 1991 giảm 1,12 lần; năm 1992 giảm 1,01 lần'.",
+          "type": "text"
+        },
+        {
+          "top_left_x": 356,
+          "top_left_y": 915,
+          "bottom_right_x": 389,
+          "bottom_right_y": 931,
+          "content": "- 30 -",
+          "type": "footer"
+        }
+      ]
+    }
+  ],
+  "model": "mistral-ocr-latest",
+  "document_annotation": null,
+  "usage_info": {
+    "pages_processed": 5,
+    "doc_size_bytes": 216281
+  },
+  "status": "complete",
+  "success": true,
+  "markdown": "- Chia thực nghiệm thành nhiều bước, mỗi bước chỉ đưa ra một mục tiêu thực nghiệm.\n- Phát hiện thêm các điều kiện phụ cho mỗi bước thực nghiệm. Như vậy, công việc thực nghiệm trở nên sáng tỏ hơn, giảm bớt mờ mẫm.\n\n### 3.5. PHƯƠNG PHÁP TRẮC NGHIỆM\n\nTrắc nghiệm là một phương pháp bán thực nghiệm.\n\nNói trắc nghiệm là một phương pháp bán thực nghiệm là vì, sự vật không bị bất cứ tác động nào làm biến đổi trạng thái, mà chỉ có các tình huống của môi trường hoạt động của sự vật bị thay đổi. Qua trắc nghiệm, người nghiên cứu nhận biết được chất lượng của đối tượng khảo sát. Trắc nghiệm được sử dụng trong nhiều lĩnh vực nghiên cứu. Chẳng hạn:\n\n- Trong lĩnh vực công nghệ, người ta có thể làm những trắc nghiệm như thử nghiệm đánh hỏng vật liệu; thử nghiệm độ bền cơ học của vật liệu; thử nghiệm các điều kiện làm việc: thời gian ngắn, cường độ lao động cao; tải trọng thường xuyên biến đổi; điều kiện vật lý bất ổn định, v.v..\n- Với những trắc nghiệm tâm lý, cần tác động trên con người, người ta có thể đặt những câu hỏi như: trắc nghiệm \"có-không\"; trắc nghiệm với câu hỏi trả lời sẵn; trắc nghiệm với câu hỏi mở.\n\n### 3.6. PHƯƠNG PHÁP XỬ LÝ THÔNG TIN\n\nKết quả thu thập thông tin từ công việc nghiên cứu tài liệu, số liệu thống kê, quan sát hoặc thực nghiệm tồn tại dưới hai dạng: Thông tin định tính và Thông tin định lượng.\n\nCác thông tin định tính và định lượng cần được xử lý để xây dựng các luận cứ, phục vụ cho việc chứng minh hoặc bác bỏ các giả thuyết khoa học. Có hai phương hướng xử lý thông tin:\n\n- Xử lý toán học đối với các thông tin định lượng. Đây là việc sử dụng phương pháp thống kê toán để xác định xu hướng diễn biến của tập hợp số liệu thu thập được.\n- Xử lý logic đối với các thông tin định tính. Đây là việc đưa ra những phán đoán về bản chất các sự kiện, đồng thời thể hiện những liên hệ logic của các sự kiện.\n\n# 1. Xử lý thông tin định lượng\n\nNgười nghiên cứu không thể ghi chép các số liệu dưới dạng nguyên thủy vào tài liệu khoa học, mà phải sắp xếp chúng để làm bộc lộ ra các mối liên hệ và xu thế của sự vật. Tuỳ thuộc tính hệ thống và khả năng thu thập thông tin, số liệu có thể được trình bày dưới nhiều dạng, từ thấp đến cao gồm: Con số rời rạc; Bảng số liệu; Biểu đồ; Đồ thị.\n\n## *Con số rời rạc*\n\nNhững con số rời rạc là hình thức thông dụng trong các tài liệu khoa học. Nó cung cấp cho người đọc những thông tin định lượng để có thể so sánh được các sự kiện với nhau. Con số rời rạc được sử dụng trong trường hợp số liệu thuộc các sự vật riêng lẻ, không mang tính hệ thống, không thành chuỗi theo thời gian. Ví dụ, 'Đến tháng 9-1994 Chính phủ Việt Nam đã cấp 1000 giấy phép đầu tư với tổng vốn pháp định khoảng 10 tỷ đô-la Mỹ, trong đó công nghiệp chiếm 57,4%...'\n\n## *Bảng số liệu*\n\nBảng số liệu được sử dụng khi số liệu mang tính hệ thống, thể hiện một cấu trúc hoặc một xu thế. Ví dụ, đoạn sau đây hoàn toàn có thể thay thế bằng một bảng số liệu như trình bày trên Bảng 3: 'Trong cơ cấu công nghiệp năm 1992 thì xí nghiệp quốc doanh chiếm 70,6% giá trị tổng sản lượng, 32,5% lao động, 78,9% vốn sản xuất; tỷ trọng tương ứng của tập thể là 2,8%, 10,1%, 2,0%; của xí nghiệp tư doanh là 2,8%, 2,3%, 3,1% và của hộ cả thể là 23,8%, 55,1%, 16,0%'.\n\nBảng 3: Cơ cấu công nghiệp năm 1992 (%)\n\n[tbl-0.html](tbl-0.html)\n\n## *Biểu đồ*\n\nĐối với những số liệu so sánh, người nghiên cứu có thể chuyển từ bảng số liệu sang biểu đồ (Hình 1) để cung cấp cho người đọc một hình ảnh trực quan về tương quan giữa hai hoặc nhiều sự vật cần so sánh.\n\nChẳng hạn, biểu đồ hình cột, cho phép so sánh các sự vật diễn biến theo thời gian; biểu đồ hình quạt, cho phép quan sát tỷ lệ các phần của một thể thống nhất; biểu đồ tuyến tính – quan sát động thái của sự vật theo thời gian; biểu đồ không gian, cho phép hình dung sự biến động của những hệ thống số liệu có tọa độ không gian; biểu đồ bậc thang, cho phép quan sát tương quan giữa các nhóm có đẳng cấp.\n\n![img-0.jpeg](img-0.jpeg)\n\nBiểu đồ hình cột\n\n![img-1.jpeg](img-1.jpeg)\n\nBiểu đồ hình quạt\n\n![img-2.jpeg](img-2.jpeg)\n\nBiểu đồ tuyến tính\n\n![img-3.jpeg](img-3.jpeg)\n\nBiểu đồ phối hợp\n\n![img-4.jpeg](img-4.jpeg)\n\nBiểu đồ không gian\n\n![img-5.jpeg](img-5.jpeg)\n\nBiểu đồ bậc thang\n\nHình 1: Một số dạng biểu đồ có thể xây dựng từ số liệu đã thu thập\n\n### Đồ thị\n\nĐồ thị được sử dụng khi quy mô của tập hợp số liệu đủ lớn, để có thể từ các số liệu ngẫu nhiên, nhận ra những liên hệ tất yếu.\n\n## 2. Xử lý các thông tin định tính\n\nMục đích của xử lý định tính, nói cho cùng, là nhận dạng bản chất và mối liên hệ bản chất giữa các sự kiện. Kết quả sẽ giúp người nghiên cứu mô tả được dưới dạng các sơ đồ hoặc biểu thức toán học (xem phần Lý thuyết khoa học).\n\nSơ đồ cho phép hình dung một cách trực quan các mối liên hệ giữa các yếu tố trong cấu trúc của một sự vật mà không quan tâm đến kích thước thực hoặc tỷ lệ thực của chúng.\n\nMô hình toán cho phép khái quát hóa các liên hệ của sự vật, tính toán được các quan hệ định lượng giữa chúng.\n\n### 3. Sai số quan sát\n\nBất cứ phép đo nào cũng phạm những sai số. Vận dụng khái niệm sai số trong kỹ thuật đo lường, ta có thể xem xét ba cấp độ sai số sau đây:\n\n#### 1) Sai số ngẫu nhiên.\n\nĐây là loại sai số do sự cảm nhận chủ quan của người quan sát. Trong trường hợp quan sát bằng các phương tiện đo lường thì đây là sai số phép đo, là sai số xuất hiện do năng lực quan sát của mỗi người.\n\n#### 2) Sai số kỹ thuật.\n\nĐây là loại sai số xuất hiện do các yếu tố kỹ thuật gây ra một cách khách quan, không do năng lực cảm nhận chủ quan của người quan sát.\n\n#### 3) Sai số hệ thống.\n\nĐây là loại sai số do hệ thống quyết định. Hệ thống càng lớn thì sai số quan sát càng lớn.\n\n### 4. Phương pháp trình bày độ chính xác của số liệu\n\nKhông phải mọi số liệu đều được biểu diễn với một yêu cầu về độ chính xác như nhau, cũng không phải một số liệu được trình bày với nhiều con số sau dấu phẩy mới là khoa học.\n\nĐộ chính xác của số liệu được trình bày khác nhau tuỳ thuộc một số yếu tố:\n\n#### 1) Độ chính xác phụ thuộc kích thước của hệ thống\n\nKhông phải khi một số liệu càng chi tiết và càng nhiều số lẻ sau dấu phẩy mới là một số liệu chính xác. Ngược lại, có khi càng làm như vậy, càng chứng tỏ người nghiên cứu không hiểu đầy đủ khái niệm về độ chính xác. Chẳng hạn,\n\n- Các nhà khảo cổ học chỉ cần công bố, chẳng hạn tuổi trống khoảng 4800 năm, nghĩa là độ chính xác tới hàng trăm năm.\n- Tính tuổi của một đứa trẻ đang còn được bế trên tay mẹ, thì độ chính xác lại phải đến ngày, ví dụ, \"cháu được ba tháng ba ngày\".\n\nĐó cũng là nguyên tắc biểu diễn số lẻ trong khi xử lý các số liệu thu thập được qua quan sát, thực nghiệm.\n\n## **2) Độ chính xác phụ thuộc phương tiện quan sát**\n\nKhi đặt bao xi măng loại 50 kilôgam lên bàn cân, ta chỉ quan tâm độ chính xác tới vài trăm gam. Sẽ là hài hước khi ta đòi cân chính xác tới gam, bởi vì dù ta có muốn như vậy, thì phương tiện kỹ thuật cũng không thể thỏa mãn. Nhưng khi cân vàng thì người ta đòi độ chính xác tới phần trăm gam, có khi còn cao hơn nữa.\n\n## **3) Tính nhất quán trong khi trình bày độ chính xác của số liệu**\n\nĐộ chính xác phải nhất quán trong cùng một hệ thống và trong các hệ thống tương đương. Trong một công trình khoa học xuất bản ở Hà Nội, các tác giả viết: 'Tỷ lệ nhập siêu giảm đáng kể: năm 1985 giảm 2,6 lần; năm 1991 giảm 1,12 lần; năm 1992 giảm 1,012 lần'. Viết như trên là không nhất quán về độ chính xác của phép đo, vì năm 1985 số đo chỉ tính chính xác tới phần mười đơn vị, nhưng năm 1991 lại tính đến phần trăm, và đến 1992 lại tính đến phần nghìn. Đúng ra phải đưa về cùng một độ chính xác, giả dụ, tính chính xác đến phần trăm. Khi đó sẽ phải sửa thành: '... năm 1985 giảm 2,60 lần; năm 1991 giảm 1,12 lần; năm 1992 giảm 1,01 lần'."
+}

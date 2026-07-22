@@ -1,0 +1,298 @@
+{
+  "pages": [
+    {
+      "index": 0,
+      "markdown": "# Đề 2\n\n1. Đề xuất phát tháo một đề tài NCKH về 1 trong các chủ đề: sinh viên, học tập, ...\n\n1. Tên đề tài\n\nPhát hiện hành vi gian lận thi cử bằng trí tuệ nhân tạo dựa trên dữ liệu camera giám sát\n\n2. Mục đích nghiên cứu\n\nỨng dụng trí tuệ nhân tạo để phát hiện hành vi gian lận trong thi cử dựa trên dữ liệu camera, nâng cao tính công bằng và hiệu quả giám sát.\n\n3. Câu hỏi nghiên cứu\n\nAI có thể phát hiện hành vi gian lận dựa trên camera giám sát không?\n\n4. Giá thuyết nghiên cứu\n\nAI có thể giúp giám sát bao quát hiệu quả hơn các phương pháp thi công, giảm tải cho giảm thi\n\n5. Phương pháp nghiên cứu\n\nSử dụng thị giác máy tính và học máy để phân tích video từ camera, nhận diện hành vi bất thường của sinh viên\n\n6. Cơ sở lý luận\n\nDựa trên lý thuyết trí tuệ nhân tạo, học máy, thị giác máy tính và các nghiên cứu phát hiện bất thường\n\n7. Luận cứ thực tế\n\nGian lận thi cử ngày càng tinh vi trong khi giám sát thi công còn hạn chế. AI sẽ là công cụ hỗ trợ đào tạo và phù hợp với thực tiễn hiện nay\n\n2. Trình bày vẽ",
+      "images": [],
+      "tables": [],
+      "hyperlinks": [
+        "https://v3.camscanner.com/user/download"
+      ],
+      "header": "Nguyễn Đình Nam - B25 CHKH 036",
+      "footer": "HAI TIÊN\nĐược quét bằng CamScanner",
+      "dimensions": {
+        "dpi": 87,
+        "height": 1018,
+        "width": 719
+      },
+      "confidence_scores": null,
+      "blocks": [
+        {
+          "top_left_x": 65,
+          "top_left_y": 51,
+          "bottom_right_x": 471,
+          "bottom_right_y": 85,
+          "content": "Nguyễn Đình Nam - B25 CHKH 036",
+          "type": "header"
+        },
+        {
+          "top_left_x": 258,
+          "top_left_y": 85,
+          "bottom_right_x": 319,
+          "bottom_right_y": 110,
+          "content": "# Đề 2",
+          "type": "title"
+        },
+        {
+          "top_left_x": 118,
+          "top_left_y": 110,
+          "bottom_right_x": 662,
+          "bottom_right_y": 170,
+          "content": "1. Đề xuất phát tháo một đề tài NCKH về 1 trong các chủ đề: sinh viên, học tập, ...",
+          "type": "list"
+        },
+        {
+          "top_left_x": 121,
+          "top_left_y": 170,
+          "bottom_right_x": 254,
+          "bottom_right_y": 197,
+          "content": "1. Tên đề tài",
+          "type": "list"
+        },
+        {
+          "top_left_x": 118,
+          "top_left_y": 195,
+          "bottom_right_x": 679,
+          "bottom_right_y": 259,
+          "content": "Phát hiện hành vi gian lận thi cử bằng trí tuệ nhân tạo dựa trên dữ liệu camera giám sát",
+          "type": "text"
+        },
+        {
+          "top_left_x": 118,
+          "top_left_y": 256,
+          "bottom_right_x": 376,
+          "bottom_right_y": 286,
+          "content": "2. Mục đích nghiên cứu",
+          "type": "list"
+        },
+        {
+          "top_left_x": 118,
+          "top_left_y": 283,
+          "bottom_right_x": 659,
+          "bottom_right_y": 374,
+          "content": "Ứng dụng trí tuệ nhân tạo để phát hiện hành vi gian lận trong thi cử dựa trên dữ liệu camera, nâng cao tính công bằng và hiệu quả giám sát.",
+          "type": "text"
+        },
+        {
+          "top_left_x": 118,
+          "top_left_y": 370,
+          "bottom_right_x": 340,
+          "bottom_right_y": 400,
+          "content": "3. Câu hỏi nghiên cứu",
+          "type": "list"
+        },
+        {
+          "top_left_x": 118,
+          "top_left_y": 397,
+          "bottom_right_x": 648,
+          "bottom_right_y": 460,
+          "content": "AI có thể phát hiện hành vi gian lận dựa trên camera giám sát không?",
+          "type": "text"
+        },
+        {
+          "top_left_x": 118,
+          "top_left_y": 454,
+          "bottom_right_x": 368,
+          "bottom_right_y": 485,
+          "content": "4. Giá thuyết nghiên cứu",
+          "type": "list"
+        },
+        {
+          "top_left_x": 118,
+          "top_left_y": 482,
+          "bottom_right_x": 648,
+          "bottom_right_y": 545,
+          "content": "AI có thể giúp giám sát bao quát hiệu quả hơn các phương pháp thi công, giảm tải cho giảm thi",
+          "type": "text"
+        },
+        {
+          "top_left_x": 118,
+          "top_left_y": 541,
+          "bottom_right_x": 379,
+          "bottom_right_y": 572,
+          "content": "5. Phương pháp nghiên cứu",
+          "type": "list"
+        },
+        {
+          "top_left_x": 118,
+          "top_left_y": 569,
+          "bottom_right_x": 679,
+          "bottom_right_y": 653,
+          "content": "Sử dụng thị giác máy tính và học máy để phân tích video từ camera, nhận diện hành vi bất thường của sinh viên",
+          "type": "text"
+        },
+        {
+          "top_left_x": 118,
+          "top_left_y": 653,
+          "bottom_right_x": 302,
+          "bottom_right_y": 684,
+          "content": "6. Cơ sở lý luận",
+          "type": "list"
+        },
+        {
+          "top_left_x": 118,
+          "top_left_y": 680,
+          "bottom_right_x": 683,
+          "bottom_right_y": 747,
+          "content": "Dựa trên lý thuyết trí tuệ nhân tạo, học máy, thị giác máy tính và các nghiên cứu phát hiện bất thường",
+          "type": "text"
+        },
+        {
+          "top_left_x": 118,
+          "top_left_y": 741,
+          "bottom_right_x": 337,
+          "bottom_right_y": 771,
+          "content": "7. Luận cứ thực tế",
+          "type": "list"
+        },
+        {
+          "top_left_x": 118,
+          "top_left_y": 768,
+          "bottom_right_x": 664,
+          "bottom_right_y": 862,
+          "content": "Gian lận thi cử ngày càng tinh vi trong khi giám sát thi công còn hạn chế. AI sẽ là công cụ hỗ trợ đào tạo và phù hợp với thực tiễn hiện nay",
+          "type": "text"
+        },
+        {
+          "top_left_x": 118,
+          "top_left_y": 879,
+          "bottom_right_x": 314,
+          "bottom_right_y": 920,
+          "content": "2. Trình bày vẽ",
+          "type": "list"
+        },
+        {
+          "top_left_x": 574,
+          "top_left_y": 948,
+          "bottom_right_x": 630,
+          "bottom_right_y": 964,
+          "content": "HAI TIÊN",
+          "type": "footer"
+        },
+        {
+          "top_left_x": 501,
+          "top_left_y": 984,
+          "bottom_right_x": 699,
+          "bottom_right_y": 1004,
+          "content": "Được quét bằng CamScanner",
+          "type": "footer"
+        }
+      ]
+    },
+    {
+      "index": 1,
+      "markdown": "1, Khoa học\n\nLà hệ thống tri thức được hình thành thông qua nghiên cứu cơ phương pháp nhằm khám phá quy luật của tự nhiên và xã hội\n\n2, Nghiên cứu khoa học\n\nLà quá trình thu thập và phân tích dữ liệu để kiểm chứng giả thuyết và tạo ra tri thức mới\n\n[tbl-0.html](tbl-0.html)\n\n4, Đánh dấu x e trường ứng\n\n[tbl-1.html](tbl-1.html)",
+      "images": [],
+      "tables": [
+        {
+          "id": "tbl-0.html",
+          "content": "<table><thead><tr><th>3, Phân biệt khái niệm</th><th>Phát hiện</th><th>Phát minh</th><th>Sáng chế</th></tr></thead><tr><td>World Wide Web</td><td></td><td></td><td>x</td></tr><tr><td>Thuyết di truyền</td><td></td><td>x</td><td></td></tr><tr><td>Vị trùng lao</td><td>x</td><td></td><td></td></tr><tr><td>Công nghệ di truyền</td><td></td><td></td><td>x</td></tr><tr><td>Định luật Acsimet</td><td></td><td>x</td><td></td></tr><tr><td>“hành tinh đỏ” sao Hoá</td><td>x</td><td></td><td></td></tr><tr><td>Điện thoại Iphone</td><td></td><td></td><td>x</td></tr><tr><td>Định luật vạn vật hấp dẫn</td><td></td><td>x</td><td></td></tr><tr><td>Gen di truyền</td><td>x</td><td></td><td></td></tr></table>",
+          "format": "html",
+          "word_confidence_scores": null
+        },
+        {
+          "id": "tbl-1.html",
+          "content": "<table><thead><tr><th></th><th>Đúng</th><th>Sai</th></tr></thead><tr><td>Mua bán phát minh</td><td></td><td>x</td></tr><tr><td>Mua bán sáng chế</td><td>x</td><td></td></tr><tr><td>Mua bán patient</td><td>x</td><td></td></tr><tr><td>Mua bán licence</td><td>x</td><td></td></tr><tr><td>Bảo hộ quyền tác giả đối với phát hiện ở phát minh</td><td></td><td>x</td></tr><tr><td>Bảo hộ quyền tác giả đối với tác phẩm viết về phát hiện, phát minh</td><td>x</td><td></td></tr><tr><td>Bảo hộ quyền sở hữu công nghiệp đối với phát hiện và phát minh</td><td></td><td>x</td></tr><tr><td>Bảo hộ quyền sở hữu công nghiệp đối với sáng chế</td><td>x</td><td></td></tr></table>",
+          "format": "html",
+          "word_confidence_scores": null
+        }
+      ],
+      "hyperlinks": [
+        "https://v3.camscanner.com/user/download"
+      ],
+      "header": null,
+      "footer": "HAI TIẾN\nĐược quét bằng CamScanner",
+      "dimensions": {
+        "dpi": 87,
+        "height": 1018,
+        "width": 719
+      },
+      "confidence_scores": null,
+      "blocks": [
+        {
+          "top_left_x": 112,
+          "top_left_y": 87,
+          "bottom_right_x": 231,
+          "bottom_right_y": 114,
+          "content": "1, Khoa học",
+          "type": "text"
+        },
+        {
+          "top_left_x": 112,
+          "top_left_y": 110,
+          "bottom_right_x": 690,
+          "bottom_right_y": 204,
+          "content": "Là hệ thống tri thức được hình thành thông qua nghiên cứu cơ phương pháp nhằm khám phá quy luật của tự nhiên và xã hội",
+          "type": "text"
+        },
+        {
+          "top_left_x": 112,
+          "top_left_y": 202,
+          "bottom_right_x": 345,
+          "bottom_right_y": 233,
+          "content": "2, Nghiên cứu khoa học",
+          "type": "text"
+        },
+        {
+          "top_left_x": 112,
+          "top_left_y": 225,
+          "bottom_right_x": 687,
+          "bottom_right_y": 293,
+          "content": "Là quá trình thu thập và phân tích dữ liệu để kiểm chứng giả thuyết và tạo ra tri thức mới",
+          "type": "text"
+        },
+        {
+          "top_left_x": 112,
+          "top_left_y": 312,
+          "bottom_right_x": 690,
+          "bottom_right_y": 622,
+          "content": "<table><thead><tr><th>3, Phân biệt khái niệm</th><th>Phát hiện</th><th>Phát minh</th><th>Sáng chế</th></tr></thead><tr><td>World Wide Web</td><td></td><td></td><td>x</td></tr><tr><td>Thuyết di truyền</td><td></td><td>x</td><td></td></tr><tr><td>Vị trùng lao</td><td>x</td><td></td><td></td></tr><tr><td>Công nghệ di truyền</td><td></td><td></td><td>x</td></tr><tr><td>Định luật Acsimet</td><td></td><td>x</td><td></td></tr><tr><td>“hành tinh đỏ” sao Hoá</td><td>x</td><td></td><td></td></tr><tr><td>Điện thoại Iphone</td><td></td><td></td><td>x</td></tr><tr><td>Định luật vạn vật hấp dẫn</td><td></td><td>x</td><td></td></tr><tr><td>Gen di truyền</td><td>x</td><td></td><td></td></tr></table>",
+          "type": "table",
+          "table_id": "tbl-0.html"
+        },
+        {
+          "top_left_x": 112,
+          "top_left_y": 626,
+          "bottom_right_x": 368,
+          "bottom_right_y": 661,
+          "content": "4, Đánh dấu x e trường ứng",
+          "type": "text"
+        },
+        {
+          "top_left_x": 104,
+          "top_left_y": 626,
+          "bottom_right_x": 679,
+          "bottom_right_y": 954,
+          "content": "<table><thead><tr><th></th><th>Đúng</th><th>Sai</th></tr></thead><tr><td>Mua bán phát minh</td><td></td><td>x</td></tr><tr><td>Mua bán sáng chế</td><td>x</td><td></td></tr><tr><td>Mua bán patient</td><td>x</td><td></td></tr><tr><td>Mua bán licence</td><td>x</td><td></td></tr><tr><td>Bảo hộ quyền tác giả đối với phát hiện ở phát minh</td><td></td><td>x</td></tr><tr><td>Bảo hộ quyền tác giả đối với tác phẩm viết về phát hiện, phát minh</td><td>x</td><td></td></tr><tr><td>Bảo hộ quyền sở hữu công nghiệp đối với phát hiện và phát minh</td><td></td><td>x</td></tr><tr><td>Bảo hộ quyền sở hữu công nghiệp đối với sáng chế</td><td>x</td><td></td></tr></table>",
+          "type": "table",
+          "table_id": "tbl-1.html"
+        },
+        {
+          "top_left_x": 553,
+          "top_left_y": 951,
+          "bottom_right_x": 612,
+          "bottom_right_y": 967,
+          "content": "HAI TIẾN",
+          "type": "footer"
+        },
+        {
+          "top_left_x": 502,
+          "top_left_y": 985,
+          "bottom_right_x": 700,
+          "bottom_right_y": 1004,
+          "content": "Được quét bằng CamScanner",
+          "type": "footer"
+        }
+      ]
+    }
+  ],
+  "model": "mistral-ocr-latest",
+  "document_annotation": null,
+  "usage_info": {
+    "pages_processed": 2,
+    "doc_size_bytes": 1016998
+  },
+  "status": "complete",
+  "success": true,
+  "markdown": "# Đề 2\n\n1. Đề xuất phát tháo một đề tài NCKH về 1 trong các chủ đề: sinh viên, học tập, ...\n\n1. Tên đề tài\n\nPhát hiện hành vi gian lận thi cử bằng trí tuệ nhân tạo dựa trên dữ liệu camera giám sát\n\n2. Mục đích nghiên cứu\n\nỨng dụng trí tuệ nhân tạo để phát hiện hành vi gian lận trong thi cử dựa trên dữ liệu camera, nâng cao tính công bằng và hiệu quả giám sát.\n\n3. Câu hỏi nghiên cứu\n\nAI có thể phát hiện hành vi gian lận dựa trên camera giám sát không?\n\n4. Giá thuyết nghiên cứu\n\nAI có thể giúp giám sát bao quát hiệu quả hơn các phương pháp thi công, giảm tải cho giảm thi\n\n5. Phương pháp nghiên cứu\n\nSử dụng thị giác máy tính và học máy để phân tích video từ camera, nhận diện hành vi bất thường của sinh viên\n\n6. Cơ sở lý luận\n\nDựa trên lý thuyết trí tuệ nhân tạo, học máy, thị giác máy tính và các nghiên cứu phát hiện bất thường\n\n7. Luận cứ thực tế\n\nGian lận thi cử ngày càng tinh vi trong khi giám sát thi công còn hạn chế. AI sẽ là công cụ hỗ trợ đào tạo và phù hợp với thực tiễn hiện nay\n\n2. Trình bày vẽ\n\n1, Khoa học\n\nLà hệ thống tri thức được hình thành thông qua nghiên cứu cơ phương pháp nhằm khám phá quy luật của tự nhiên và xã hội\n\n2, Nghiên cứu khoa học\n\nLà quá trình thu thập và phân tích dữ liệu để kiểm chứng giả thuyết và tạo ra tri thức mới\n\n[tbl-0.html](tbl-0.html)\n\n4, Đánh dấu x e trường ứng\n\n[tbl-1.html](tbl-1.html)"
+}

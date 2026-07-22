@@ -127,8 +127,8 @@ TOOL_DEFINITIONS = [
                     },
                     "lang": {
                         "type": "string",
-                        "enum": ["en", "vi", "ja", "all"],
-                        "description": "Lọc theo ngôn ngữ: 'en'=tiếng Anh, 'vi'=tiếng Việt, 'ja'=tiếng Nhật. 'all' = tất cả.",
+                        "enum": ["en", "vi", "ja", "ko", "zh", "all"],
+                        "description": "Lọc theo ngôn ngữ: 'en'=tiếng Anh, 'vi'=tiếng Việt, 'ja'=tiếng Nhật, 'ko'=tiếng Hàn, 'zh'=tiếng Trung. 'all' = tất cả.",
                     },
                     "models": {
                         "type": "array",
@@ -185,11 +185,12 @@ TOOL_DEFINITIONS = [
                     },
                     "lang": {
                         "type": "string",
-                        "enum": ["en", "vi", "ja"],
+                        "enum": ["en", "vi", "ja", "ko", "zh"],
                         "description": (
                             "Ngôn ngữ cần gợi ý. Bỏ trống = so sánh tất cả ngôn ngữ. "
                             "Mapping: 'en'=English/tiếng Anh, 'vi'=Vietnamese/tiếng Việt, "
-                            "'ja'=Japanese/tiếng Nhật/日本語."
+                            "'ja'=Japanese/tiếng Nhật/日本語, 'ko'=Korean/tiếng Hàn/한국어, "
+                            "'zh'=Chinese/tiếng Trung/中文."
                         ),
                     },
                     "metric": {
@@ -318,7 +319,7 @@ def _tool_get_model_recommendation(
 
     # Determine which uc_type×lang combos to cover
     all_ucs  = ["scan", "table", "text_layer"]
-    all_langs = ["en", "vi", "ja"]
+    all_langs = ["en", "vi", "ja", "ko", "zh"]
     uc_filter   = [uc_type] if uc_type else all_ucs
     lang_filter = [lang]    if lang    else all_langs
 

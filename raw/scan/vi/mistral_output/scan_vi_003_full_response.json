@@ -1,0 +1,961 @@
+{
+  "pages": [
+    {
+      "index": 0,
+      "markdown": "### 1 Người đàn ông cô độc giữa rừng$^{(\\*)}$\n\n(Trích tiểu thuyết *Đất rừng phương Nam*)\n\nĐOÀN GIỎI\n\n#### 1 Chuẩn bị\n\n– Xem lại phần *Kiến thức ngữ văn* để vận dụng vào đọc hiểu văn bản này.$^{(\\*\\*)}$\n\n– Khi đọc truyện, các em cần chú ý:$^{(\\*\\*\\*)}$\n\n+ Tóm tắt được nội dung văn bản (Truyện kể lại sự kiện gì? Xảy ra trong bối cảnh nào?).\n\n+ Nhân vật chính là ai? Nhân vật ấy được nhà văn thể hiện qua những phương diện nào?\n\n+ Truyện kể theo ngôi kể nào? Nếu có sự thay đổi ngôi kể thì tác dụng của việc thay đổi ấy là gì?\n\n+ Truyện giúp em hiểu biết thêm những gì và tác động đến tình cảm của em như thế nào?\n\n– Đọc trước đoạn trích *Người đàn ông cô độc giữa rừng*, tìm hiểu thêm những thông tin về tác phẩm *Đất rừng phương Nam* và nhà văn Đoàn Giỏi.\n\n– Đọc đoạn tóm tắt sau để hiểu bối cảnh của đoạn trích:\n\n*Đất rừng phương Nam* là tiểu thuyết của nhà văn Đoàn Giỏi, viết về cuộc đời phiêu bạt của cậu bé An. Em theo cha mẹ chạy giặc Pháp hết vùng này tới vùng khác của miền Tây Nam Bộ rồi lạc mất gia đình, trở thành cậu bé lang thang. Trong lúc lưu lạc, An đã được gặp và trở thành con nuôi gia đình ông Hai bán rắn, làm anh em với thằng Cò và làm bạn với chú Võ Tòng. Đoạn trích *Người đàn ông cô độc giữa rừng* kể lại việc tía nuôi đất An đi thăm chú Võ Tòng.\n\n#### 2 Đọc hiểu\n\n①$^{(\\*\\*\\*\\*)}$ Chắc tôi ngủ một giấc lâu lắm thì phải. Khi tôi mở mắt ra, thấy xuống$^{(1)}$ buộc lên một gốc cây tràm. Không biết tía nuôi tôi đi đâu. Nghe có tiếng người nói chuyện\n\n![img-0.jpeg](img-0.jpeg)\n\nĐoàn Giỏi (1925 – 1989),",
+      "images": [
+        {
+          "id": "img-0.jpeg",
+          "top_left_x": 492,
+          "top_left_y": 263,
+          "bottom_right_x": 635,
+          "bottom_right_y": 463,
+          "image_base64": null,
+          "image_annotation": null
+        }
+      ],
+      "tables": [],
+      "hyperlinks": [],
+      "header": "## ĐỌC HIỂU VĂN BẢN",
+      "footer": "(\\*) Người biên soạn sách đã chỉnh sửa nhan đề.\n(\\*\\*), (\\*\\*\\*) Khi đọc hiểu các văn bản khác trong Bài 1, học sinh cần vận dụng các gợi ý ở đây.\n(\\*\\*\\*\\*) Ở các văn bản, để học sinh tiện theo dõi, người biên soạn sách thường đánh số thứ tự dòng thơ hoặc chia phần các văn bản.\n(1) *Xuống*: thuyền nhỏ, không có mai che.\nĐọc sách tại học10.vn\n15",
+      "dimensions": {
+        "dpi": 87,
+        "height": 1018,
+        "width": 719
+      },
+      "confidence_scores": null,
+      "blocks": [
+        {
+          "top_left_x": 94,
+          "top_left_y": 108,
+          "bottom_right_x": 309,
+          "bottom_right_y": 139,
+          "content": "## ĐỌC HIỂU VĂN BẢN",
+          "type": "header"
+        },
+        {
+          "top_left_x": 80,
+          "top_left_y": 160,
+          "bottom_right_x": 562,
+          "bottom_right_y": 194,
+          "content": "### 1 Người đàn ông cô độc giữa rừng$^{(\\*)}$",
+          "type": "title"
+        },
+        {
+          "top_left_x": 223,
+          "top_left_y": 195,
+          "bottom_right_x": 496,
+          "bottom_right_y": 216,
+          "content": "(Trích tiểu thuyết *Đất rừng phương Nam*)",
+          "type": "text"
+        },
+        {
+          "top_left_x": 505,
+          "top_left_y": 220,
+          "bottom_right_x": 584,
+          "bottom_right_y": 237,
+          "content": "ĐOÀN GIỎI",
+          "type": "text"
+        },
+        {
+          "top_left_x": 80,
+          "top_left_y": 243,
+          "bottom_right_x": 181,
+          "bottom_right_y": 266,
+          "content": "#### 1 Chuẩn bị",
+          "type": "title"
+        },
+        {
+          "top_left_x": 80,
+          "top_left_y": 272,
+          "bottom_right_x": 470,
+          "bottom_right_y": 312,
+          "content": "– Xem lại phần *Kiến thức ngữ văn* để vận dụng vào đọc hiểu văn bản này.$^{(\\*\\*)}$",
+          "type": "text"
+        },
+        {
+          "top_left_x": 104,
+          "top_left_y": 316,
+          "bottom_right_x": 361,
+          "bottom_right_y": 336,
+          "content": "– Khi đọc truyện, các em cần chú ý:$^{(\\*\\*\\*)}$",
+          "type": "text"
+        },
+        {
+          "top_left_x": 80,
+          "top_left_y": 338,
+          "bottom_right_x": 471,
+          "bottom_right_y": 378,
+          "content": "+ Tóm tắt được nội dung văn bản (Truyện kể lại sự kiện gì? Xảy ra trong bối cảnh nào?).",
+          "type": "text"
+        },
+        {
+          "top_left_x": 80,
+          "top_left_y": 381,
+          "bottom_right_x": 470,
+          "bottom_right_y": 421,
+          "content": "+ Nhân vật chính là ai? Nhân vật ấy được nhà văn thể hiện qua những phương diện nào?",
+          "type": "text"
+        },
+        {
+          "top_left_x": 80,
+          "top_left_y": 424,
+          "bottom_right_x": 470,
+          "bottom_right_y": 464,
+          "content": "+ Truyện kể theo ngôi kể nào? Nếu có sự thay đổi ngôi kể thì tác dụng của việc thay đổi ấy là gì?",
+          "type": "text"
+        },
+        {
+          "top_left_x": 80,
+          "top_left_y": 468,
+          "bottom_right_x": 470,
+          "bottom_right_y": 507,
+          "content": "+ Truyện giúp em hiểu biết thêm những gì và tác động đến tình cảm của em như thế nào?",
+          "type": "text"
+        },
+        {
+          "top_left_x": 80,
+          "top_left_y": 511,
+          "bottom_right_x": 624,
+          "bottom_right_y": 551,
+          "content": "– Đọc trước đoạn trích *Người đàn ông cô độc giữa rừng*, tìm hiểu thêm những thông tin về tác phẩm *Đất rừng phương Nam* và nhà văn Đoàn Giỏi.",
+          "type": "text"
+        },
+        {
+          "top_left_x": 104,
+          "top_left_y": 554,
+          "bottom_right_x": 479,
+          "bottom_right_y": 574,
+          "content": "– Đọc đoạn tóm tắt sau để hiểu bối cảnh của đoạn trích:",
+          "type": "text"
+        },
+        {
+          "top_left_x": 80,
+          "top_left_y": 577,
+          "bottom_right_x": 625,
+          "bottom_right_y": 697,
+          "content": "*Đất rừng phương Nam* là tiểu thuyết của nhà văn Đoàn Giỏi, viết về cuộc đời phiêu bạt của cậu bé An. Em theo cha mẹ chạy giặc Pháp hết vùng này tới vùng khác của miền Tây Nam Bộ rồi lạc mất gia đình, trở thành cậu bé lang thang. Trong lúc lưu lạc, An đã được gặp và trở thành con nuôi gia đình ông Hai bán rắn, làm anh em với thằng Cò và làm bạn với chú Võ Tòng. Đoạn trích *Người đàn ông cô độc giữa rừng* kể lại việc tía nuôi đất An đi thăm chú Võ Tòng.",
+          "type": "text"
+        },
+        {
+          "top_left_x": 80,
+          "top_left_y": 709,
+          "bottom_right_x": 180,
+          "bottom_right_y": 733,
+          "content": "#### 2 Đọc hiểu",
+          "type": "title"
+        },
+        {
+          "top_left_x": 80,
+          "top_left_y": 740,
+          "bottom_right_x": 625,
+          "bottom_right_y": 782,
+          "content": "①$^{(\\*\\*\\*\\*)}$ Chắc tôi ngủ một giấc lâu lắm thì phải. Khi tôi mở mắt ra, thấy xuống$^{(1)}$ buộc lên một gốc cây tràm. Không biết tía nuôi tôi đi đâu. Nghe có tiếng người nói chuyện",
+          "type": "text"
+        },
+        {
+          "top_left_x": 80,
+          "top_left_y": 821,
+          "bottom_right_x": 343,
+          "bottom_right_y": 839,
+          "content": "(\\*) Người biên soạn sách đã chỉnh sửa nhan đề.",
+          "type": "footer"
+        },
+        {
+          "top_left_x": 80,
+          "top_left_y": 839,
+          "bottom_right_x": 596,
+          "bottom_right_y": 857,
+          "content": "(\\*\\*), (\\*\\*\\*) Khi đọc hiểu các văn bản khác trong Bài 1, học sinh cần vận dụng các gợi ý ở đây.",
+          "type": "footer"
+        },
+        {
+          "top_left_x": 80,
+          "top_left_y": 857,
+          "bottom_right_x": 624,
+          "bottom_right_y": 889,
+          "content": "(\\*\\*\\*\\*) Ở các văn bản, để học sinh tiện theo dõi, người biên soạn sách thường đánh số thứ tự dòng thơ hoặc chia phần các văn bản.",
+          "type": "footer"
+        },
+        {
+          "top_left_x": 80,
+          "top_left_y": 889,
+          "bottom_right_x": 314,
+          "bottom_right_y": 906,
+          "content": "(1) *Xuống*: thuyền nhỏ, không có mai che.",
+          "type": "footer"
+        },
+        {
+          "top_left_x": 492,
+          "top_left_y": 263,
+          "bottom_right_x": 635,
+          "bottom_right_y": 463,
+          "content": "![img-0.jpeg](img-0.jpeg)",
+          "type": "image",
+          "image_id": "img-0.jpeg"
+        },
+        {
+          "top_left_x": 492,
+          "top_left_y": 467,
+          "bottom_right_x": 636,
+          "bottom_right_y": 500,
+          "content": "Đoàn Giỏi (1925 – 1989),",
+          "type": "caption"
+        },
+        {
+          "top_left_x": 71,
+          "top_left_y": 919,
+          "bottom_right_x": 262,
+          "bottom_right_y": 942,
+          "content": "Đọc sách tại học10.vn",
+          "type": "footer"
+        },
+        {
+          "top_left_x": 626,
+          "top_left_y": 919,
+          "bottom_right_x": 646,
+          "bottom_right_y": 937,
+          "content": "15",
+          "type": "footer"
+        }
+      ]
+    },
+    {
+      "index": 1,
+      "markdown": "rì rầm bên bờ. “A! Thế thì đến nhà chú Võ Tòng rồi!”. Tôi ngồi dậy, dụi mắt trông lên. Ánh lửa bếp từ trong một ngôi lều chiếu qua khung cửa mở, soi rõ hình những khúc gỗ xếp thành bậc thang dài xuống bến. Tôi bước ra khỏi xuồng, lần theo bậc gỗ mò lên. Bỗng nghe con vượn bạc má kêu “ché... ét, ché... ét” trong lều, và tiếng chú Võ Tòng nói: “Thằng bé của anh nó lên đấy!”.\n\n– Vào đây, An! – Tía nuôi tôi gọi.\n\nTiếng kêu và hình ảnh của con vượn bạc má trong phần ① gợi ra cảm giác về một bối cảnh như thế nào?(*)\n\n![img-1.jpeg](img-1.jpeg)\n\nTôi bước qua mấy bậc gỗ trơn tuột và dừng lại chỗ cửa. Con vượn bạc má ngồi vắt vẻo trên một thanh xà ngang, nhe răng dọa tôi. Tía nuôi tôi và chú Võ Tòng ngồi trên hai gốc cây(1). Trước mặt hai người, chỗ giữa lều, có đặt một cái bếp cà ràng(2) lửa cháy riu riu, trên cà ràng bắc một chiếc nồi đất đầy vung kín mít. Chai rượu đã vơi và một đĩa khô(3) nướng còn bày trên nền đất ngay dưới chân chủ và khách, bên cạnh hai chiếc nỏ(4) gác chèo lên nhau.\n\n② – Ngồi xuống đây, chú em!\n\nChú Võ Tòng đứng dậy, lôi một gốc cây trong tối đặt bên bếp lửa. Chú cởi trần, mặc chiếc quần ka ki còn mới, nhưng coi bộ đã lâu không giặt (chiếc quần lính Pháp có\n\nNhững chi tiết về nhà cửa, cách ăn mặc và tiếp khách,... gợi lên ấn tượng gì về chú Võ Tòng?\n\n(*) Các câu hỏi gợi ý ở bên phải văn bản chỉ để học sinh theo dõi thêm về nội dung, nghệ thuật,... trong khi đọc, không cần trả lời.\n\n(1) Gộc cây: phần gốc và rễ của một cây già cỗi sau khi đã bị chặt đi.\n\n(2) Cà ràng: một loại bếp lò làm bằng đất nung của người Khmer Nam Bộ, đun bằng củi.\n\n(3) Khô: thịt được phơi khô để cất giữ lâu, thường đem nướng trước khi ăn.\n\n(4) Nỏ: một loại vũ khí hình cái cung, có cán để cầm và có lấy, bật dây căng để bắn tên.",
+      "images": [
+        {
+          "id": "img-1.jpeg",
+          "top_left_x": 203,
+          "top_left_y": 285,
+          "bottom_right_x": 505,
+          "bottom_right_y": 517,
+          "image_base64": null,
+          "image_annotation": null
+        }
+      ],
+      "tables": [],
+      "hyperlinks": [],
+      "header": null,
+      "footer": "Đọc sách tại học10.vn",
+      "dimensions": {
+        "dpi": 87,
+        "height": 1018,
+        "width": 719
+      },
+      "confidence_scores": null,
+      "blocks": [
+        {
+          "top_left_x": 89,
+          "top_left_y": 102,
+          "bottom_right_x": 460,
+          "bottom_right_y": 250,
+          "content": "rì rầm bên bờ. “A! Thế thì đến nhà chú Võ Tòng rồi!”. Tôi ngồi dậy, dụi mắt trông lên. Ánh lửa bếp từ trong một ngôi lều chiếu qua khung cửa mở, soi rõ hình những khúc gỗ xếp thành bậc thang dài xuống bến. Tôi bước ra khỏi xuồng, lần theo bậc gỗ mò lên. Bỗng nghe con vượn bạc má kêu “ché... ét, ché... ét” trong lều, và tiếng chú Võ Tòng nói: “Thằng bé của anh nó lên đấy!”.",
+          "type": "text"
+        },
+        {
+          "top_left_x": 114,
+          "top_left_y": 255,
+          "bottom_right_x": 338,
+          "bottom_right_y": 274,
+          "content": "– Vào đây, An! – Tía nuôi tôi gọi.",
+          "type": "text"
+        },
+        {
+          "top_left_x": 492,
+          "top_left_y": 114,
+          "bottom_right_x": 636,
+          "bottom_right_y": 195,
+          "content": "Tiếng kêu và hình ảnh của con vượn bạc má trong phần ① gợi ra cảm giác về một bối cảnh như thế nào?(*)",
+          "type": "aside_text"
+        },
+        {
+          "top_left_x": 203,
+          "top_left_y": 285,
+          "bottom_right_x": 505,
+          "bottom_right_y": 517,
+          "content": "![img-1.jpeg](img-1.jpeg)",
+          "type": "image",
+          "image_id": "img-1.jpeg"
+        },
+        {
+          "top_left_x": 89,
+          "top_left_y": 529,
+          "bottom_right_x": 636,
+          "bottom_right_y": 655,
+          "content": "Tôi bước qua mấy bậc gỗ trơn tuột và dừng lại chỗ cửa. Con vượn bạc má ngồi vắt vẻo trên một thanh xà ngang, nhe răng dọa tôi. Tía nuôi tôi và chú Võ Tòng ngồi trên hai gốc cây(1). Trước mặt hai người, chỗ giữa lều, có đặt một cái bếp cà ràng(2) lửa cháy riu riu, trên cà ràng bắc một chiếc nồi đất đầy vung kín mít. Chai rượu đã vơi và một đĩa khô(3) nướng còn bày trên nền đất ngay dưới chân chủ và khách, bên cạnh hai chiếc nỏ(4) gác chèo lên nhau.",
+          "type": "text"
+        },
+        {
+          "top_left_x": 89,
+          "top_left_y": 662,
+          "bottom_right_x": 294,
+          "bottom_right_y": 684,
+          "content": "② – Ngồi xuống đây, chú em!",
+          "type": "text"
+        },
+        {
+          "top_left_x": 89,
+          "top_left_y": 688,
+          "bottom_right_x": 460,
+          "bottom_right_y": 750,
+          "content": "Chú Võ Tòng đứng dậy, lôi một gốc cây trong tối đặt bên bếp lửa. Chú cởi trần, mặc chiếc quần ka ki còn mới, nhưng coi bộ đã lâu không giặt (chiếc quần lính Pháp có",
+          "type": "text"
+        },
+        {
+          "top_left_x": 492,
+          "top_left_y": 680,
+          "bottom_right_x": 636,
+          "bottom_right_y": 745,
+          "content": "Những chi tiết về nhà cửa, cách ăn mặc và tiếp khách,... gợi lên ấn tượng gì về chú Võ Tòng?",
+          "type": "aside_text"
+        },
+        {
+          "top_left_x": 89,
+          "top_left_y": 795,
+          "bottom_right_x": 636,
+          "bottom_right_y": 828,
+          "content": "(*) Các câu hỏi gợi ý ở bên phải văn bản chỉ để học sinh theo dõi thêm về nội dung, nghệ thuật,... trong khi đọc, không cần trả lời.",
+          "type": "references"
+        },
+        {
+          "top_left_x": 89,
+          "top_left_y": 827,
+          "bottom_right_x": 471,
+          "bottom_right_y": 845,
+          "content": "(1) Gộc cây: phần gốc và rễ của một cây già cỗi sau khi đã bị chặt đi.",
+          "type": "references"
+        },
+        {
+          "top_left_x": 89,
+          "top_left_y": 844,
+          "bottom_right_x": 582,
+          "bottom_right_y": 861,
+          "content": "(2) Cà ràng: một loại bếp lò làm bằng đất nung của người Khmer Nam Bộ, đun bằng củi.",
+          "type": "references"
+        },
+        {
+          "top_left_x": 89,
+          "top_left_y": 860,
+          "bottom_right_x": 505,
+          "bottom_right_y": 877,
+          "content": "(3) Khô: thịt được phơi khô để cất giữ lâu, thường đem nướng trước khi ăn.",
+          "type": "references"
+        },
+        {
+          "top_left_x": 89,
+          "top_left_y": 876,
+          "bottom_right_x": 571,
+          "bottom_right_y": 894,
+          "content": "(4) Nỏ: một loại vũ khí hình cái cung, có cán để cầm và có lấy, bật dây căng để bắn tên.",
+          "type": "references"
+        },
+        {
+          "top_left_x": 69,
+          "top_left_y": 919,
+          "bottom_right_x": 263,
+          "bottom_right_y": 942,
+          "content": "Đọc sách tại học10.vn",
+          "type": "footer"
+        }
+      ]
+    },
+    {
+      "index": 2,
+      "markdown": "những sáu túi). Bên hông, chú đeo lủng lẳng một lưỡi lê(1) nằm gọn trong vỏ sắt, đúng như lời mà nuôi tôi đã tả. Lại còn thắt cái xanh-tuya-rông(2) nữa chứ!\n\nTôi không sợ chú Võ Tòng như cái đêm đã gặp chú lần đầu tiên ở bờ sông, mà lại còn có đôi chút cảm tình xen lẫn với ngạc nhiên hơi buồn cười thế nào ấy. Tía nuôi tôi ngó tôi, cười cười nhắc cái tàu(3) thuốc lá ở miệng ra.\n\n– Ngủ đấy giấc rồi à? Tía thấy con ngủ say, tía không gọi. Thôi, đã dậy rồi thì ngồi đây chơi!\n\n– Nhai bậy(4) một miếng khô nai đi, chú em. Cho đỡ buồn miệng mà! – Chú Võ Tòng nhặt trong lửa ra một thỏi khô nướng to nhất đặt vào tay tôi.\n\nCon vượn bạc mà lại kêu “ché... ét, ché... ét...” ở phía trên đầu tôi. Tôi cứ mặc kệ nó, vừa xé miếng thịt khô ướp muối sả nướng thơm phức cho vào mồm nhai, vừa đưa mắt nhìn quanh ngôi lều. [...] Mùi lông khét xông khói lâu ngày toả ra, cùng với một làn khói gì mùi hăng hắc, màu xanh xanh bay ra từ chiếc nồi đậy kín vung sôi “ục... ục...” trên bếp cá ràng, khiến tôi có một thứ cảm giác rợn rợn không tả được. Dường như những cái bóng lặng lẽ ngồi bên bếp đây đang sống lùi lại từ cái thời kì loài người mới tìm ra lửa vậy.\n\n③ Không ai biết tên thật của gã là gì. Mười mấy năm về trước, gã một mình bơi một chiếc xuồng nát đến che lều ở giữa khu rừng đầy thú dữ này. Gã sống đơn độc một mình, đến con chó để làm bạn cũng không có. Hồi ấy, rừng này còn nhiều hồ lắm. [...] Một buổi trưa, gã đang ngủ trong lều, có con hổ chúa mò vào, từ ngoài sân phóng một cái phủ lên người gã. Bất thần gã tỉnh dậy. Gã vớ luôn cái mác(5) bên người, cũng không kịp ngồi dậy nữa, cứ nằm ngửa thế mà xóc mũi mác lên đâm thẳng một nhát vào hàm dưới con hổ chúa, hai chân gã đã thốc lên bụng nó, không cho con ác thú kịp chụp xuống người. Con hổ chúa lộn vòng, rơi xuống đất. Lưỡi mác đâm từ hàm dưới thấu lên tận óc, làm nó không hà họng được, nhưng vẫn còn có vết cái tát cuối cùng, để lại trên mặt gã một hàng sẹo khủng khiếp chạy từ thái dương xuống cổ. Không biết có phải do đấy mà gã mang tên “Võ Tòng” hay không? Chứ theo như một vài\n\nChỉ ra dấu hiệu về sự chuyển đổi ngôi kể.\n\nChuyện Võ Tòng đánh hổ hé mở điều gì về tính cách, cuộc đời nhân vật?\n\n(1) Lưỡi lê: bộ phận gắn trên đầu súng, có đầu nhọn, dùng để đâm.\n\n(2) Xanh-tuya-rông (tiếng Pháp: ceinture): dây thắt lưng.\n\n(3) Tàu: dụng cụ để hút thuốc lá sợi.\n\n(4) Nhai bậy: nhai (ăn) một cách thoải mái, không cần suy nghĩ gì hoặc ăn tạm cho vui (cách nói khiêm tốn, thân mật của người Nam Bộ).\n\n(5) Mác: vũ khí thời xưa, có cán, lưỡi dài và to, mũi nhọn, dùng để đâm hoặc chém.",
+      "images": [],
+      "tables": [],
+      "hyperlinks": [],
+      "header": null,
+      "footer": "Đọc sách tại học10.vn\n17",
+      "dimensions": {
+        "dpi": 87,
+        "height": 1018,
+        "width": 719
+      },
+      "confidence_scores": null,
+      "blocks": [
+        {
+          "top_left_x": 78,
+          "top_left_y": 102,
+          "bottom_right_x": 625,
+          "bottom_right_y": 144,
+          "content": "những sáu túi). Bên hông, chú đeo lủng lẳng một lưỡi lê(1) nằm gọn trong vỏ sắt, đúng như lời mà nuôi tôi đã tả. Lại còn thắt cái xanh-tuya-rông(2) nữa chứ!",
+          "type": "text"
+        },
+        {
+          "top_left_x": 78,
+          "top_left_y": 148,
+          "bottom_right_x": 625,
+          "bottom_right_y": 211,
+          "content": "Tôi không sợ chú Võ Tòng như cái đêm đã gặp chú lần đầu tiên ở bờ sông, mà lại còn có đôi chút cảm tình xen lẫn với ngạc nhiên hơi buồn cười thế nào ấy. Tía nuôi tôi ngó tôi, cười cười nhắc cái tàu(3) thuốc lá ở miệng ra.",
+          "type": "text"
+        },
+        {
+          "top_left_x": 78,
+          "top_left_y": 215,
+          "bottom_right_x": 625,
+          "bottom_right_y": 256,
+          "content": "– Ngủ đấy giấc rồi à? Tía thấy con ngủ say, tía không gọi. Thôi, đã dậy rồi thì ngồi đây chơi!",
+          "type": "text"
+        },
+        {
+          "top_left_x": 78,
+          "top_left_y": 260,
+          "bottom_right_x": 625,
+          "bottom_right_y": 302,
+          "content": "– Nhai bậy(4) một miếng khô nai đi, chú em. Cho đỡ buồn miệng mà! – Chú Võ Tòng nhặt trong lửa ra một thỏi khô nướng to nhất đặt vào tay tôi.",
+          "type": "text"
+        },
+        {
+          "top_left_x": 78,
+          "top_left_y": 306,
+          "bottom_right_x": 625,
+          "bottom_right_y": 451,
+          "content": "Con vượn bạc mà lại kêu “ché... ét, ché... ét...” ở phía trên đầu tôi. Tôi cứ mặc kệ nó, vừa xé miếng thịt khô ướp muối sả nướng thơm phức cho vào mồm nhai, vừa đưa mắt nhìn quanh ngôi lều. [...] Mùi lông khét xông khói lâu ngày toả ra, cùng với một làn khói gì mùi hăng hắc, màu xanh xanh bay ra từ chiếc nồi đậy kín vung sôi “ục... ục...” trên bếp cá ràng, khiến tôi có một thứ cảm giác rợn rợn không tả được. Dường như những cái bóng lặng lẽ ngồi bên bếp đây đang sống lùi lại từ cái thời kì loài người mới tìm ra lửa vậy.",
+          "type": "text"
+        },
+        {
+          "top_left_x": 78,
+          "top_left_y": 459,
+          "bottom_right_x": 625,
+          "bottom_right_y": 753,
+          "content": "③ Không ai biết tên thật của gã là gì. Mười mấy năm về trước, gã một mình bơi một chiếc xuồng nát đến che lều ở giữa khu rừng đầy thú dữ này. Gã sống đơn độc một mình, đến con chó để làm bạn cũng không có. Hồi ấy, rừng này còn nhiều hồ lắm. [...] Một buổi trưa, gã đang ngủ trong lều, có con hổ chúa mò vào, từ ngoài sân phóng một cái phủ lên người gã. Bất thần gã tỉnh dậy. Gã vớ luôn cái mác(5) bên người, cũng không kịp ngồi dậy nữa, cứ nằm ngửa thế mà xóc mũi mác lên đâm thẳng một nhát vào hàm dưới con hổ chúa, hai chân gã đã thốc lên bụng nó, không cho con ác thú kịp chụp xuống người. Con hổ chúa lộn vòng, rơi xuống đất. Lưỡi mác đâm từ hàm dưới thấu lên tận óc, làm nó không hà họng được, nhưng vẫn còn có vết cái tát cuối cùng, để lại trên mặt gã một hàng sẹo khủng khiếp chạy từ thái dương xuống cổ. Không biết có phải do đấy mà gã mang tên “Võ Tòng” hay không? Chứ theo như một vài",
+          "type": "text"
+        },
+        {
+          "top_left_x": 480,
+          "top_left_y": 470,
+          "bottom_right_x": 625,
+          "bottom_right_y": 504,
+          "content": "Chỉ ra dấu hiệu về sự chuyển đổi ngôi kể.",
+          "type": "aside_text"
+        },
+        {
+          "top_left_x": 480,
+          "top_left_y": 636,
+          "bottom_right_x": 625,
+          "bottom_right_y": 686,
+          "content": "Chuyện Võ Tòng đánh hổ hé mở điều gì về tính cách, cuộc đời nhân vật?",
+          "type": "aside_text"
+        },
+        {
+          "top_left_x": 78,
+          "top_left_y": 801,
+          "bottom_right_x": 447,
+          "bottom_right_y": 819,
+          "content": "(1) Lưỡi lê: bộ phận gắn trên đầu súng, có đầu nhọn, dùng để đâm.",
+          "type": "references"
+        },
+        {
+          "top_left_x": 78,
+          "top_left_y": 818,
+          "bottom_right_x": 394,
+          "bottom_right_y": 836,
+          "content": "(2) Xanh-tuya-rông (tiếng Pháp: ceinture): dây thắt lưng.",
+          "type": "references"
+        },
+        {
+          "top_left_x": 78,
+          "top_left_y": 835,
+          "bottom_right_x": 282,
+          "bottom_right_y": 852,
+          "content": "(3) Tàu: dụng cụ để hút thuốc lá sợi.",
+          "type": "references"
+        },
+        {
+          "top_left_x": 78,
+          "top_left_y": 851,
+          "bottom_right_x": 625,
+          "bottom_right_y": 883,
+          "content": "(4) Nhai bậy: nhai (ăn) một cách thoải mái, không cần suy nghĩ gì hoặc ăn tạm cho vui (cách nói khiêm tốn, thân mật của người Nam Bộ).",
+          "type": "references"
+        },
+        {
+          "top_left_x": 78,
+          "top_left_y": 882,
+          "bottom_right_x": 541,
+          "bottom_right_y": 899,
+          "content": "(5) Mác: vũ khí thời xưa, có cán, lưỡi dài và to, mũi nhọn, dùng để đâm hoặc chém.",
+          "type": "references"
+        },
+        {
+          "top_left_x": 70,
+          "top_left_y": 919,
+          "bottom_right_x": 263,
+          "bottom_right_y": 942,
+          "content": "Đọc sách tại học10.vn",
+          "type": "footer"
+        },
+        {
+          "top_left_x": 625,
+          "top_left_y": 919,
+          "bottom_right_x": 646,
+          "bottom_right_y": 937,
+          "content": "17",
+          "type": "footer"
+        }
+      ]
+    },
+    {
+      "index": 3,
+      "markdown": "ông lão đa sự$^{(1)}$, thì ngày xưa gã là một chàng trai hiền lành, ở tận một vùng xa lắm. Gã cũng có gia đình đàng hoàng như ai. Vợ gã là một người đàn bà trông cũng xinh mắt. Chị ấy, lúc có chửa đứa đầu lòng, cứ kêu thèm ăn mắng. Gã đàn ông hiền lành, quý vợ rất mực ấy bèn liều xách dao đến bụi tre đỉnh làng xắn một mụt mắng$^{(2)}$. Khi về qua ngang bờ tre nhà tên địa chủ$^{(3)}$, tên này bắt gã bỏ mụt mắng xuống và vu cho gã lấy trộm mắng tre của hắn. Gã một mực cãi lại, nhưng tên địa chủ quyền thế nhất xã ấy cứ vung ba toong đánh lên đầu gã. “Đánh đầu thì còn nhịn được, chứ đánh lên đầu là nơi thờ phụng ông bà... thì số mày tôi rồi!”. Lưỡi dao trên tay gã không cho phép tên địa chủ ngang ngược kia giơ tay đánh ba toong lên đầu gã đến cái thứ hai. Nhất dao chém trả vào mặt gã gi tên bóc lột và hống hách này nằm gục xuống vùng máu. Nhưng gã không trốn chạy. Gã đường hoàng xách dao đến ném trước nhà việc$^{(4)}$, bó tay chịu tội.\n\nSo sánh hành vi chống trả tên địa chủ ngang ngược với việc đánh hổ của Võ Tòng.\n\nSau mười năm tù đày, gã trở về làng cũ thì nghe tin vợ đã làm lễ tên địa chủ kia, và đứa con trai độc nhất mà gã chưa biết mặt thì đã chết từ khi gã còn ngồi trong khám$^{(5)}$ lạnh. Người trong xã vốn ghét tên địa chủ hống hách, khấp khể chớ xem cuộc rửa thù bằng máu lần thứ hai. Nhưng họ đã thất vọng. Gã chỉ kêu trời một tiếng rồi cười nhạt bỏ làng ra đi. Những người đa sự quả quyết rằng chính gã đã mang tên “Võ Tòng” từ lúc xách dao đến nhà việc chịu tội. Còn như những chữ bùa$^{(6)}$ xanh lè xám rằn rực$^{(7)}$ trên người gã, và gã trở nên một người giỏi võ từ lúc nào, thì có kẻ nói đó là dấu vết trong những năm gã ở tù, lại có người bảo đó là mới có từ lúc gã đi giang hồ$^{(8)}$. Hơn mười năm sống trơ trọi giữa rừng, mặc dầu, cũng có nhiều người đánh tiếng mối mai cho gã, nhưng tuyệt nhiên Võ Tòng không để mắt tới một người đàn bà nào nữa. Ở trong rừng lâu năm chảy$^{(9)}$ thăng, gã ngày càng trở nên kì hình dị tướng$^{(10)}$. Nhưng ai cũng mến gã ở cái tính tình chất phác, thật thà, lúc nào cũng sẵn sàng giúp đỡ mọi người mà không hề nghĩ đến chuyện",
+      "images": [],
+      "tables": [],
+      "hyperlinks": [],
+      "header": "(1) *Đa sự*: nhiều chuyện, hay làm rắc rối, phiền phức, cả những việc không liên quan đến mình.\n(2) *Mụt mắng (mụn mắng, ngọn mắng)*: phần mắm tre mọc trên mặt đất, có thể dùng làm thức ăn.\n(3) *Địa chủ*: chủ đất, người giàu có ở nông thôn xưa.\n(4) *Nhà việc* (từ địa phương): chỉ nơi làm việc của chính quyền địa phương.",
+      "footer": "(5) *Khám* (từ địa phương): chỉ nhà giam, nhà tù.\n(6) *Bùa*: mảnh giấy hoặc vải có những dấu hiệu đặc biệt được cho là có phép thiêng, dùng để trừ ma quỷ, làm mê hoặc được người khác.\n(7) *Rắn rực*: chỉ những đường xám nhiều màu xen lẫn, nổi rõ trên cơ thể người.\n(8) *Giang hồ* (sông và hồ): chỉ người sống nay đây mai đó một cách tự do, thoải mái.\n(9) *Chảy*: lâu dài; *lâu năm chảy thăng*: chỉ khoảng thời gian dài.\n(10) *Kì hình dị tướng*: thành ngữ chỉ diện mạo kì lạ, khác thường.\n18 học sách tại học10.vn",
+      "dimensions": {
+        "dpi": 87,
+        "height": 1018,
+        "width": 719
+      },
+      "confidence_scores": null,
+      "blocks": [
+        {
+          "top_left_x": 89,
+          "top_left_y": 103,
+          "bottom_right_x": 637,
+          "bottom_right_y": 396,
+          "content": "ông lão đa sự$^{(1)}$, thì ngày xưa gã là một chàng trai hiền lành, ở tận một vùng xa lắm. Gã cũng có gia đình đàng hoàng như ai. Vợ gã là một người đàn bà trông cũng xinh mắt. Chị ấy, lúc có chửa đứa đầu lòng, cứ kêu thèm ăn mắng. Gã đàn ông hiền lành, quý vợ rất mực ấy bèn liều xách dao đến bụi tre đỉnh làng xắn một mụt mắng$^{(2)}$. Khi về qua ngang bờ tre nhà tên địa chủ$^{(3)}$, tên này bắt gã bỏ mụt mắng xuống và vu cho gã lấy trộm mắng tre của hắn. Gã một mực cãi lại, nhưng tên địa chủ quyền thế nhất xã ấy cứ vung ba toong đánh lên đầu gã. “Đánh đầu thì còn nhịn được, chứ đánh lên đầu là nơi thờ phụng ông bà... thì số mày tôi rồi!”. Lưỡi dao trên tay gã không cho phép tên địa chủ ngang ngược kia giơ tay đánh ba toong lên đầu gã đến cái thứ hai. Nhất dao chém trả vào mặt gã gi tên bóc lột và hống hách này nằm gục xuống vùng máu. Nhưng gã không trốn chạy. Gã đường hoàng xách dao đến ném trước nhà việc$^{(4)}$, bó tay chịu tội.",
+          "type": "text"
+        },
+        {
+          "top_left_x": 492,
+          "top_left_y": 294,
+          "bottom_right_x": 637,
+          "bottom_right_y": 359,
+          "content": "So sánh hành vi chống trả tên địa chủ ngang ngược với việc đánh hổ của Võ Tòng.",
+          "type": "text"
+        },
+        {
+          "top_left_x": 89,
+          "top_left_y": 400,
+          "bottom_right_x": 637,
+          "bottom_right_y": 673,
+          "content": "Sau mười năm tù đày, gã trở về làng cũ thì nghe tin vợ đã làm lễ tên địa chủ kia, và đứa con trai độc nhất mà gã chưa biết mặt thì đã chết từ khi gã còn ngồi trong khám$^{(5)}$ lạnh. Người trong xã vốn ghét tên địa chủ hống hách, khấp khể chớ xem cuộc rửa thù bằng máu lần thứ hai. Nhưng họ đã thất vọng. Gã chỉ kêu trời một tiếng rồi cười nhạt bỏ làng ra đi. Những người đa sự quả quyết rằng chính gã đã mang tên “Võ Tòng” từ lúc xách dao đến nhà việc chịu tội. Còn như những chữ bùa$^{(6)}$ xanh lè xám rằn rực$^{(7)}$ trên người gã, và gã trở nên một người giỏi võ từ lúc nào, thì có kẻ nói đó là dấu vết trong những năm gã ở tù, lại có người bảo đó là mới có từ lúc gã đi giang hồ$^{(8)}$. Hơn mười năm sống trơ trọi giữa rừng, mặc dầu, cũng có nhiều người đánh tiếng mối mai cho gã, nhưng tuyệt nhiên Võ Tòng không để mắt tới một người đàn bà nào nữa. Ở trong rừng lâu năm chảy$^{(9)}$ thăng, gã ngày càng trở nên kì hình dị tướng$^{(10)}$. Nhưng ai cũng mến gã ở cái tính tình chất phác, thật thà, lúc nào cũng sẵn sàng giúp đỡ mọi người mà không hề nghĩ đến chuyện",
+          "type": "text"
+        },
+        {
+          "top_left_x": 89,
+          "top_left_y": 720,
+          "bottom_right_x": 615,
+          "bottom_right_y": 739,
+          "content": "(1) *Đa sự*: nhiều chuyện, hay làm rắc rối, phiền phức, cả những việc không liên quan đến mình.",
+          "type": "header"
+        },
+        {
+          "top_left_x": 89,
+          "top_left_y": 739,
+          "bottom_right_x": 625,
+          "bottom_right_y": 756,
+          "content": "(2) *Mụt mắng (mụn mắng, ngọn mắng)*: phần mắm tre mọc trên mặt đất, có thể dùng làm thức ăn.",
+          "type": "header"
+        },
+        {
+          "top_left_x": 89,
+          "top_left_y": 756,
+          "bottom_right_x": 382,
+          "bottom_right_y": 772,
+          "content": "(3) *Địa chủ*: chủ đất, người giàu có ở nông thôn xưa.",
+          "type": "header"
+        },
+        {
+          "top_left_x": 89,
+          "top_left_y": 772,
+          "bottom_right_x": 507,
+          "bottom_right_y": 789,
+          "content": "(4) *Nhà việc* (từ địa phương): chỉ nơi làm việc của chính quyền địa phương.",
+          "type": "header"
+        },
+        {
+          "top_left_x": 89,
+          "top_left_y": 789,
+          "bottom_right_x": 357,
+          "bottom_right_y": 805,
+          "content": "(5) *Khám* (từ địa phương): chỉ nhà giam, nhà tù.",
+          "type": "footer"
+        },
+        {
+          "top_left_x": 89,
+          "top_left_y": 805,
+          "bottom_right_x": 637,
+          "bottom_right_y": 836,
+          "content": "(6) *Bùa*: mảnh giấy hoặc vải có những dấu hiệu đặc biệt được cho là có phép thiêng, dùng để trừ ma quỷ, làm mê hoặc được người khác.",
+          "type": "footer"
+        },
+        {
+          "top_left_x": 89,
+          "top_left_y": 836,
+          "bottom_right_x": 528,
+          "bottom_right_y": 852,
+          "content": "(7) *Rắn rực*: chỉ những đường xám nhiều màu xen lẫn, nổi rõ trên cơ thể người.",
+          "type": "footer"
+        },
+        {
+          "top_left_x": 89,
+          "top_left_y": 852,
+          "bottom_right_x": 558,
+          "bottom_right_y": 868,
+          "content": "(8) *Giang hồ* (sông và hồ): chỉ người sống nay đây mai đó một cách tự do, thoải mái.",
+          "type": "footer"
+        },
+        {
+          "top_left_x": 89,
+          "top_left_y": 868,
+          "bottom_right_x": 443,
+          "bottom_right_y": 885,
+          "content": "(9) *Chảy*: lâu dài; *lâu năm chảy thăng*: chỉ khoảng thời gian dài.",
+          "type": "footer"
+        },
+        {
+          "top_left_x": 89,
+          "top_left_y": 885,
+          "bottom_right_x": 451,
+          "bottom_right_y": 901,
+          "content": "(10) *Kì hình dị tướng*: thành ngữ chỉ diện mạo kì lạ, khác thường.",
+          "type": "footer"
+        },
+        {
+          "top_left_x": 69,
+          "top_left_y": 919,
+          "bottom_right_x": 263,
+          "bottom_right_y": 942,
+          "content": "18 học sách tại học10.vn",
+          "type": "footer"
+        }
+      ]
+    },
+    {
+      "index": 4,
+      "markdown": "người ta có đến đáp lại mình không. Điều đó, mà nuôi tôi quả quyết, nói một cách chắc chắn như vậy...\n\n④ Chú Võ Tòng vẫn ngồi đó, đối diện với tia nuôi tôi, bên bếp lửa. Tia nuôi tôi tay cầm một chiếc nỏ lên ngắm nghía; bật thử sợi dây nỏ trên đầu ngón tay nghe “pung... pung...” rồi lại đặt xuống. Chú Võ Tòng rót rượu ra bát, uống một ngụm, trao bát sang cho tia nuôi tôi và nói:\n\nChú ý cách uống rượu và lời nói của chú Võ Tòng với tia nuôi “tôi”.\n\n– Con dao găm của anh Hai cùng với cánh nỏ này, thừa làm nên chuyện. Mình thì cần gì tới súng? Mấy thằng nhát gan mới cần súng, vì súng ở xa cũng bắn được mà! Phải không anh Hai? Tôi cho rằng súng dở lắm, động tới thì kêu ầm ĩ. Tôi ghét tiếng nổ lắm. Như cái bận tôi làm vừa rồi đấy. Tách một tiếng, chết ngay thẳng giặc Pháp râu xồm, mà cái thằng đứng cách nằm, sáu thước(1) không hay biết gì cả. Tôi chừng tôi mò ra tháo cây tiểu liên(2) nghe động sột soạt, nỏ mới quay lại thấy tôi, liền bắn tôi một phát súng mút(3) nhưng trượt. Tiếng súng của nó bắn ra mà cha con chúng nó hoảng lên, hò hét chạy lung tung mới buồn cười chứ! Tôi xách cây tiểu liên bay vào rừng, chờ tôi mò trở ra. [...]\n\nTrong giọng nói bốn cọng của Võ Tòng có pha đượm một nỗi buồn chua chát, khiến tôi vừa ngồi nghe vừa nhìn bếp lửa cháy riu riu mà không khỏi bùi ngùi.\n\n– Chú em cầm hộ lọ muối chỗ vách kia đưa giùm qua(4) chút! – Chú Võ Tòng đổi giọng, vui vẻ bảo tôi. [...]\n\n⑤ Bên ngoài, trời rạng dần. Đã nghe một vài tiếng chim rừng ríu rít gọi nhau trở dậy đón bình minh trên những ngọn cây xung quanh lều. Chú Võ Tòng trao chiếc nỏ và ống tên thuốc cho tia nuôi tôi:\n\n– Cứ tình hình này thì chúng nó sẽ mò tới đây thôi. Tôi quý anh Hai là bậc can trường(5), nên mới dám chọn mặt gửi vàng. Chứ những mũi tên độc này mà lọt vào tay một người hèn nhát, thì nó sẽ gây nhiều tác hại đấy. Sở dĩ tôi không dám nói với bà chị, là còn e bà chị ngại điều nguy hiểm, biết đâu sẽ ngăn trở công việc của chúng ta.\n\nTia nuôi tôi vội đỡ lời:\n\n(1) Thước: đơn vị đo chiều dài, cách gọi thông thường của mét.\n\n(2) Tiểu liên: loại vũ khí cá nhân tầm gần, thuộc họ súng máy, cũng thuộc họ súng tự động, do người Đức sáng chế từ cuối Chiến tranh thế giới thứ nhất.\n\n(3) Mút (viết tắt tên súng mút-cơ-tông, tiếng Pháp: mousqueton): súng trường nhẹ, ngắn.\n\n(4) Qua (từ địa phương): từ mà người đàn ông lớn tuổi tự xưng một cách thân mật khi nói với người nhỏ tuổi hơn.\n\n(5) Can trường: gan dạ, dũng cảm, bền bỉ.",
+      "images": [],
+      "tables": [],
+      "hyperlinks": [],
+      "header": null,
+      "footer": "Đọc sách tại học10.vn\n19",
+      "dimensions": {
+        "dpi": 87,
+        "height": 1018,
+        "width": 719
+      },
+      "confidence_scores": null,
+      "blocks": [
+        {
+          "top_left_x": 78,
+          "top_left_y": 103,
+          "bottom_right_x": 625,
+          "bottom_right_y": 145,
+          "content": "người ta có đến đáp lại mình không. Điều đó, mà nuôi tôi quả quyết, nói một cách chắc chắn như vậy...",
+          "type": "text"
+        },
+        {
+          "top_left_x": 78,
+          "top_left_y": 152,
+          "bottom_right_x": 448,
+          "bottom_right_y": 256,
+          "content": "④ Chú Võ Tòng vẫn ngồi đó, đối diện với tia nuôi tôi, bên bếp lửa. Tia nuôi tôi tay cầm một chiếc nỏ lên ngắm nghía; bật thử sợi dây nỏ trên đầu ngón tay nghe “pung... pung...” rồi lại đặt xuống. Chú Võ Tòng rót rượu ra bát, uống một ngụm, trao bát sang cho tia nuôi tôi và nói:",
+          "type": "text"
+        },
+        {
+          "top_left_x": 480,
+          "top_left_y": 169,
+          "bottom_right_x": 625,
+          "bottom_right_y": 218,
+          "content": "Chú ý cách uống rượu và lời nói của chú Võ Tòng với tia nuôi “tôi”.",
+          "type": "aside_text"
+        },
+        {
+          "top_left_x": 78,
+          "top_left_y": 261,
+          "bottom_right_x": 625,
+          "bottom_right_y": 448,
+          "content": "– Con dao găm của anh Hai cùng với cánh nỏ này, thừa làm nên chuyện. Mình thì cần gì tới súng? Mấy thằng nhát gan mới cần súng, vì súng ở xa cũng bắn được mà! Phải không anh Hai? Tôi cho rằng súng dở lắm, động tới thì kêu ầm ĩ. Tôi ghét tiếng nổ lắm. Như cái bận tôi làm vừa rồi đấy. Tách một tiếng, chết ngay thẳng giặc Pháp râu xồm, mà cái thằng đứng cách nằm, sáu thước(1) không hay biết gì cả. Tôi chừng tôi mò ra tháo cây tiểu liên(2) nghe động sột soạt, nỏ mới quay lại thấy tôi, liền bắn tôi một phát súng mút(3) nhưng trượt. Tiếng súng của nó bắn ra mà cha con chúng nó hoảng lên, hò hét chạy lung tung mới buồn cười chứ! Tôi xách cây tiểu liên bay vào rừng, chờ tôi mò trở ra. [...]",
+          "type": "text"
+        },
+        {
+          "top_left_x": 78,
+          "top_left_y": 452,
+          "bottom_right_x": 625,
+          "bottom_right_y": 494,
+          "content": "Trong giọng nói bốn cọng của Võ Tòng có pha đượm một nỗi buồn chua chát, khiến tôi vừa ngồi nghe vừa nhìn bếp lửa cháy riu riu mà không khỏi bùi ngùi.",
+          "type": "text"
+        },
+        {
+          "top_left_x": 78,
+          "top_left_y": 497,
+          "bottom_right_x": 625,
+          "bottom_right_y": 540,
+          "content": "– Chú em cầm hộ lọ muối chỗ vách kia đưa giùm qua(4) chút! – Chú Võ Tòng đổi giọng, vui vẻ bảo tôi. [...]",
+          "type": "text"
+        },
+        {
+          "top_left_x": 78,
+          "top_left_y": 547,
+          "bottom_right_x": 625,
+          "bottom_right_y": 609,
+          "content": "⑤ Bên ngoài, trời rạng dần. Đã nghe một vài tiếng chim rừng ríu rít gọi nhau trở dậy đón bình minh trên những ngọn cây xung quanh lều. Chú Võ Tòng trao chiếc nỏ và ống tên thuốc cho tia nuôi tôi:",
+          "type": "text"
+        },
+        {
+          "top_left_x": 78,
+          "top_left_y": 613,
+          "bottom_right_x": 625,
+          "bottom_right_y": 717,
+          "content": "– Cứ tình hình này thì chúng nó sẽ mò tới đây thôi. Tôi quý anh Hai là bậc can trường(5), nên mới dám chọn mặt gửi vàng. Chứ những mũi tên độc này mà lọt vào tay một người hèn nhát, thì nó sẽ gây nhiều tác hại đấy. Sở dĩ tôi không dám nói với bà chị, là còn e bà chị ngại điều nguy hiểm, biết đâu sẽ ngăn trở công việc của chúng ta.",
+          "type": "text"
+        },
+        {
+          "top_left_x": 104,
+          "top_left_y": 722,
+          "bottom_right_x": 254,
+          "bottom_right_y": 741,
+          "content": "Tia nuôi tôi vội đỡ lời:",
+          "type": "text"
+        },
+        {
+          "top_left_x": 78,
+          "top_left_y": 786,
+          "bottom_right_x": 428,
+          "bottom_right_y": 804,
+          "content": "(1) Thước: đơn vị đo chiều dài, cách gọi thông thường của mét.",
+          "type": "references"
+        },
+        {
+          "top_left_x": 78,
+          "top_left_y": 803,
+          "bottom_right_x": 625,
+          "bottom_right_y": 835,
+          "content": "(2) Tiểu liên: loại vũ khí cá nhân tầm gần, thuộc họ súng máy, cũng thuộc họ súng tự động, do người Đức sáng chế từ cuối Chiến tranh thế giới thứ nhất.",
+          "type": "references"
+        },
+        {
+          "top_left_x": 78,
+          "top_left_y": 834,
+          "bottom_right_x": 566,
+          "bottom_right_y": 852,
+          "content": "(3) Mút (viết tắt tên súng mút-cơ-tông, tiếng Pháp: mousqueton): súng trường nhẹ, ngắn.",
+          "type": "references"
+        },
+        {
+          "top_left_x": 78,
+          "top_left_y": 851,
+          "bottom_right_x": 625,
+          "bottom_right_y": 882,
+          "content": "(4) Qua (từ địa phương): từ mà người đàn ông lớn tuổi tự xưng một cách thân mật khi nói với người nhỏ tuổi hơn.",
+          "type": "references"
+        },
+        {
+          "top_left_x": 78,
+          "top_left_y": 882,
+          "bottom_right_x": 314,
+          "bottom_right_y": 899,
+          "content": "(5) Can trường: gan dạ, dũng cảm, bền bỉ.",
+          "type": "references"
+        },
+        {
+          "top_left_x": 71,
+          "top_left_y": 919,
+          "bottom_right_x": 263,
+          "bottom_right_y": 942,
+          "content": "Đọc sách tại học10.vn",
+          "type": "footer"
+        },
+        {
+          "top_left_x": 625,
+          "top_left_y": 919,
+          "bottom_right_x": 647,
+          "bottom_right_y": 937,
+          "content": "19",
+          "type": "footer"
+        }
+      ]
+    },
+    {
+      "index": 5,
+      "markdown": "– Chú phòng xa như vậy cũng phải. Đàn bà nhà tôi còn mê tín, tin có Trời, có Phật. Nhưng về cái gan dạ thì... chú cứ tin lời tôi, bà(1) không thua anh em ta một bước nào đâu.\n\n– Vậy thì tôi có lỗi với chị Hai quá trời, để bữa nào ta làm một bữa rượu để tôi tạ lỗi với bà chị của tôi mới được.\n\nTôi đã bước xuống cõi đây buộc xuồng mà con vượn bạc mà còn chạy theo ra cửa, nhe răng nhảy nhó, dọa tôi. Tia nuôi tôi đập đập tay vào lưng chú Võ Tòng:\n\n– Xin đa tạ chú! Đa tạ chú!\n\n– Có gì đâu anh Hai. Vì nghĩa chung mà!\n\nTia nuôi tôi lưng đeo nó, hông buộc ống tên bước xuống xuồng. Tôi cầm giầm(2) bơi nhưng còn ngoái lên, nói với:\n\n– Chào chú ạ! Hôm nào chú sang chơi, nhớ mang theo một con nai hay một con heo rừng bé bé, chú nhá!\n\n– Ồ, thế nào cũng có chú! Chú nuôi đầy rừng, muốn con cỡ nào chú bắt cho đúng con cỡ ấy! – Chú Võ Tòng vẫy vẫy tay, cười lớn một thôi dài.\n\nCâu nói cảm ơn trang trọng của ông Hai và lời đáp của chú Võ Tòng thể hiện điều gì?\n\n(Đất rừng phương Nam, NXB(*) Văn học, Hà Nội, 2010)\n\n1. Văn bản Người đàn ông cô độc giữa rừng kể về việc gì? Đoạn trích có những nhân vật nào? Ai là nhân vật chính? Nhan đề văn bản gợi cho em những suy nghĩ gì?\n\n2. Đặc điểm tính cách nhân vật Võ Tòng được nhà văn thể hiện trên những phương diện nào? Hãy vẽ hoặc miêu tả bằng lời về nhân vật Võ Tòng theo hình dung của em.\n\n3. Nêu tác dụng của việc kết hợp giữa lời kể theo ngôi thứ nhất (xưng “tôi”) với lời kể theo ngôi thứ ba trong việc khắc họa nhân vật Võ Tòng.\n\n4. Hãy nêu ra một số yếu tố (ngôn ngữ, phong cảnh, tính cách con người, nếp sinh hoạt,...) trong văn bản để thấy tiểu thuyết của Đoàn Giỏi mang đậm màu sắc Nam Bộ.\n\n5. Qua văn bản, em hiểu thêm được gì về con người và thiên nhiên của vùng đất phương Nam? Hãy nêu một chi tiết mà em thích nhất và lí giải vì sao.\n\n6. Viết một đoạn văn (khoảng 6 – 8 dòng) nêu lên những nét đặc sắc về nội dung và nghệ thuật của văn bản Người đàn ông cô độc giữa rừng.\n\n(*) NXB: viết tắt của Nhà xuất bản.\n\n(1) Bà (từ địa phương): bà ấy.\n\n(2) Giầm: mái chèo ngắn, cầm tay để chèo.",
+      "images": [],
+      "tables": [],
+      "hyperlinks": [],
+      "header": null,
+      "footer": "20 học sách tại học10.vn",
+      "dimensions": {
+        "dpi": 87,
+        "height": 1018,
+        "width": 719
+      },
+      "confidence_scores": null,
+      "blocks": [
+        {
+          "top_left_x": 89,
+          "top_left_y": 103,
+          "bottom_right_x": 637,
+          "bottom_right_y": 163,
+          "content": "– Chú phòng xa như vậy cũng phải. Đàn bà nhà tôi còn mê tín, tin có Trời, có Phật. Nhưng về cái gan dạ thì... chú cứ tin lời tôi, bà(1) không thua anh em ta một bước nào đâu.",
+          "type": "text"
+        },
+        {
+          "top_left_x": 89,
+          "top_left_y": 169,
+          "bottom_right_x": 637,
+          "bottom_right_y": 210,
+          "content": "– Vậy thì tôi có lỗi với chị Hai quá trời, để bữa nào ta làm một bữa rượu để tôi tạ lỗi với bà chị của tôi mới được.",
+          "type": "text"
+        },
+        {
+          "top_left_x": 89,
+          "top_left_y": 215,
+          "bottom_right_x": 637,
+          "bottom_right_y": 257,
+          "content": "Tôi đã bước xuống cõi đây buộc xuồng mà con vượn bạc mà còn chạy theo ra cửa, nhe răng nhảy nhó, dọa tôi. Tia nuôi tôi đập đập tay vào lưng chú Võ Tòng:",
+          "type": "text"
+        },
+        {
+          "top_left_x": 114,
+          "top_left_y": 262,
+          "bottom_right_x": 294,
+          "bottom_right_y": 280,
+          "content": "– Xin đa tạ chú! Đa tạ chú!",
+          "type": "text"
+        },
+        {
+          "top_left_x": 114,
+          "top_left_y": 285,
+          "bottom_right_x": 385,
+          "bottom_right_y": 305,
+          "content": "– Có gì đâu anh Hai. Vì nghĩa chung mà!",
+          "type": "text"
+        },
+        {
+          "top_left_x": 89,
+          "top_left_y": 310,
+          "bottom_right_x": 460,
+          "bottom_right_y": 369,
+          "content": "Tia nuôi tôi lưng đeo nó, hông buộc ống tên bước xuống xuồng. Tôi cầm giầm(2) bơi nhưng còn ngoái lên, nói với:",
+          "type": "text"
+        },
+        {
+          "top_left_x": 89,
+          "top_left_y": 376,
+          "bottom_right_x": 459,
+          "bottom_right_y": 417,
+          "content": "– Chào chú ạ! Hôm nào chú sang chơi, nhớ mang theo một con nai hay một con heo rừng bé bé, chú nhá!",
+          "type": "text"
+        },
+        {
+          "top_left_x": 89,
+          "top_left_y": 421,
+          "bottom_right_x": 637,
+          "bottom_right_y": 463,
+          "content": "– Ồ, thế nào cũng có chú! Chú nuôi đầy rừng, muốn con cỡ nào chú bắt cho đúng con cỡ ấy! – Chú Võ Tòng vẫy vẫy tay, cười lớn một thôi dài.",
+          "type": "text"
+        },
+        {
+          "top_left_x": 492,
+          "top_left_y": 280,
+          "bottom_right_x": 637,
+          "bottom_right_y": 345,
+          "content": "Câu nói cảm ơn trang trọng của ông Hai và lời đáp của chú Võ Tòng thể hiện điều gì?",
+          "type": "aside_text"
+        },
+        {
+          "top_left_x": 286,
+          "top_left_y": 471,
+          "bottom_right_x": 601,
+          "bottom_right_y": 489,
+          "content": "(Đất rừng phương Nam, NXB(*) Văn học, Hà Nội, 2010)",
+          "type": "text"
+        },
+        {
+          "top_left_x": 105,
+          "top_left_y": 518,
+          "bottom_right_x": 620,
+          "bottom_right_y": 577,
+          "content": "1. Văn bản Người đàn ông cô độc giữa rừng kể về việc gì? Đoạn trích có những nhân vật nào? Ai là nhân vật chính? Nhan đề văn bản gợi cho em những suy nghĩ gì?",
+          "type": "list"
+        },
+        {
+          "top_left_x": 105,
+          "top_left_y": 579,
+          "bottom_right_x": 620,
+          "bottom_right_y": 637,
+          "content": "2. Đặc điểm tính cách nhân vật Võ Tòng được nhà văn thể hiện trên những phương diện nào? Hãy vẽ hoặc miêu tả bằng lời về nhân vật Võ Tòng theo hình dung của em.",
+          "type": "list"
+        },
+        {
+          "top_left_x": 105,
+          "top_left_y": 640,
+          "bottom_right_x": 620,
+          "bottom_right_y": 679,
+          "content": "3. Nêu tác dụng của việc kết hợp giữa lời kể theo ngôi thứ nhất (xưng “tôi”) với lời kể theo ngôi thứ ba trong việc khắc họa nhân vật Võ Tòng.",
+          "type": "list"
+        },
+        {
+          "top_left_x": 105,
+          "top_left_y": 682,
+          "bottom_right_x": 620,
+          "bottom_right_y": 720,
+          "content": "4. Hãy nêu ra một số yếu tố (ngôn ngữ, phong cảnh, tính cách con người, nếp sinh hoạt,...) trong văn bản để thấy tiểu thuyết của Đoàn Giỏi mang đậm màu sắc Nam Bộ.",
+          "type": "list"
+        },
+        {
+          "top_left_x": 105,
+          "top_left_y": 722,
+          "bottom_right_x": 620,
+          "bottom_right_y": 760,
+          "content": "5. Qua văn bản, em hiểu thêm được gì về con người và thiên nhiên của vùng đất phương Nam? Hãy nêu một chi tiết mà em thích nhất và lí giải vì sao.",
+          "type": "list"
+        },
+        {
+          "top_left_x": 105,
+          "top_left_y": 763,
+          "bottom_right_x": 620,
+          "bottom_right_y": 801,
+          "content": "6. Viết một đoạn văn (khoảng 6 – 8 dòng) nêu lên những nét đặc sắc về nội dung và nghệ thuật của văn bản Người đàn ông cô độc giữa rừng.",
+          "type": "list"
+        },
+        {
+          "top_left_x": 89,
+          "top_left_y": 850,
+          "bottom_right_x": 286,
+          "bottom_right_y": 867,
+          "content": "(*) NXB: viết tắt của Nhà xuất bản.",
+          "type": "references"
+        },
+        {
+          "top_left_x": 89,
+          "top_left_y": 867,
+          "bottom_right_x": 258,
+          "bottom_right_y": 883,
+          "content": "(1) Bà (từ địa phương): bà ấy.",
+          "type": "references"
+        },
+        {
+          "top_left_x": 89,
+          "top_left_y": 882,
+          "bottom_right_x": 330,
+          "bottom_right_y": 899,
+          "content": "(2) Giầm: mái chèo ngắn, cầm tay để chèo.",
+          "type": "references"
+        },
+        {
+          "top_left_x": 68,
+          "top_left_y": 919,
+          "bottom_right_x": 263,
+          "bottom_right_y": 942,
+          "content": "20 học sách tại học10.vn",
+          "type": "footer"
+        }
+      ]
+    }
+  ],
+  "model": "mistral-ocr-latest",
+  "document_annotation": null,
+  "usage_info": {
+    "pages_processed": 6,
+    "doc_size_bytes": 2513033
+  },
+  "status": "complete",
+  "success": true,
+  "markdown": "### 1 Người đàn ông cô độc giữa rừng$^{(\\*)}$\n\n(Trích tiểu thuyết *Đất rừng phương Nam*)\n\nĐOÀN GIỎI\n\n#### 1 Chuẩn bị\n\n– Xem lại phần *Kiến thức ngữ văn* để vận dụng vào đọc hiểu văn bản này.$^{(\\*\\*)}$\n\n– Khi đọc truyện, các em cần chú ý:$^{(\\*\\*\\*)}$\n\n+ Tóm tắt được nội dung văn bản (Truyện kể lại sự kiện gì? Xảy ra trong bối cảnh nào?).\n\n+ Nhân vật chính là ai? Nhân vật ấy được nhà văn thể hiện qua những phương diện nào?\n\n+ Truyện kể theo ngôi kể nào? Nếu có sự thay đổi ngôi kể thì tác dụng của việc thay đổi ấy là gì?\n\n+ Truyện giúp em hiểu biết thêm những gì và tác động đến tình cảm của em như thế nào?\n\n– Đọc trước đoạn trích *Người đàn ông cô độc giữa rừng*, tìm hiểu thêm những thông tin về tác phẩm *Đất rừng phương Nam* và nhà văn Đoàn Giỏi.\n\n– Đọc đoạn tóm tắt sau để hiểu bối cảnh của đoạn trích:\n\n*Đất rừng phương Nam* là tiểu thuyết của nhà văn Đoàn Giỏi, viết về cuộc đời phiêu bạt của cậu bé An. Em theo cha mẹ chạy giặc Pháp hết vùng này tới vùng khác của miền Tây Nam Bộ rồi lạc mất gia đình, trở thành cậu bé lang thang. Trong lúc lưu lạc, An đã được gặp và trở thành con nuôi gia đình ông Hai bán rắn, làm anh em với thằng Cò và làm bạn với chú Võ Tòng. Đoạn trích *Người đàn ông cô độc giữa rừng* kể lại việc tía nuôi đất An đi thăm chú Võ Tòng.\n\n#### 2 Đọc hiểu\n\n①$^{(\\*\\*\\*\\*)}$ Chắc tôi ngủ một giấc lâu lắm thì phải. Khi tôi mở mắt ra, thấy xuống$^{(1)}$ buộc lên một gốc cây tràm. Không biết tía nuôi tôi đi đâu. Nghe có tiếng người nói chuyện\n\n![img-0.jpeg](img-0.jpeg)\n\nĐoàn Giỏi (1925 – 1989),\n\nrì rầm bên bờ. “A! Thế thì đến nhà chú Võ Tòng rồi!”. Tôi ngồi dậy, dụi mắt trông lên. Ánh lửa bếp từ trong một ngôi lều chiếu qua khung cửa mở, soi rõ hình những khúc gỗ xếp thành bậc thang dài xuống bến. Tôi bước ra khỏi xuồng, lần theo bậc gỗ mò lên. Bỗng nghe con vượn bạc má kêu “ché... ét, ché... ét” trong lều, và tiếng chú Võ Tòng nói: “Thằng bé của anh nó lên đấy!”.\n\n– Vào đây, An! – Tía nuôi tôi gọi.\n\nTiếng kêu và hình ảnh của con vượn bạc má trong phần ① gợi ra cảm giác về một bối cảnh như thế nào?(*)\n\n![img-1.jpeg](img-1.jpeg)\n\nTôi bước qua mấy bậc gỗ trơn tuột và dừng lại chỗ cửa. Con vượn bạc má ngồi vắt vẻo trên một thanh xà ngang, nhe răng dọa tôi. Tía nuôi tôi và chú Võ Tòng ngồi trên hai gốc cây(1). Trước mặt hai người, chỗ giữa lều, có đặt một cái bếp cà ràng(2) lửa cháy riu riu, trên cà ràng bắc một chiếc nồi đất đầy vung kín mít. Chai rượu đã vơi và một đĩa khô(3) nướng còn bày trên nền đất ngay dưới chân chủ và khách, bên cạnh hai chiếc nỏ(4) gác chèo lên nhau.\n\n② – Ngồi xuống đây, chú em!\n\nChú Võ Tòng đứng dậy, lôi một gốc cây trong tối đặt bên bếp lửa. Chú cởi trần, mặc chiếc quần ka ki còn mới, nhưng coi bộ đã lâu không giặt (chiếc quần lính Pháp có\n\nNhững chi tiết về nhà cửa, cách ăn mặc và tiếp khách,... gợi lên ấn tượng gì về chú Võ Tòng?\n\n(*) Các câu hỏi gợi ý ở bên phải văn bản chỉ để học sinh theo dõi thêm về nội dung, nghệ thuật,... trong khi đọc, không cần trả lời.\n\n(1) Gộc cây: phần gốc và rễ của một cây già cỗi sau khi đã bị chặt đi.\n\n(2) Cà ràng: một loại bếp lò làm bằng đất nung của người Khmer Nam Bộ, đun bằng củi.\n\n(3) Khô: thịt được phơi khô để cất giữ lâu, thường đem nướng trước khi ăn.\n\n(4) Nỏ: một loại vũ khí hình cái cung, có cán để cầm và có lấy, bật dây căng để bắn tên.\n\nnhững sáu túi). Bên hông, chú đeo lủng lẳng một lưỡi lê(1) nằm gọn trong vỏ sắt, đúng như lời mà nuôi tôi đã tả. Lại còn thắt cái xanh-tuya-rông(2) nữa chứ!\n\nTôi không sợ chú Võ Tòng như cái đêm đã gặp chú lần đầu tiên ở bờ sông, mà lại còn có đôi chút cảm tình xen lẫn với ngạc nhiên hơi buồn cười thế nào ấy. Tía nuôi tôi ngó tôi, cười cười nhắc cái tàu(3) thuốc lá ở miệng ra.\n\n– Ngủ đấy giấc rồi à? Tía thấy con ngủ say, tía không gọi. Thôi, đã dậy rồi thì ngồi đây chơi!\n\n– Nhai bậy(4) một miếng khô nai đi, chú em. Cho đỡ buồn miệng mà! – Chú Võ Tòng nhặt trong lửa ra một thỏi khô nướng to nhất đặt vào tay tôi.\n\nCon vượn bạc mà lại kêu “ché... ét, ché... ét...” ở phía trên đầu tôi. Tôi cứ mặc kệ nó, vừa xé miếng thịt khô ướp muối sả nướng thơm phức cho vào mồm nhai, vừa đưa mắt nhìn quanh ngôi lều. [...] Mùi lông khét xông khói lâu ngày toả ra, cùng với một làn khói gì mùi hăng hắc, màu xanh xanh bay ra từ chiếc nồi đậy kín vung sôi “ục... ục...” trên bếp cá ràng, khiến tôi có một thứ cảm giác rợn rợn không tả được. Dường như những cái bóng lặng lẽ ngồi bên bếp đây đang sống lùi lại từ cái thời kì loài người mới tìm ra lửa vậy.\n\n③ Không ai biết tên thật của gã là gì. Mười mấy năm về trước, gã một mình bơi một chiếc xuồng nát đến che lều ở giữa khu rừng đầy thú dữ này. Gã sống đơn độc một mình, đến con chó để làm bạn cũng không có. Hồi ấy, rừng này còn nhiều hồ lắm. [...] Một buổi trưa, gã đang ngủ trong lều, có con hổ chúa mò vào, từ ngoài sân phóng một cái phủ lên người gã. Bất thần gã tỉnh dậy. Gã vớ luôn cái mác(5) bên người, cũng không kịp ngồi dậy nữa, cứ nằm ngửa thế mà xóc mũi mác lên đâm thẳng một nhát vào hàm dưới con hổ chúa, hai chân gã đã thốc lên bụng nó, không cho con ác thú kịp chụp xuống người. Con hổ chúa lộn vòng, rơi xuống đất. Lưỡi mác đâm từ hàm dưới thấu lên tận óc, làm nó không hà họng được, nhưng vẫn còn có vết cái tát cuối cùng, để lại trên mặt gã một hàng sẹo khủng khiếp chạy từ thái dương xuống cổ. Không biết có phải do đấy mà gã mang tên “Võ Tòng” hay không? Chứ theo như một vài\n\nChỉ ra dấu hiệu về sự chuyển đổi ngôi kể.\n\nChuyện Võ Tòng đánh hổ hé mở điều gì về tính cách, cuộc đời nhân vật?\n\n(1) Lưỡi lê: bộ phận gắn trên đầu súng, có đầu nhọn, dùng để đâm.\n\n(2) Xanh-tuya-rông (tiếng Pháp: ceinture): dây thắt lưng.\n\n(3) Tàu: dụng cụ để hút thuốc lá sợi.\n\n(4) Nhai bậy: nhai (ăn) một cách thoải mái, không cần suy nghĩ gì hoặc ăn tạm cho vui (cách nói khiêm tốn, thân mật của người Nam Bộ).\n\n(5) Mác: vũ khí thời xưa, có cán, lưỡi dài và to, mũi nhọn, dùng để đâm hoặc chém.\n\nông lão đa sự$^{(1)}$, thì ngày xưa gã là một chàng trai hiền lành, ở tận một vùng xa lắm. Gã cũng có gia đình đàng hoàng như ai. Vợ gã là một người đàn bà trông cũng xinh mắt. Chị ấy, lúc có chửa đứa đầu lòng, cứ kêu thèm ăn mắng. Gã đàn ông hiền lành, quý vợ rất mực ấy bèn liều xách dao đến bụi tre đỉnh làng xắn một mụt mắng$^{(2)}$. Khi về qua ngang bờ tre nhà tên địa chủ$^{(3)}$, tên này bắt gã bỏ mụt mắng xuống và vu cho gã lấy trộm mắng tre của hắn. Gã một mực cãi lại, nhưng tên địa chủ quyền thế nhất xã ấy cứ vung ba toong đánh lên đầu gã. “Đánh đầu thì còn nhịn được, chứ đánh lên đầu là nơi thờ phụng ông bà... thì số mày tôi rồi!”. Lưỡi dao trên tay gã không cho phép tên địa chủ ngang ngược kia giơ tay đánh ba toong lên đầu gã đến cái thứ hai. Nhất dao chém trả vào mặt gã gi tên bóc lột và hống hách này nằm gục xuống vùng máu. Nhưng gã không trốn chạy. Gã đường hoàng xách dao đến ném trước nhà việc$^{(4)}$, bó tay chịu tội.\n\nSo sánh hành vi chống trả tên địa chủ ngang ngược với việc đánh hổ của Võ Tòng.\n\nSau mười năm tù đày, gã trở về làng cũ thì nghe tin vợ đã làm lễ tên địa chủ kia, và đứa con trai độc nhất mà gã chưa biết mặt thì đã chết từ khi gã còn ngồi trong khám$^{(5)}$ lạnh. Người trong xã vốn ghét tên địa chủ hống hách, khấp khể chớ xem cuộc rửa thù bằng máu lần thứ hai. Nhưng họ đã thất vọng. Gã chỉ kêu trời một tiếng rồi cười nhạt bỏ làng ra đi. Những người đa sự quả quyết rằng chính gã đã mang tên “Võ Tòng” từ lúc xách dao đến nhà việc chịu tội. Còn như những chữ bùa$^{(6)}$ xanh lè xám rằn rực$^{(7)}$ trên người gã, và gã trở nên một người giỏi võ từ lúc nào, thì có kẻ nói đó là dấu vết trong những năm gã ở tù, lại có người bảo đó là mới có từ lúc gã đi giang hồ$^{(8)}$. Hơn mười năm sống trơ trọi giữa rừng, mặc dầu, cũng có nhiều người đánh tiếng mối mai cho gã, nhưng tuyệt nhiên Võ Tòng không để mắt tới một người đàn bà nào nữa. Ở trong rừng lâu năm chảy$^{(9)}$ thăng, gã ngày càng trở nên kì hình dị tướng$^{(10)}$. Nhưng ai cũng mến gã ở cái tính tình chất phác, thật thà, lúc nào cũng sẵn sàng giúp đỡ mọi người mà không hề nghĩ đến chuyện\n\nngười ta có đến đáp lại mình không. Điều đó, mà nuôi tôi quả quyết, nói một cách chắc chắn như vậy...\n\n④ Chú Võ Tòng vẫn ngồi đó, đối diện với tia nuôi tôi, bên bếp lửa. Tia nuôi tôi tay cầm một chiếc nỏ lên ngắm nghía; bật thử sợi dây nỏ trên đầu ngón tay nghe “pung... pung...” rồi lại đặt xuống. Chú Võ Tòng rót rượu ra bát, uống một ngụm, trao bát sang cho tia nuôi tôi và nói:\n\nChú ý cách uống rượu và lời nói của chú Võ Tòng với tia nuôi “tôi”.\n\n– Con dao găm của anh Hai cùng với cánh nỏ này, thừa làm nên chuyện. Mình thì cần gì tới súng? Mấy thằng nhát gan mới cần súng, vì súng ở xa cũng bắn được mà! Phải không anh Hai? Tôi cho rằng súng dở lắm, động tới thì kêu ầm ĩ. Tôi ghét tiếng nổ lắm. Như cái bận tôi làm vừa rồi đấy. Tách một tiếng, chết ngay thẳng giặc Pháp râu xồm, mà cái thằng đứng cách nằm, sáu thước(1) không hay biết gì cả. Tôi chừng tôi mò ra tháo cây tiểu liên(2) nghe động sột soạt, nỏ mới quay lại thấy tôi, liền bắn tôi một phát súng mút(3) nhưng trượt. Tiếng súng của nó bắn ra mà cha con chúng nó hoảng lên, hò hét chạy lung tung mới buồn cười chứ! Tôi xách cây tiểu liên bay vào rừng, chờ tôi mò trở ra. [...]\n\nTrong giọng nói bốn cọng của Võ Tòng có pha đượm một nỗi buồn chua chát, khiến tôi vừa ngồi nghe vừa nhìn bếp lửa cháy riu riu mà không khỏi bùi ngùi.\n\n– Chú em cầm hộ lọ muối chỗ vách kia đưa giùm qua(4) chút! – Chú Võ Tòng đổi giọng, vui vẻ bảo tôi. [...]\n\n⑤ Bên ngoài, trời rạng dần. Đã nghe một vài tiếng chim rừng ríu rít gọi nhau trở dậy đón bình minh trên những ngọn cây xung quanh lều. Chú Võ Tòng trao chiếc nỏ và ống tên thuốc cho tia nuôi tôi:\n\n– Cứ tình hình này thì chúng nó sẽ mò tới đây thôi. Tôi quý anh Hai là bậc can trường(5), nên mới dám chọn mặt gửi vàng. Chứ những mũi tên độc này mà lọt vào tay một người hèn nhát, thì nó sẽ gây nhiều tác hại đấy. Sở dĩ tôi không dám nói với bà chị, là còn e bà chị ngại điều nguy hiểm, biết đâu sẽ ngăn trở công việc của chúng ta.\n\nTia nuôi tôi vội đỡ lời:\n\n(1) Thước: đơn vị đo chiều dài, cách gọi thông thường của mét.\n\n(2) Tiểu liên: loại vũ khí cá nhân tầm gần, thuộc họ súng máy, cũng thuộc họ súng tự động, do người Đức sáng chế từ cuối Chiến tranh thế giới thứ nhất.\n\n(3) Mút (viết tắt tên súng mút-cơ-tông, tiếng Pháp: mousqueton): súng trường nhẹ, ngắn.\n\n(4) Qua (từ địa phương): từ mà người đàn ông lớn tuổi tự xưng một cách thân mật khi nói với người nhỏ tuổi hơn.\n\n(5) Can trường: gan dạ, dũng cảm, bền bỉ.\n\n– Chú phòng xa như vậy cũng phải. Đàn bà nhà tôi còn mê tín, tin có Trời, có Phật. Nhưng về cái gan dạ thì... chú cứ tin lời tôi, bà(1) không thua anh em ta một bước nào đâu.\n\n– Vậy thì tôi có lỗi với chị Hai quá trời, để bữa nào ta làm một bữa rượu để tôi tạ lỗi với bà chị của tôi mới được.\n\nTôi đã bước xuống cõi đây buộc xuồng mà con vượn bạc mà còn chạy theo ra cửa, nhe răng nhảy nhó, dọa tôi. Tia nuôi tôi đập đập tay vào lưng chú Võ Tòng:\n\n– Xin đa tạ chú! Đa tạ chú!\n\n– Có gì đâu anh Hai. Vì nghĩa chung mà!\n\nTia nuôi tôi lưng đeo nó, hông buộc ống tên bước xuống xuồng. Tôi cầm giầm(2) bơi nhưng còn ngoái lên, nói với:\n\n– Chào chú ạ! Hôm nào chú sang chơi, nhớ mang theo một con nai hay một con heo rừng bé bé, chú nhá!\n\n– Ồ, thế nào cũng có chú! Chú nuôi đầy rừng, muốn con cỡ nào chú bắt cho đúng con cỡ ấy! – Chú Võ Tòng vẫy vẫy tay, cười lớn một thôi dài.\n\nCâu nói cảm ơn trang trọng của ông Hai và lời đáp của chú Võ Tòng thể hiện điều gì?\n\n(Đất rừng phương Nam, NXB(*) Văn học, Hà Nội, 2010)\n\n1. Văn bản Người đàn ông cô độc giữa rừng kể về việc gì? Đoạn trích có những nhân vật nào? Ai là nhân vật chính? Nhan đề văn bản gợi cho em những suy nghĩ gì?\n\n2. Đặc điểm tính cách nhân vật Võ Tòng được nhà văn thể hiện trên những phương diện nào? Hãy vẽ hoặc miêu tả bằng lời về nhân vật Võ Tòng theo hình dung của em.\n\n3. Nêu tác dụng của việc kết hợp giữa lời kể theo ngôi thứ nhất (xưng “tôi”) với lời kể theo ngôi thứ ba trong việc khắc họa nhân vật Võ Tòng.\n\n4. Hãy nêu ra một số yếu tố (ngôn ngữ, phong cảnh, tính cách con người, nếp sinh hoạt,...) trong văn bản để thấy tiểu thuyết của Đoàn Giỏi mang đậm màu sắc Nam Bộ.\n\n5. Qua văn bản, em hiểu thêm được gì về con người và thiên nhiên của vùng đất phương Nam? Hãy nêu một chi tiết mà em thích nhất và lí giải vì sao.\n\n6. Viết một đoạn văn (khoảng 6 – 8 dòng) nêu lên những nét đặc sắc về nội dung và nghệ thuật của văn bản Người đàn ông cô độc giữa rừng.\n\n(*) NXB: viết tắt của Nhà xuất bản.\n\n(1) Bà (từ địa phương): bà ấy.\n\n(2) Giầm: mái chèo ngắn, cầm tay để chèo."
+}
