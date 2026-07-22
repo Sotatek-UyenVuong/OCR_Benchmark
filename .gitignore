@@ -11,13 +11,16 @@ dist/
 build/
 .pytest_cache/
 
-# Raw data — commit PDF gốc, bỏ marker output cache
+# Raw data — commit PDF/ảnh gốc, bỏ model output cache
 raw/**/marker_output/
+raw/**/mistral_output/
 
 # Data directories — không commit, tạo tự động khi chạy
 ground_truth/
 predictions/
 benchmark_results/
+paddleocr_vl16_output/
+datasota/
 
 # Editor / OS
 .vscode/
