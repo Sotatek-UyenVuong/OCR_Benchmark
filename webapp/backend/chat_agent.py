@@ -128,7 +128,7 @@ TOOL_DEFINITIONS = [
                     "lang": {
                         "type": "string",
                         "enum": ["en", "vi", "ja", "all"],
-                        "description": "Lọc theo ngôn ngữ. 'all' = tất cả.",
+                        "description": "Lọc theo ngôn ngữ: 'en'=tiếng Anh, 'vi'=tiếng Việt, 'ja'=tiếng Nhật. 'all' = tất cả.",
                     },
                     "models": {
                         "type": "array",
@@ -171,7 +171,9 @@ TOOL_DEFINITIONS = [
                 "Gợi ý model tốt nhất cho một use case cụ thể: loại tài liệu (scan/table/text_layer) "
                 "và/hoặc ngôn ngữ (en/vi/ja). Trả về ranking và phân tích điểm mạnh/yếu từng model. "
                 "Dùng khi user hỏi: 'nên dùng model nào cho scan tiếng Việt', 'model nào tốt nhất cho "
-                "table tiếng Nhật', 'model phù hợp nhất cho text_layer tiếng Anh', v.v."
+                "table tiếng Nhật', 'model phù hợp nhất cho text_layer tiếng Anh', v.v. "
+                "QUAN TRỌNG: lang phải là 'en' (English/tiếng Anh), 'vi' (Vietnamese/tiếng Việt), "
+                "hoặc 'ja' (Japanese/tiếng Nhật). KHÔNG dùng tên đầy đủ như 'japanese' hay 'vietnamese'."
             ),
             "parameters": {
                 "type": "object",
@@ -184,7 +186,11 @@ TOOL_DEFINITIONS = [
                     "lang": {
                         "type": "string",
                         "enum": ["en", "vi", "ja"],
-                        "description": "Ngôn ngữ cần gợi ý. Bỏ trống = so sánh tất cả ngôn ngữ.",
+                        "description": (
+                            "Ngôn ngữ cần gợi ý. Bỏ trống = so sánh tất cả ngôn ngữ. "
+                            "Mapping: 'en'=English/tiếng Anh, 'vi'=Vietnamese/tiếng Việt, "
+                            "'ja'=Japanese/tiếng Nhật/日本語."
+                        ),
                     },
                     "metric": {
                         "type": "string",
