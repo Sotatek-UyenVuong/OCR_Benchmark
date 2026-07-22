@@ -165,8 +165,16 @@ def _load_pred_from_raw_pipeline(
         # Convert tables to expected format with html key
         tables = [{"table_id": t.get("table_id", i+1), "html": t.get("html", "")}
                   for i, t in enumerate(tables_raw) if t.get("html")]
+        # Build full_text = text + flatten table cells
+        # (mirrors _build_full_text_for_scoring on GT side)
+        text_filtered = _filter_content(raw_text)
+        parts = [text_filtered] if text_filtered else []
+        for tbl in tables:
+            cell_text = _flatten_html_table_text(tbl.get("html") or "")
+            if cell_text:
+                parts.append(cell_text)
         result[pnum] = {
-            "full_text": _filter_content(raw_text),
+            "full_text": "\n".join(parts),
             "tables":    tables,
         }
     return result if result else None

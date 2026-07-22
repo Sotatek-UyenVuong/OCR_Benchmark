@@ -148,8 +148,8 @@ def _flatten_html_table_text(html: str) -> str:
 def _build_full_text_for_scoring(gt_page: dict) -> str:
     """
     Build full text for scoring that includes BOTH prose text AND table cell content.
-    This ensures text metrics (CER/F1) are computed on all readable content,
-    not just the non-table portion.
+    Both GT and pred text include table content (cells flattened), so text metrics
+    measure all readable content on the page regardless of how the model formatted it.
     """
     parts = [gt_page.get("full_text") or ""]
     for tbl in (gt_page.get("tables") or []):
