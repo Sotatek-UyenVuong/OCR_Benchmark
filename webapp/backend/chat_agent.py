@@ -451,7 +451,8 @@ def _build_system_prompt() -> str:
 
     return f"""OCR Benchmark Analyst. Answer in user's language (Vietnamese/English).
 
-BENCHMARK: 24 docs (scan/table/text_layer × en/vi/ja). Models: {model_list_str}
+BENCHMARK: docs (scan/table/text_layer × en/vi/ja/ko/zh). Models: {model_list_str}
+Languages: en=English, vi=Vietnamese, ja=Japanese, ko=Korean/한국어, zh=Chinese/中文
 
 METRICS (cite values in answers):
 - CER/WER: lower=better. >100% means pred longer than GT.

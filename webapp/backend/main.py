@@ -112,15 +112,21 @@ AVAILABLE_MODELS = [
 ]
 
 UC_OPTIONS = [
-    {"id": "scan_vi",       "label": "Scan — Tiếng Việt",    "type": "scan"},
-    {"id": "scan_en",       "label": "Scan — English",       "type": "scan"},
-    {"id": "scan_ja",       "label": "Scan — 日本語",         "type": "scan"},
-    {"id": "table_vi",      "label": "Table — Tiếng Việt",   "type": "table"},
-    {"id": "table_en",      "label": "Table — English",      "type": "table"},
-    {"id": "table_ja",      "label": "Table — 日本語",        "type": "table"},
+    {"id": "scan_vi",       "label": "Scan — Tiếng Việt",     "type": "scan"},
+    {"id": "scan_en",       "label": "Scan — English",        "type": "scan"},
+    {"id": "scan_ja",       "label": "Scan — 日本語",          "type": "scan"},
+    {"id": "scan_ko",       "label": "Scan — 한국어",          "type": "scan"},
+    {"id": "scan_zh",       "label": "Scan — 中文",            "type": "scan"},
+    {"id": "table_vi",      "label": "Table — Tiếng Việt",    "type": "table"},
+    {"id": "table_en",      "label": "Table — English",       "type": "table"},
+    {"id": "table_ja",      "label": "Table — 日本語",         "type": "table"},
+    {"id": "table_ko",      "label": "Table — 한국어",         "type": "table"},
+    {"id": "table_zh",      "label": "Table — 中文",           "type": "table"},
     {"id": "text_layer_vi", "label": "Text Layer — Tiếng Việt","type": "text_layer"},
     {"id": "text_layer_en", "label": "Text Layer — English",  "type": "text_layer"},
     {"id": "text_layer_ja", "label": "Text Layer — 日本語",   "type": "text_layer"},
+    {"id": "text_layer_ko", "label": "Text Layer — 한국어",   "type": "text_layer"},
+    {"id": "text_layer_zh", "label": "Text Layer — 中文",     "type": "text_layer"},
 ]
 
 
