@@ -18,7 +18,7 @@ from pathlib import Path
 from typing import Literal
 
 from fastapi import APIRouter, BackgroundTasks, HTTPException, Query
-from fastapi.responses import JSONResponse
+from fastapi.responses import JSONResponse, FileResponse
 from pydantic import BaseModel
 
 import sys
@@ -138,9 +138,10 @@ def list_pdfs():
         # Check eval result per model
         eval_done = {m: _result_path(m, uc_type, lang, doc_id).exists() for m in MODEL_SUBDIR}
 
-        # Build URL — PDF gets served via pdf endpoint, images served as static
+        # Build URL — PDF gets served via gt/pdf endpoint, images via ocr/image endpoint
         is_pdf = src.suffix.lower() == ".pdf"
-        pdf_url = f"/api/gt/pdf/{uc_type}/{lang}/{filename}" if is_pdf else None
+        pdf_url   = f"/api/gt/pdf/{uc_type}/{lang}/{filename}" if is_pdf else None
+        image_url = f"/api/ocr/image/{uc_type}/{lang}/{filename}" if not is_pdf else None
 
         pdfs.append({
             "doc_id": doc_id,
@@ -148,6 +149,7 @@ def list_pdfs():
             "lang": lang,
             "lang_label": _lang_label(lang),
             "pdf_url": pdf_url,
+            "image_url": image_url,
             "source_ext": src.suffix.lower(),
             "ocr_done": ocr_done,
             "gt_saved": gt_file.exists(),
@@ -158,6 +160,18 @@ def list_pdfs():
             "has_table_pred_by_model": has_table_pred_by_model,
         })
     return pdfs
+
+
+@router.get("/image/{uc_type}/{lang}/{filename}")
+def serve_image(uc_type: str, lang: str, filename: str):
+    """Serve a raw image file (PNG/JPG) for preview."""
+    img_path = RAW_ROOT / uc_type / lang / filename
+    if not img_path.exists():
+        raise HTTPException(404, f"Image not found: {img_path}")
+    ext = img_path.suffix.lower()
+    mime = {"png": "image/png", "jpg": "image/jpeg", "jpeg": "image/jpeg",
+            "webp": "image/webp"}.get(ext.lstrip("."), "application/octet-stream")
+    return FileResponse(str(img_path), media_type=mime)
 
 
 class RunOCRRequest(BaseModel):

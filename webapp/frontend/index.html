@@ -922,7 +922,7 @@ function renderFileGrid(pdfs){
       <div class="fc-name">${f.doc_id}</div>
       <div class="fc-meta">
         ${f.uc_type} · ${f.lang_label}<br>
-        PDF ${f.pdf_url?'✓':'✗'}
+        ${f.image_url ? '🖼 Image' : f.pdf_url ? '📄 PDF' : '—'}
       </div>
       <div class="fc-badges">${statusChips(f)}</div>`;
     el.onclick=()=>selectFile(f);
@@ -1115,11 +1115,17 @@ async function renderReview(){
   const f=S.selected;
   if(!f) return;
 
-  // Load PDF
+  // Load PDF or Image
   const pdfFrame=document.getElementById('pdf-frame');
-  pdfFrame.innerHTML=f.pdf_url
-    ?`<iframe src="${f.pdf_url}" title="PDF"></iframe>`
-    :'<div class="empty"><p>PDF not available</p></div>';
+  if (f.image_url) {
+    pdfFrame.innerHTML = `<div style="overflow:auto;height:100%;padding:8px;background:var(--bg)">
+      <img src="${f.image_url}" style="max-width:100%;border-radius:6px;box-shadow:0 2px 12px rgba(0,0,0,.5)" alt="${esc(f.doc_id)}">
+    </div>`;
+  } else if (f.pdf_url) {
+    pdfFrame.innerHTML = `<iframe src="${f.pdf_url}" title="PDF"></iframe>`;
+  } else {
+    pdfFrame.innerHTML = '<div class="empty"><p>Preview not available</p></div>';
+  }
 
   // Load cả text lẫn table draft (song song) — dùng model của S.selectedOcrSource (nếu có) hoặc S.model
   const srcModel = S.selectedOcrSource || S.model || 'marker';
