@@ -57,6 +57,8 @@ _MD_IMAGE_RE   = re.compile(
 )
 _FENCED_CODE_RE = re.compile(r'```[\w-]*\n[\s\S]*?```', re.DOTALL)  # ```lang\n...\n``` blocks (diagrams, code)
 _TABLE_RE      = re.compile(r'<table\b[^>]*>.*?</table>', re.IGNORECASE | re.DOTALL)
+# Markdown pipe table: one or more lines starting with |, including separator rows (|---|---|)
+_MD_TABLE_RE   = re.compile(r'(?:^[ \t]*\|[^\n]*\n)+', re.MULTILINE)
 _PAGE_FILENAME_RE = re.compile(r'^(.+?)_(\d+)\.md$')
 
 _AVERAGED_METRICS = [
@@ -145,6 +147,30 @@ def _flatten_html_table_text(html: str) -> str:
     return ' '.join(t for t in cell_texts if t)
 
 
+def _flatten_md_table_text(md_table: str) -> str:
+    """
+    Extract cell text from a markdown pipe table, stripping | separators
+    and skipping divider rows (|---|---|).
+
+    Input:  | A | B |\n|---|---|\n| 1 | 2 |
+    Output: A B\n1 2
+    """
+    rows = []
+    for line in md_table.splitlines():
+        line = line.strip()
+        if not line.startswith("|"):
+            continue
+        # Skip pure separator rows like |---|---| or | :--- | :---: |
+        stripped = line.replace("|", "").replace("-", "").replace(":", "").replace(" ", "")
+        if not stripped:
+            continue
+        cells = [c.strip() for c in line.strip("|").split("|")]
+        row_text = " ".join(c for c in cells if c)
+        if row_text:
+            rows.append(row_text)
+    return "\n".join(rows)
+
+
 def _build_full_text_for_scoring(gt_page: dict) -> str:
     """
     Build full text for scoring that includes BOTH prose text AND table cell content.
@@ -171,6 +197,8 @@ def _filter_content(text: str) -> str:
     text = _DIV_IMG_RE.sub("", text)
     text = _MD_IMAGE_RE.sub("", text)   # remove ![alt](url) + any following caption paragraph
     text = _FENCED_CODE_RE.sub("", text)  # remove ```graph TD```, ```python```, etc.
+    # Flatten markdown pipe tables → plain cell text (must run BEFORE HTML table handler)
+    text = _MD_TABLE_RE.sub(lambda m: "\n" + _flatten_md_table_text(m.group(0)) + "\n", text)
     # Replace HTML tables with their flattened text content
     text = _TABLE_RE.sub(lambda m: "\n" + _flatten_html_table_text(m.group(0)) + "\n", text)
     if _NORMALIZE_AVAILABLE:

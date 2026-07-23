@@ -90,6 +90,48 @@ def _result_path(model: str, uc_type: str, lang: str, doc_id: str) -> Path:
     return RESULT_ROOT / model / uc_type / lang / f"{doc_id}_eval.json"
 
 
+def _build_gt_full_text(gt_page: dict) -> str:
+    """
+    Build GT text for CER/WER scoring: includes full_text + all table cell text.
+    Table cells are flattened so text metrics cover ALL readable content on the page,
+    not just the prose text in full_text (which is often minimal for table-heavy docs).
+    """
+    import re as _re
+    parts = [gt_page.get("full_text") or ""]
+    for tbl in (gt_page.get("tables") or []):
+        cells = tbl.get("cells") or []
+        if cells:
+            cell_text = " ".join(c.get("text", "") for c in cells if c.get("text", "").strip())
+        else:
+            # Fallback: flatten HTML
+            html = tbl.get("html") or ""
+            found = _re.findall(r'<t[dh][^>]*>(.*?)</t[dh]>', html, _re.IGNORECASE | _re.DOTALL)
+            cell_text = " ".join(_re.sub(r'<[^>]+>', ' ', c).strip() for c in found if c.strip())
+        if cell_text:
+            parts.append(cell_text)
+    return "\n".join(p for p in parts if p)
+
+
+def _build_pred_full_text(pred_page: dict) -> str:
+    """
+    Build pred text for CER/WER scoring: full_text + all table cell text (from HTML tables).
+    Mirrors _build_gt_full_text so both sides include equivalent content.
+    """
+    import re as _re
+    parts = [pred_page.get("full_text") or ""]
+    for tbl in (pred_page.get("tables") or []):
+        cells = tbl.get("cells") or []
+        if cells:
+            cell_text = " ".join(c.get("text", "") for c in cells if c.get("text", "").strip())
+        else:
+            html = tbl.get("html") or ""
+            found = _re.findall(r'<t[dh][^>]*>(.*?)</t[dh]>', html, _re.IGNORECASE | _re.DOTALL)
+            cell_text = " ".join(_re.sub(r'<[^>]+>', ' ', c).strip() for c in found if c.strip())
+        if cell_text:
+            parts.append(cell_text)
+    return "\n".join(p for p in parts if p)
+
+
 def _safe_mean(vals):
     return round(sum(vals) / len(vals), 6) if vals else 0.0
 
@@ -356,6 +398,15 @@ def run_eval(req: EvalRequest):
         with open(text_pred_file, encoding="utf-8") as f:
             pred_data = json.load(f)
 
+        # Also load table prediction so pred_page has tables for CER/WER scoring
+        # (text and table predictions are saved as separate files)
+        table_pred_file = RAW_ROOT / req.uc_type / req.lang / model_subdir / f"{req.doc_id}_table_prediction.json"
+        table_pred_pages: dict[int, dict] = {}
+        if table_pred_file.exists():
+            with open(table_pred_file, encoding="utf-8") as f:
+                table_pred_data = json.load(f)
+            table_pred_pages = {p["page_num"]: p for p in table_pred_data.get("pages", [])}
+
         pred_pages = {p["page_num"]: p for p in pred_data.get("pages", [])}
         page_results = []
 
@@ -364,8 +415,18 @@ def run_eval(req: EvalRequest):
             pred_page = pred_pages.get(pnum, {})
             pred_text = pred_page.get("full_text", "")
 
+            # Merge table cells from table_prediction into pred_page so
+            # _build_pred_full_text includes table content (same as GT side)
+            if pnum in table_pred_pages and not pred_page.get("tables"):
+                pred_page = {**pred_page, "tables": table_pred_pages[pnum].get("tables", [])}
+
+            # Build full text for scoring: GT and pred both include table cell content
+            # so CER/WER measures all readable content, not just prose full_text
+            gt_page_for_scoring   = {**gt_page,  "full_text": _build_gt_full_text(gt_page)}
+            pred_page_for_scoring = {**pred_page, "full_text": _build_pred_full_text(pred_page)}
+
             # Use UET metrics for full metric set
-            r = compute_all_metrics(gt_page, pred_page)
+            r = compute_all_metrics(gt_page_for_scoring, pred_page_for_scoring)
             r["doc_id"] = req.doc_id
             r["page_num"] = pnum
 
