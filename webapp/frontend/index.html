@@ -3293,12 +3293,53 @@ const _patchedRenderReview = async function() {
   if (f.pdf_url) {
     pdfPromise = _renderAllPagesPng(f);
   } else if (f.image_url) {
-    // Source is a single image — display directly in the pdf-frame
+    // Source is a single image — display with bbox overlay support
     const frame = document.getElementById('pdf-frame');
     if (frame) {
-      frame.innerHTML = `<div style="overflow:auto;height:100%;padding:8px;background:var(--bg)">
-        <img src="${f.image_url}" style="max-width:100%;border-radius:6px;box-shadow:0 2px 12px rgba(0,0,0,.5)" alt="${f.doc_id}">
-      </div>`;
+      frame.innerHTML = `
+        <div id="img-preview-wrap" style="overflow:auto;height:100%;padding:8px;background:var(--bg)">
+          <div style="position:relative;display:inline-block">
+            <img id="img-preview-src" src="${f.image_url}"
+                 style="max-width:100%;border-radius:6px;box-shadow:0 2px 12px rgba(0,0,0,.5);display:block"
+                 alt="${f.doc_id}">
+            <svg id="img-bbox-overlay" style="position:absolute;top:0;left:0;width:100%;height:100%;pointer-events:none"></svg>
+          </div>
+        </div>`;
+      // Load bboxes after image loads
+      const img = frame.querySelector('#img-preview-src');
+      const drawBboxes = async (modelId) => {
+        const svg = document.getElementById('img-bbox-overlay');
+        if (!svg) return;
+        svg.innerHTML = '';
+        try {
+          const r = await fetch(`/api/gt/bboxes?doc_id=${f.doc_id}&uc_type=${f.uc_type}&lang=${f.lang}&model=${modelId}`);
+          const data = await r.json();
+          const blocks = (data.pages || {})['1'] || [];
+          const W = img.naturalWidth || img.clientWidth;
+          const H = img.naturalHeight || img.clientHeight;
+          const dispW = img.clientWidth;
+          const dispH = img.clientHeight;
+          for (const b of blocks) {
+            const [x1n, y1n, x2n, y2n] = b.bbox;
+            const x = x1n * dispW, y = y1n * dispH;
+            const w = (x2n - x1n) * dispW, h = (y2n - y1n) * dispH;
+            const rect = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
+            rect.setAttribute('x', x); rect.setAttribute('y', y);
+            rect.setAttribute('width', w); rect.setAttribute('height', h);
+            rect.setAttribute('fill', 'transparent');
+            rect.setAttribute('stroke', b.type === 'Table' ? '#22c55e' : '#7c83ff');
+            rect.setAttribute('stroke-width', '1.5');
+            rect.setAttribute('rx', '3');
+            rect.style.cursor = 'pointer';
+            rect.title = b.text || b.type;
+            svg.appendChild(rect);
+          }
+        } catch(e) {}
+      };
+      if (img.complete) drawBboxes(S.model || 'marker');
+      else img.onload = () => drawBboxes(S.model || 'marker');
+      // Expose for model switching
+      window._drawImgBboxes = drawBboxes;
     }
     pdfPromise = Promise.resolve();
   } else {
