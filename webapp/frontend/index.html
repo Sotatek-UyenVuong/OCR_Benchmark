@@ -4011,7 +4011,12 @@ function _renderLeaderboard(ranked, progress) {
         <td style="font-weight:${best?700:400};color:${best?'var(--green)':'var(--text)'}">
           ${esc(r.model)}${!r.is_complete ? ' <span style="font-size:10px;color:var(--orange)">(đang chạy)</span>' : ''}
         </td>
-        <td style="text-align:right;color:${r.is_complete?'var(--muted)':'var(--orange)'};font-size:12px">${r.docs}/${TOTAL}</td>
+        <td style="text-align:right;font-size:12px">
+          <div style="color:${r.is_complete?'var(--green)':'var(--orange)'}">${r.docs}/${TOTAL}</div>
+          <div style="height:3px;background:var(--border);border-radius:2px;margin-top:3px;width:60px;margin-left:auto">
+            <div style="height:100%;width:${Math.min(100,Math.round(r.docs/TOTAL*100))}%;background:${r.is_complete?'var(--green)':'var(--orange)'};border-radius:2px"></div>
+          </div>
+        </td>
         <td style="text-align:right;font-weight:${best?700:400};color:${best?'var(--green)':''}">
           ${pct(r.avg_char_f1)}${!r.is_complete?'<span style="color:var(--muted);font-size:10px"> *</span>':''}
         </td>
