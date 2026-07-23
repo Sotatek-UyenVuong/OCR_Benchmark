@@ -3289,7 +3289,21 @@ const _patchedRenderReview = async function() {
   if(!f) return;
 
   // ── Render PDF as server-side PNG images (reliable, no codec issues) ──
-  const pdfPromise = f.pdf_url ? _renderAllPagesPng(f) : Promise.resolve();
+  let pdfPromise;
+  if (f.pdf_url) {
+    pdfPromise = _renderAllPagesPng(f);
+  } else if (f.image_url) {
+    // Source is a single image — display directly in the pdf-frame
+    const frame = document.getElementById('pdf-frame');
+    if (frame) {
+      frame.innerHTML = `<div style="overflow:auto;height:100%;padding:8px;background:var(--bg)">
+        <img src="${f.image_url}" style="max-width:100%;border-radius:6px;box-shadow:0 2px 12px rgba(0,0,0,.5)" alt="${f.doc_id}">
+      </div>`;
+    }
+    pdfPromise = Promise.resolve();
+  } else {
+    pdfPromise = Promise.resolve();
+  }
 
   // ── Determine source model for draft ─────────────────────────
   // Use f.gt_saved from file list (already fetched) — no extra round trip
