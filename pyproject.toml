@@ -19,6 +19,8 @@ dependencies = [
     "markdown-it-py>=4.2.0",
     "apted>=1.0.3",
     "scipy>=1.15.3",
+    "httpx>=0.28.1",
+    "pillow>=11.0.0",
 ]
 
 [project.scripts]

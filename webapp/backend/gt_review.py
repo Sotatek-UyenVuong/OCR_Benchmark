@@ -447,6 +447,120 @@ def get_full_response(
         return json.load(f)
 
 
+def _get_image_exif_orientation(img_path: Path) -> int:
+    """Return EXIF orientation tag value (1-8), or 1 if absent/unreadable.
+
+    Uses a pure-stdlib JPEG EXIF parser so it works even without Pillow.
+    Falls back to Pillow if available (for other formats like TIFF/WEBP).
+    """
+    try:
+        # --- Fast path: try Pillow first (supports all formats) ---
+        from PIL import Image as _PILImage
+        with _PILImage.open(img_path) as im:
+            exif = im.getexif()
+            if exif:
+                return exif.get(274, 1)
+    except Exception:
+        pass
+
+    # --- Fallback: pure-stdlib JPEG EXIF reader ---
+    try:
+        with open(img_path, "rb") as fh:
+            return _read_jpeg_exif_orientation(fh)
+    except Exception:
+        pass
+
+    return 1
+
+
+def _read_jpeg_exif_orientation(fh) -> int:
+    """Minimal JPEG/EXIF parser — reads Orientation tag (0x0112) without Pillow."""
+    import struct
+
+    sig = fh.read(2)
+    if sig != b"\xff\xd8":          # Not JPEG
+        return 1
+
+    while True:
+        marker = fh.read(2)
+        if len(marker) < 2:
+            break
+        if marker[0] != 0xff:
+            break
+
+        # APP1 marker = 0xff 0xe1
+        if marker == b"\xff\xe1":
+            seg_len = struct.unpack(">H", fh.read(2))[0]
+            app1_data = fh.read(seg_len - 2)
+
+            # Check Exif header
+            if app1_data[:6] != b"Exif\x00\x00":
+                continue
+
+            tiff = app1_data[6:]
+            byte_order = tiff[:2]
+            if byte_order == b"II":
+                endian = "<"
+            elif byte_order == b"MM":
+                endian = ">"
+            else:
+                break
+
+            # IFD0 offset
+            ifd_offset = struct.unpack(endian + "I", tiff[4:8])[0]
+            num_entries = struct.unpack(endian + "H",
+                                        tiff[ifd_offset: ifd_offset + 2])[0]
+            for i in range(num_entries):
+                entry_offset = ifd_offset + 2 + i * 12
+                tag = struct.unpack(endian + "H", tiff[entry_offset: entry_offset + 2])[0]
+                if tag == 0x0112:  # Orientation
+                    value = struct.unpack(endian + "H",
+                                          tiff[entry_offset + 8: entry_offset + 10])[0]
+                    return value
+            return 1
+        else:
+            # Skip segment
+            seg_len_bytes = fh.read(2)
+            if len(seg_len_bytes) < 2:
+                break
+            seg_len = struct.unpack(">H", seg_len_bytes)[0]
+            fh.seek(seg_len - 2, 1)
+
+    return 1
+
+
+def _rotate_bbox_norm(bbox: list[float], orientation: int) -> list[float]:
+    """
+    Transform a normalized bbox [x1,y1,x2,y2] from Marker/OCR coordinate space
+    to browser-display coordinate space, compensating for EXIF orientation.
+
+    Marker processes the raw pixel data (ignoring EXIF), so its coords are in
+    the raw-image coordinate system.  The browser (and img.clientWidth/Height)
+    uses the EXIF-corrected display orientation.
+
+    EXIF orientation values that involve rotation:
+      6 = 90° CW  (most common "portrait photo taken landscape")
+      8 = 90° CCW
+      3 = 180°
+
+    For EXIF 6 (90° CW): rotate raw landscape → display portrait
+      raw point (rx_norm, ry_norm) → display (1-ry_norm, rx_norm)
+      bbox [x1,y1,x2,y2] → [1-y2, x1, 1-y1, x2]
+    """
+    x1, y1, x2, y2 = bbox
+    if orientation == 6:
+        # 90° CW: new_x = 1-y_old, new_y = x_old
+        return [1 - y2, x1, 1 - y1, x2]
+    elif orientation == 8:
+        # 90° CCW: new_x = y_old, new_y = 1-x_old
+        return [y1, 1 - x2, y2, 1 - x1]
+    elif orientation == 3:
+        # 180°
+        return [1 - x2, 1 - y2, 1 - x1, 1 - y1]
+    # 1, 2, 4, 5, 7 — no rotation needed (or flip only)
+    return bbox
+
+
 @router.get("/bboxes")
 def get_bboxes(
     doc_id:  str = Query(...),
@@ -464,6 +578,16 @@ def get_bboxes(
         full = json.load(f)
 
     import re as _re
+
+    # Detect EXIF orientation for image-based docs (PNG/JPG, no PDF)
+    # Only needed when the source is a raw image (not a PDF rendered to image)
+    _IMG_EXTS = {".png", ".jpg", ".jpeg", ".webp"}
+    exif_orientation = 1
+    for ext in _IMG_EXTS:
+        img_path = RAW_ROOT / uc_type / lang / f"{doc_id}{ext}"
+        if img_path.exists():
+            exif_orientation = _get_image_exif_orientation(img_path)
+            break
 
     # ── Mistral format ────────────────────────────────────────────────────────
     if model == "mistral":
@@ -487,6 +611,7 @@ def get_bboxes(
                     round(x1 / pw, 4), round(y1 / ph, 4),
                     round(x2 / pw, 4), round(y2 / ph, 4),
                 ]
+                bbox_norm = _rotate_bbox_norm(bbox_norm, exif_orientation)
                 content = blk.get("content", "")
                 # Strip HTML tags for text preview
                 text = _re.sub(r"<[^>]+>", " ", content)
@@ -526,6 +651,9 @@ def get_bboxes(
                 round(bbox_abs[2] / pw, 4),
                 round(bbox_abs[3] / ph, 4),
             ]
+            # Compensate for EXIF orientation: Marker ignores EXIF, browser applies it
+            bbox_norm = _rotate_bbox_norm(bbox_norm, exif_orientation)
+
             html = blk.get("html", "")
             text = _re.sub(r"<img\b[^>]*>", "", html, flags=_re.I)
             text = _re.sub(r"<[^>]+>", " ", text)
